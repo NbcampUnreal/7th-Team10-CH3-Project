@@ -13,15 +13,18 @@ class BASICTPS_API UStatComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this component's properties
 	UStatComponent();
 
 protected:
-	// Called when the game starts
 	virtual void BeginPlay() override;
 
 public:
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
-	                           FActorComponentTickFunction* ThisTickFunction) override;
+	void OnTakeDamage(float DamageAmount);
+	
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat")
+	float MaxHP = 100.f;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stat")
+	float CurrentHP;
 };

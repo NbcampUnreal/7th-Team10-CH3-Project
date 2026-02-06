@@ -4,32 +4,22 @@
 #include "Components/StatComponent.h"
 
 
-// Sets default values for this component's properties
 UStatComponent::UStatComponent()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = true;
-
-	// ...
+	PrimaryComponentTick.bCanEverTick = false;
+	bWantsInitializeComponent = true;
 }
 
 
-// Called when the game starts
 void UStatComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
-	// ...
 	
+	CurrentHP = MaxHP;
 }
 
-
-// Called every frame
-void UStatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+void UStatComponent::OnTakeDamage(float DamageAmount)
 {
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	// ...
+	CurrentHP = FMath::Clamp(CurrentHP - DamageAmount, 0.0f, MaxHP);
+	UE_LOG(LogTemp, Log, TEXT("Loss HP! : %f / %f"), CurrentHP, MaxHP);
 }
-
