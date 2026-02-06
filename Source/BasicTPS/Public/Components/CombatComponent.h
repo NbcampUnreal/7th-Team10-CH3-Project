@@ -6,7 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "CombatComponent.generated.h"
 
-class UStatComponent;
+//class UStatComponent;
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class BASICTPS_API UCombatComponent : public UActorComponent
@@ -17,13 +17,14 @@ public:
 	UCombatComponent();
 	
 protected:
-	virtual void BeginPlay() override;
+	//virtual void BeginPlay() override;
 	
 public:
 	void ExecuteAttack(AActor* TargetActor, float DamageAmount, FHitResult HitInfo);
-	void OnTakeDamage(float IncomingDamage);
+//	void OnTakeDamage(float IncomingDamage);
 	
-private:
-	UPROPERTY()
-	TObjectPtr<UStatComponent> StatComp;
+//private:
+//	UPROPERTY()
+//	TObjectPtr<UStatComponent> StatComp;
+//
 };

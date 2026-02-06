@@ -2,7 +2,7 @@
 
 
 #include "BasicTPS/Public/Components/CombatComponent.h"
-#include "BasicTPS/Public/Components/StatComponent.h"
+//#include "BasicTPS/Public/Components/StatComponent.h"
 #include "Kismet/GameplayStatics.h"
 
 UCombatComponent::UCombatComponent()
@@ -10,14 +10,14 @@ UCombatComponent::UCombatComponent()
 	PrimaryComponentTick.bCanEverTick = false; 
 }
 
- void UCombatComponent::OnTakeDamage(float IncomingDamage)
- {
- 	if (StatComp)
- 	{
- 		StatComp->OnTakeDamage(IncomingDamage);
- 		UE_LOG(LogTemp, Log, TEXT("Take Damage!: %f"), IncomingDamage);
- 	}
- }
+ // void UCombatComponent::OnTakeDamage(float IncomingDamage)
+ // {
+ // 	if (StatComp)
+ // 	{
+ // 		StatComp->OnTakeDamage(IncomingDamage);
+ // 		UE_LOG(LogTemp, Log, TEXT("Take Damage!: %f"), IncomingDamage);
+ // 	}
+ // }
 
 void UCombatComponent::ExecuteAttack(AActor* TargetActor, float DamageAmount, FHitResult HitInfo)
 {
