@@ -1,0 +1,92 @@
+﻿#pragma once
+
+#include "CoreMinimal.h"
+#include "Components/ActorComponent.h"
+#include "Engine/EngineTypes.h" //ECollisionChannel 콜리전 사용하는 헤더
+#include "ShootingMachineComponent.generated.h"
+
+class UInputAction;
+struct FInputActionValue;
+
+UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+class BASICTPS_API UShootingMachineComponent : public UActorComponent
+{
+	GENERATED_BODY()
+
+public:	
+	// Sets default values for this component's properties
+	UShootingMachineComponent();
+
+protected:
+	// Called when the game starts
+	virtual void BeginPlay() override;
+
+	UPROPERTY(EditAnywhere, Category = "Input")
+	UInputAction* AimAction;
+	UPROPERTY(EditAnywhere, Category = "Input")
+	UInputAction* FireAction;
+	UPROPERTY(EditAnywhere, Category = "Input")
+	UInputAction* InteractAction;
+
+	UPROPERTY(EditAnywhere, Category = "Montage")
+	UAnimMontage* AimMontage;
+	UPROPERTY(EditAnywhere, Category = "Montage")
+	UAnimMontage* FireMontage;
+	UPROPERTY(EditAnywhere, Category = "Montage")
+	UAnimMontage* InteractMontage;
+
+	UPROPERTY(VisibleInstanceOnly, Category = "Aim")
+	bool bIsAiming = false;
+
+	UPROPERTY(EditAnywhere, Category = "Weapon")
+	float FireRange = 10000.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Weapon")
+	TEnumAsByte<ECollisionChannel> WeaponTraceChannel = ECC_Visibility;
+
+	UPROPERTY(EditAnywhere, Category = "Weapon")
+	FName RightHandSocketName = TEXT("hand_r");
+	UPROPERTY(EditAnywhere, Category = "Interact")
+	FName LeftHandSocketName = TEXT("hand_l");
+
+	UPROPERTY(EditAnywhere, Category = "Weapon")
+	bool bDrawFireDebug = true;
+	UPROPERTY(EditAnywhere, Category = "Interact")
+	float FireDebugDuration = 1.0f;
+	UPROPERTY(EditAnywhere, Category = "Interact")
+	float InteractRange = 5.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Interact")
+	TEnumAsByte<ECollisionChannel> InteractTraceChannel = ECC_Visibility;
+
+	UPROPERTY(EditAnywhere, Category = "Interact")
+	float InteractSphereRadius = 25.0f;
+	UPROPERTY(EditAnywhere, Category = "Interact")
+	float InteractDebug = true;
+	UPROPERTY(EditAnywhere, Category = "Interact")
+	float InteractDebugDuration = 1.0f;
+
+	void AimStarted(const FInputActionValue& Value);
+	void AimCompleted(const FInputActionValue& Value);
+	void Fire(const FInputActionValue& Value);
+	void Interact(const FInputActionValue& Value);
+public:	
+	// Called every frame
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+	UFUNCTION(BlueprintCallable, Category = "Input")
+	virtual void DoAimStart();
+
+	UFUNCTION(BlueprintCallable, Category = "Input")
+	virtual void DoAimEnd();
+
+	UFUNCTION(BlueprintCallable, Category = "Input")
+	virtual void DoFire();
+
+	UFUNCTION(BlueprintCallable, Category = "Input")
+	virtual void DoInteract();
+
+private:
+	UPROPERTY()
+	ACharacter* PlayerCharacter;
+};
