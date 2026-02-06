@@ -1,20 +1,20 @@
-#include "BaseCharacter.h"
+#include "02_Characters/BTPS_BaseCharacter.h"
 
-ABaseCharacter::ABaseCharacter()
+ABTPS_BaseCharacter::ABTPS_BaseCharacter()
 	: MaxHp(100),
 	  CurrentHp(MaxHp),
-	  Attack(10),
-	  Defense(10),
+	  AttackPower(10),
+	  DefensePower(10),
 	  bIsDead(false)
 {
 	PrimaryActorTick.bCanEverTick = false;
 }
 
-void ABaseCharacter::Attack()
+void ABTPS_BaseCharacter::Attack()
 {
 }
 
-float ABaseCharacter::TakeDamage(
+float ABTPS_BaseCharacter::TakeDamage(
 	float DamageAmount,
 	FDamageEvent const& DamageEvent, 
 	AController* EventInstigator,
@@ -23,28 +23,29 @@ float ABaseCharacter::TakeDamage(
 	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 }
 
-float ABaseCharacter::ApplyDamage(float Damage)
-{
-}
+// float ABTPS_BaseCharacter::ApplyDamage(float Damage)
+// {
+//
+// }
 
-void ABaseCharacter::OnDeath()
-{
-}
+// void ABTPS_BaseCharacter::OnDeath()
+// {
+// }
 
-void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+void ABTPS_BaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 }
 
-void ABaseCharacter::SetCurrentHp(float Amount)
+void ABTPS_BaseCharacter::SetCurrentHp(float Amount)
 {
 	if ((CurrentHp += Amount) > MaxHp)
 	{
 		return;
 	} else if (CurrentHp > 0)
 	{
-		CurrentHp += HealAmount;
+		CurrentHp += Amount;
 		if (CurrentHp <= 0)
 		{
 			bIsDead = true;

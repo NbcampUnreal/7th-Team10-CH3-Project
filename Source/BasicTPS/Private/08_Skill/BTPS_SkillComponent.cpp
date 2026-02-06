@@ -1,12 +1,12 @@
-#include "Skill/SkillComponent.h"
+#include "08_Skill/BTPS_SkillComponent.h"
 
 
-USkillComponent::USkillComponent()
+UBTPS_SkillComponent::UBTPS_SkillComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
 }
 
-void USkillComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+void UBTPS_SkillComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
@@ -22,12 +22,12 @@ void USkillComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 	}
 }
 
-bool USkillComponent::CanActivate() const
+bool UBTPS_SkillComponent::CanActivate() const
 {
 	return bCanActivate;
 }
 
-void USkillComponent::TryActivate()
+void UBTPS_SkillComponent::TryActivate()
 {
 	if (!CanActivate()) return;
 
@@ -39,4 +39,4 @@ void USkillComponent::TryActivate()
 	SkillActivation();
 }
 
-void USkillComponent::SkillActivation() {}
+void UBTPS_SkillComponent::SkillActivation() {}

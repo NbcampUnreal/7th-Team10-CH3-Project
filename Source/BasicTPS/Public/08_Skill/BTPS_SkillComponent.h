@@ -2,16 +2,16 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "SkillComponent.generated.h"
+#include "BTPS_SkillComponent.generated.h"
 
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class BASICTPS_API USkillComponent : public UActorComponent
+class BASICTPS_API UBTPS_SkillComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
 public:	
-	USkillComponent();
+	UBTPS_SkillComponent();
 
 	bool CanActivate() const;
 

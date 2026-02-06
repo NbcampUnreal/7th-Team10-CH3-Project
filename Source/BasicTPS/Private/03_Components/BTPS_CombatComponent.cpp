@@ -1,16 +1,16 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "BasicTPS/Public/Components/CombatComponent.h"
+#include "BasicTPS/Public/03_Components/BTPS_CombatComponent.h"
 //#include "BasicTPS/Public/Components/StatComponent.h"
 #include "Kismet/GameplayStatics.h"
 
-UCombatComponent::UCombatComponent()
+UBTPS_CombatComponent::UBTPS_CombatComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false; 
 }
 
- // void UCombatComponent::OnTakeDamage(float IncomingDamage)
+ // void UBTPS_CombatComponent::OnTakeDamage(float IncomingDamage)
  // {
  // 	if (StatComp)
  // 	{
@@ -19,7 +19,7 @@ UCombatComponent::UCombatComponent()
  // 	}
  // }
 
-void UCombatComponent::ExecuteAttack(AActor* TargetActor, float DamageAmount, FHitResult HitInfo)
+void UBTPS_CombatComponent::ExecuteAttack(AActor* TargetActor, float DamageAmount, FHitResult HitInfo)
 {
 	if (!TargetActor) return;
 	

@@ -4,17 +4,17 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "CombatComponent.generated.h"
+#include "BTPS_CombatComponent.generated.h"
 
 //class UStatComponent;
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
-class BASICTPS_API UCombatComponent : public UActorComponent
+class BASICTPS_API UBTPS_CombatComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
 public:
-	UCombatComponent();
+	UBTPS_CombatComponent();
 	
 protected:
 	//virtual void BeginPlay() override;

@@ -1,4 +1,4 @@
-﻿#include "Components/ShootingMachineComponent.h"
+﻿#include "03_Components/BTPS_ShootingMachineComponent.h"
 #include "EnhancedInputComponent.h"
 #include "CollisionShape.h"
 #include "DrawDebugHelpers.h"
@@ -11,13 +11,13 @@
 // #include "CollisionAndTrace5_6Character.h" 팀플 camera component구현한 헤더 포함해야함, camera component는 public으로 해야함.
 
 
-UShootingMachineComponent::UShootingMachineComponent()
+UBTPS_ShootingMachineComponent::UBTPS_ShootingMachineComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
 
 }
 
-void UShootingMachineComponent::BeginPlay()
+void UBTPS_ShootingMachineComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
@@ -25,53 +25,53 @@ void UShootingMachineComponent::BeginPlay()
 }
 
 
-void UShootingMachineComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+void UBTPS_ShootingMachineComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 }
 
 /* action binding할때 여기 헤더 참조해서 같이 바인딩.
-void UShootingMachineComponent::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+void UBTPS_ShootingMachineComponent::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent)) {
 
 		if (AimAction)
 		{
-			EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Started, this, &UShootingMachineComponent::AimStarted);
-			EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Completed, this, &UShootingMachineComponent::AimCompleted);
+			EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Started, this, &UBTPS_ShootingMachineComponent::AimStarted);
+			EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Completed, this, &UBTPS_ShootingMachineComponent::AimCompleted);
 		}
 
 		if (FireAction)
 		{
-			EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Started, this, &UShootingMachineComponent::Fire);
+			EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Started, this, &UBTPS_ShootingMachineComponent::Fire);
 		}
 
 		if (InteractAction)
 		{
-			EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &UShootingMachineComponent::Interact);
+			EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &UBTPS_ShootingMachineComponent::Interact);
 		}
 	}
 }
 */
 
 
-void UShootingMachineComponent::AimStarted(const FInputActionValue& Value)
+void UBTPS_ShootingMachineComponent::AimStarted(const FInputActionValue& Value)
 {
 	DoAimStart();
 }
 
-void UShootingMachineComponent::AimCompleted(const FInputActionValue& Value)
+void UBTPS_ShootingMachineComponent::AimCompleted(const FInputActionValue& Value)
 {
 	DoAimEnd();
 }
 
-void UShootingMachineComponent::Fire(const FInputActionValue& Value)
+void UBTPS_ShootingMachineComponent::Fire(const FInputActionValue& Value)
 {
 	DoFire();
 }
 
-void UShootingMachineComponent::Interact(const FInputActionValue& Value)
+void UBTPS_ShootingMachineComponent::Interact(const FInputActionValue& Value)
 {
 	DoInteract();
 }
@@ -79,7 +79,7 @@ void UShootingMachineComponent::Interact(const FInputActionValue& Value)
 
 //move에 추가 	if (bIsAiming) return;
 
-void UShootingMachineComponent::DoAimStart()
+void UBTPS_ShootingMachineComponent::DoAimStart()
 {
 	bIsAiming = true;
 
@@ -89,7 +89,7 @@ void UShootingMachineComponent::DoAimStart()
 	}
 }
 
-void UShootingMachineComponent::DoAimEnd()
+void UBTPS_ShootingMachineComponent::DoAimEnd()
 {
 	bIsAiming = false;
 
@@ -99,11 +99,11 @@ void UShootingMachineComponent::DoAimEnd()
 	}
 }
 
-void UShootingMachineComponent::DoFire() {}
-void UShootingMachineComponent::DoInteract() {}
+void UBTPS_ShootingMachineComponent::DoFire() {}
+void UBTPS_ShootingMachineComponent::DoInteract() {}
 
 /* camera component확인 후 연결해야함.
-void UShootingMachineComponent::DoFire()
+void UBTPS_ShootingMachineComponent::DoFire()
 {
 	if (PlayerCharacter && FireMontage)
 	{
@@ -184,7 +184,7 @@ void UShootingMachineComponent::DoFire()
 	}
 }
 
-void UShootingMachineComponent::DoInteract()
+void UBTPS_ShootingMachineComponent::DoInteract()
 {
 	if (PlayerCharacter && InteractMontage)
 	{

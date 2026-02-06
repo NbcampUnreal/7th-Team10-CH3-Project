@@ -1,16 +1,16 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "BaseCharacter.h"
-#include "Enemy.generated.h"
+#include "BTPS_BaseCharacter.h"
+#include "BTPS_EnemyCharacter.generated.h"
 
 UCLASS()
-class BASICTPS_API AEnemy : public ABaseCharacter
+class BASICTPS_API ABTPS_EnemyCharacter : public ABTPS_BaseCharacter
 {
 	GENERATED_BODY()
 
 public:
-	AEnemy();
+	ABTPS_EnemyCharacter();
 
 protected:
 	virtual void BeginPlay() override;

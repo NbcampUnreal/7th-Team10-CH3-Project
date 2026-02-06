@@ -3,19 +3,19 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Engine/EngineTypes.h" //ECollisionChannel 콜리전 사용하는 헤더
-#include "ShootingMachineComponent.generated.h"
+#include "BTPS_ShootingMachineComponent.generated.h"
 
 class UInputAction;
 struct FInputActionValue;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class BASICTPS_API UShootingMachineComponent : public UActorComponent
+class BASICTPS_API UBTPS_ShootingMachineComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
 public:	
 	// Sets default values for this component's properties
-	UShootingMachineComponent();
+	UBTPS_ShootingMachineComponent();
 
 protected:
 	// Called when the game starts
