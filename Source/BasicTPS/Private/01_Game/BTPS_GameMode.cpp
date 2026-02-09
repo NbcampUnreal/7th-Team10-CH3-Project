@@ -1,4 +1,75 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
+#include "01_Game/BTPS_GameMode.h"
+//TODO: 게임스테이트, 게임인스턴스 구현
+//#include "01_Game/BTPS_GameState.h"
+//#include "01_Game/BTPS_GameInstance.h"
 
-#include "BasicTPS/Public/01_Game/BTPS_GameMode.h"
+#include "02_Characters/BTPS_PlayerCharacter.h"
+//TODO: 플레이어 컨트롤러 추가시 해제
+//#include "02_Characters/BTPS_PlayerController.h"
+
+
+ABTPS_GameMode::ABTPS_GameMode()
+{
+	//TODO: 플레이어 컨트롤러 추가시 해제
+	//PlayerControllerClass = ABTPS_PlayerController::StaticClass();
+	
+	DefaultPawnClass = ABTPS_PlayerCharacter::StaticClass();
+	
+	//TODO: 게임모드 스테이트 구현
+	//GameStateClass = ABTPS_GameState::StaticClass();
+}
+
+ABTPS_GameMode* ABTPS_GameMode::Get(const UObject* WorldContext)
+{
+	if (WorldContext == nullptr)
+	{
+		return nullptr;
+	}
+	
+	UWorld* World = WorldContext->GetWorld();
+	if (World == nullptr)
+	{
+		return nullptr;
+	}
+	
+	return World->GetAuthGameMode<ABTPS_GameMode>();
+}
+
+
+void ABTPS_GameMode::BeginPlay()
+{
+	Super::BeginPlay();
+}
+
+void ABTPS_GameMode::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+}
+
+void ABTPS_GameMode::StartLevel()
+{
+}
+
+void ABTPS_GameMode::EndLevel(bool bWin)
+{
+}
+
+void ABTPS_GameMode::GameOver()
+{
+}
+
+void ABTPS_GameMode::KilledMonsterCount()
+{
+}
+
+void ABTPS_GameMode::SpawnMonstersForWave()
+{
+}
+
+void ABTPS_GameMode::OnLevelTimeUp()
+{
+}
+
+
