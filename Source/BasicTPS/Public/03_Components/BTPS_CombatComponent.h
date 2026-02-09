@@ -6,7 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "BTPS_CombatComponent.generated.h"
 
-//class UStatComponent;
+class UBTPS_StatComponent;
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class BASICTPS_API UBTPS_CombatComponent : public UActorComponent
@@ -17,14 +17,13 @@ public:
 	UBTPS_CombatComponent();
 	
 protected:
-	//virtual void BeginPlay() override;
+	virtual void BeginPlay() override;
 	
 public:
-	void ExecuteAttack(AActor* TargetActor, float DamageAmount, FHitResult HitInfo);
-//	void OnTakeDamage(float IncomingDamage);
+	void ExecuteAttack(AActor* TargetActor, float DamageAmount, FHitResult& HitInfo);
+	void OnTakeDamage(float IncomingDamage);
 	
-//private:
-//	UPROPERTY()
-//	TObjectPtr<UStatComponent> StatComp;
-//
+private:
+	UPROPERTY()
+	TObjectPtr<UBTPS_StatComponent> StatComp;
 };
