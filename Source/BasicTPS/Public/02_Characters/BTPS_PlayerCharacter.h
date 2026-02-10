@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "CoreMinimal.h"
 #include "BTPS_BaseCharacter.h"
@@ -7,6 +7,7 @@
 #include "BTPS_PlayerCharacter.generated.h"
 
 struct FInputActionValue;
+class UBTPS_ShootingMachineComponent;
 
 UCLASS()
 class BASICTPS_API ABTPS_PlayerCharacter : public ABTPS_BaseCharacter
@@ -45,6 +46,9 @@ public:
 	TObjectPtr<USpringArmComponent> SpringArmComp;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
 	TObjectPtr<UCameraComponent> CameraComp;
+	//UBTPS_ShootingMachineComponent* ShootingMachineComp; TObjectPtr<>로 바꾸지 마세요
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	UBTPS_ShootingMachineComponent* ShootingMachineComp;
 	
 	// float HealHp(float HealAmount);
 	

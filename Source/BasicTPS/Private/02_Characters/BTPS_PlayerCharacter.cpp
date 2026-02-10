@@ -1,5 +1,6 @@
-#include "02_Characters/BTPS_PlayerCharacter.h"
+﻿#include "02_Characters/BTPS_PlayerCharacter.h"
 #include "02_Characters/BTPS_PlayerController.h"
+#include "03_Components/BTPS_ShootingMachineComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -19,6 +20,8 @@ ABTPS_PlayerCharacter::ABTPS_PlayerCharacter()
 	CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	CameraComp->SetupAttachment(SpringArmComp, USpringArmComponent::SocketName);
 	CameraComp->bUsePawnControlRotation = false;
+
+	ShootingMachineComp = CreateDefaultSubobject<UBTPS_ShootingMachineComponent>(TEXT("ShootingMachine"));
 
 	NormalSpeed = 800.f;
 	SprintSpeedMultiplier = 1.8f;
@@ -106,6 +109,54 @@ void ABTPS_PlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInp
 					&ABTPS_PlayerCharacter::StopSprint
 				);
 			}	
+
+			if (ShootingMachineComp)
+			{
+				if (PlayerController->AimAction)
+				{
+					//헤더파일 UBTPS_ShootingMachineComponent* ShootingMachineComp; TObjectPtr<>로 바꾸지 마세요
+					//BindAction parameter자체가 TObjectPtr<>를 못받아서 action binding이 안되요.
+					EnhancedInput->BindAction(
+						PlayerController->AimAction,
+						ETriggerEvent::Triggered,
+						ShootingMachineComp,
+						&UBTPS_ShootingMachineComponent::AimStarted
+					);
+					EnhancedInput->BindAction(
+						PlayerController->AimAction,
+						ETriggerEvent::Completed,
+						ShootingMachineComp,
+						&UBTPS_ShootingMachineComponent::AimCompleted
+					);
+				}
+				if (PlayerController->FireAction)
+				{
+					EnhancedInput->BindAction(
+						PlayerController->FireAction,
+						ETriggerEvent::Triggered,
+						ShootingMachineComp,
+						&UBTPS_ShootingMachineComponent::Fire
+					);
+				}
+				if (PlayerController->InteractAction)
+				{
+					EnhancedInput->BindAction(
+						PlayerController->InteractAction,
+						ETriggerEvent::Triggered,
+						ShootingMachineComp,
+						&UBTPS_ShootingMachineComponent::Interact
+					);
+				}
+				if (PlayerController->ToggleCameraAction)
+				{
+					EnhancedInput->BindAction(
+						PlayerController->ToggleCameraAction,
+						ETriggerEvent::Triggered,
+						ShootingMachineComp,
+						&UBTPS_ShootingMachineComponent::ToggleCamera
+					);
+				}
+			}
 		}
 	}
 }
