@@ -1,4 +1,5 @@
 #include "02_Characters/BTPS_PlayerCharacter.h"
+#include "02_Characters/BTPS_PlayerController.h"
 #include "Components/CapsuleComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -42,67 +43,70 @@ void ABTPS_PlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInp
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 	if (UEnhancedInputComponent* EnhancedInput = Cast<UEnhancedInputComponent>(PlayerInputComponent))
-	{	//컨트롤러가 구현되면 주석해제
-		/*if(BTPS_PlayerController->MoveAction)
+	{	
+		// IA를 가져오기 위해 소유중인 컨트롤러를 ABTPS_PlayerController로 캐스팅하는 과정 추가
+		if (ABTPS_PlayerController* PlayerController = Cast<ABTPS_PlayerController>(GetController()))
 		{
-			EnhancedInput->BindAction(
-				BTPS_PlayerController->MoveAction,
-				ETriggerEvent::Triggered,
-				this,
-				&ABTPS_PlayerCharacter::Move
-			);
+			if(PlayerController->MoveAction) // ABTPS_PlayerController를 PlayerController로 수정
+			{
+				EnhancedInput->BindAction(
+					PlayerController->MoveAction,
+					ETriggerEvent::Triggered,
+					this,
+					&ABTPS_PlayerCharacter::Move
+				);
+			}
+
+			if (PlayerController->LookAction)
+			{
+				EnhancedInput->BindAction(
+					PlayerController->LookAction,
+					ETriggerEvent::Triggered,
+					this,
+					&ABTPS_PlayerCharacter::Look
+				);
+			}
+
+			if (PlayerController->JumpAction)
+			{
+				EnhancedInput->BindAction(
+					PlayerController->JumpAction,
+					ETriggerEvent::Triggered,
+					this,
+					&ABTPS_PlayerCharacter::StartJump
+				);
+			}
+
+			if (PlayerController->JumpAction)
+			{
+				EnhancedInput->BindAction(
+					PlayerController->JumpAction,
+					ETriggerEvent::Completed,
+					this,
+					&ABTPS_PlayerCharacter::StopJump
+				);
+			}
+
+			if (PlayerController->SprintAction)
+			{
+				EnhancedInput->BindAction(
+					PlayerController->SprintAction,
+					ETriggerEvent::Triggered,
+					this,
+					&ABTPS_PlayerCharacter::StartSprint
+				);
+			}
+
+			if (PlayerController->SprintAction)
+			{
+				EnhancedInput->BindAction(
+					PlayerController->SprintAction,
+					ETriggerEvent::Completed,
+					this,
+					&ABTPS_PlayerCharacter::StopSprint
+				);
+			}	
 		}
-
-		if (BTPS_PlayerController->LookAction)
-		{
-			EnhancedInput->BindAction(
-				BTPS_PlayerController->LookAction,
-				ETriggerEvent::Triggered,
-				this,
-				&ABTPS_PlayerCharacter::Look
-			);
-		}
-
-		if (BTPS_PlayerController->JumpAction)
-		{
-			EnhancedInput->BindAction(
-				BTPS_PlayerController->JumpAction,
-				ETriggerEvent::Triggered,
-				this,
-				&ABTPS_PlayerCharacter::StartJump
-			);
-		}
-
-		if (BTPS_PlayerController->JumpAction)
-		{
-			EnhancedInput->BindAction(
-				BTPS_PlayerController->JumpAction,
-				ETriggerEvent::Completed,
-				this,
-				&ABTPS_PlayerCharacter::StopJump
-			);
-		}
-
-		if (BTPS_PlayerController->SprintAction)
-		{
-			EnhancedInput->BindAction(
-				BTPS_PlayerController->SprintAction,
-				ETriggerEvent::Triggered,
-				this,
-				&ABTPS_PlayerCharacter::StartSprint
-			);
-		}
-
-		if (BTPS_PlayerController->SprintAction)
-		{
-			EnhancedInput->BindAction(
-				BTPS_PlayerController->SprintAction,
-				ETriggerEvent::Completed,
-				this,
-				&ABTPS_PlayerCharacter::StopSprint
-			);
-		}*/
-
 	}
 }
 

@@ -4,6 +4,9 @@
 #include "GameFramework/PlayerController.h"
 #include "BTPS_PlayerController.generated.h"
 
+class UInputMappingContext;
+class UInputAction;
+
 UCLASS()
 class BASICTPS_API ABTPS_PlayerController : public APlayerController
 {
@@ -24,4 +27,5 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Input")
 	TObjectPtr<UInputAction> SprintAction;
 
+	virtual void BeginPlay() override;
 };
