@@ -44,10 +44,10 @@ void ABTPS_PlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInp
 
 	if (UEnhancedInputComponent* EnhancedInput = Cast<UEnhancedInputComponent>(PlayerInputComponent))
 	{	
-		// IA를 가져오기 위해 소유중인 컨트롤러를 ABTPS_PlayerController로 캐스팅하는 과정 추가
+		
 		if (ABTPS_PlayerController* PlayerController = Cast<ABTPS_PlayerController>(GetController()))
 		{
-			if(PlayerController->MoveAction) // ABTPS_PlayerController를 PlayerController로 수정
+			if(PlayerController->MoveAction)
 			{
 				EnhancedInput->BindAction(
 					PlayerController->MoveAction,
