@@ -2,10 +2,11 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "Engine/EngineTypes.h" //ECollisionChannel 콜리전 사용하는 헤더
+#include "Engine/EngineTypes.h"
 #include "BTPS_ShootingMachineComponent.generated.h"
 
 class UInputAction;
+class ABTPS_WeaponBase;
 struct FInputActionValue;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -14,11 +15,9 @@ class BASICTPS_API UBTPS_ShootingMachineComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:	
-	// Sets default values for this component's properties
 	UBTPS_ShootingMachineComponent();
 
 protected:
-	// Called when the game starts
 	virtual void BeginPlay() override;
 
 	UPROPERTY(EditAnywhere, Category = "Input")
@@ -27,6 +26,9 @@ protected:
 	UInputAction* FireAction;
 	UPROPERTY(EditAnywhere, Category = "Input")
 	UInputAction* InteractAction;
+	//1인칭<->3인칭 시점변환
+	UPROPERTY(EditAnywhere, Category = "Input")
+	UInputAction* ToggleCameraAction;
 
 	UPROPERTY(EditAnywhere, Category = "Montage")
 	UAnimMontage* AimMontage;
@@ -46,6 +48,10 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Weapon")
 	FName RightHandSocketName = TEXT("hand_r");
+
+	UPROPERTY(VisibleInstanceOnly, Category = "Weapon")
+	ABTPS_WeaponBase* CurrentWeapon;
+
 	UPROPERTY(EditAnywhere, Category = "Interact")
 	FName LeftHandSocketName = TEXT("hand_l");
 
@@ -66,12 +72,20 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Interact")
 	float InteractDebugDuration = 1.0f;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Camera")
+	bool bIsFirstPerson = false;
+	UPROPERTY(EditDefaultsOnly, Category = "Camera")
+	float FPSArmLength = 0.0f;
+	UPROPERTY(EditDefaultsOnly, Category = "Camera")
+	float TPSArmLength = 300.0f;
+
 	void AimStarted(const FInputActionValue& Value);
 	void AimCompleted(const FInputActionValue& Value);
 	void Fire(const FInputActionValue& Value);
 	void Interact(const FInputActionValue& Value);
+	void ToggleCamera(const FInputActionValue& Value);
+
 public:	
-	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UFUNCTION(BlueprintCallable, Category = "Input")
@@ -86,7 +100,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Input")
 	virtual void DoInteract();
 
+	UFUNCTION(BlueprintCallable, Category = "Input")
+	virtual void DoToggleCamera();
+
 private:
 	UPROPERTY()
 	ACharacter* PlayerCharacter;
+
+	void EquipWeapon(ABTPS_WeaponBase* NewWeapon);
 };

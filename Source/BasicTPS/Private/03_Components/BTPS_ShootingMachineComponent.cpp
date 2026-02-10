@@ -4,10 +4,12 @@
 #include "DrawDebugHelpers.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/Controller.h"
+#include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Animation/AnimMontage.h"
 #include "kismet/KismetSystemLibrary.h"
 #include "Engine/EngineTypes.h"
+#include "04_Items/A_Equipment/Weapon/BTPS_WeaponBase.h"
 // #include "CollisionAndTrace5_6Character.h" 팀플 camera component구현한 헤더 포함해야함, camera component는 public으로 해야함.
 
 
@@ -20,7 +22,6 @@ UBTPS_ShootingMachineComponent::UBTPS_ShootingMachineComponent()
 void UBTPS_ShootingMachineComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
 	PlayerCharacter = Cast<ACharacter>(GetOwner());
 }
 
@@ -31,7 +32,7 @@ void UBTPS_ShootingMachineComponent::TickComponent(float DeltaTime, ELevelTick T
 
 }
 
-/* action binding할때 여기 헤더 참조해서 같이 바인딩.
+/* action binding할때 여기 참조해서 같이 바인딩.
 void UBTPS_ShootingMachineComponent::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent)) {
@@ -76,6 +77,11 @@ void UBTPS_ShootingMachineComponent::Interact(const FInputActionValue& Value)
 	DoInteract();
 }
 
+void UBTPS_ShootingMachineComponent::ToggleCamera(const FInputActionValue& Value)
+{
+	DoToggleCamera();
+}
+
 
 //move에 추가 	if (bIsAiming) return;
 
@@ -99,176 +105,157 @@ void UBTPS_ShootingMachineComponent::DoAimEnd()
 	}
 }
 
-void UBTPS_ShootingMachineComponent::DoFire() {}
-void UBTPS_ShootingMachineComponent::DoInteract() {}
-
-/* camera component확인 후 연결해야함.
 void UBTPS_ShootingMachineComponent::DoFire()
 {
+	if (!CurrentWeapon || !PlayerCharacter) return;
+
 	if (PlayerCharacter && FireMontage)
 	{
 		PlayerCharacter->PlayAnimMontage(FireMontage);
 	}
 
-	ACollisionAndTrace5_6Character* MyChar = Cast<ACollisionAndTrace5_6Character>(PlayerCharacter);
-	if (!MyChar) return;
+	FVector CameraLoc;
+	FRotator CameraRot;
+	PlayerCharacter->GetController()->GetPlayerViewPoint(CameraLoc, CameraRot);
 
-	USkeletalMeshComponent* MeshComp = MyChar->GetMesh();
+	float Range = 10000.0f;
+	if (CurrentWeapon) Range = CurrentWeapon->AttackRange;
 
-	if (!MeshComp || !GetWorld())
-	{
-		return;
-	}
+	FVector TraceStart = CameraLoc;
+	FVector TraceEnd = CameraLoc + (CameraRot.Vector() * Range);
 
-	FVector Start = FVector::ZeroVector;
+	FHitResult ScreenHit;
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(PlayerCharacter);
+	Params.AddIgnoredActor(CurrentWeapon);
 
-	if (MeshComp->DoesSocketExist(RightHandSocketName))
-	{
-		Start = MeshComp->GetSocketLocation(RightHandSocketName);
-	}
-	else
-	{
-		const int32 BoneIndext = MeshComp->GetBoneIndex(RightHandSocketName);
-		if (BoneIndext != INDEX_NONE)
-		{
-			Start = MeshComp->GetBoneLocation(RightHandSocketName);
-		}
-		else
-		{
-			Start = MyChar->GetActorLocation();
-		}
-	}
-
-	FVector Dir = MyChar->GetActorForwardVector();
-	if (MyChar->FollowCamera)
-	{
-		Dir = MyChar->FollowCamera->GetForwardVector();
-	}
-
-	else if (MyChar->GetController())
-	{
-		Dir = MyChar->GetController()->GetControlRotation().Vector();
-	}
-
-	const FVector End = Start + Dir * FireRange;
-
-	const ETraceTypeQuery TraceType = UEngineTypes::ConvertToTraceType(WeaponTraceChannel);
-
-	TArray<AActor*> ActorsToIgnore;
-	ActorsToIgnore.Add(this);
-
-	const EDrawDebugTrace::Type DebugType = bDrawFireDebug ? EDrawDebugTrace::ForDuration : EDrawDebugTrace::None;
-
-	FHitResult Hit;
-
-	const bool bHit = UKismetSystemLibrary::LineTraceSingle(
-		GetWorld(),
-		Start,
-		End,
-		TraceType,
-		true,
-		ActorsToIgnore,
-		DebugType,
-		Hit,
-		true,
-		FLinearColor::Red,
-		FLinearColor::Green,
-		FireDebugDuration
+	bool bScreenHit = GetWorld()->LineTraceSingleByChannel(
+		ScreenHit, TraceStart, TraceEnd, ECC_Visibility, Params
 	);
 
-	if (bHit && Hit.GetActor())
-	{
-		const FString HitName = Hit.GetActor()->GetName();
+	FVector TargetLoc = bScreenHit ? ScreenHit.ImpactPoint : TraceEnd;
 
-		//Hit.GetActor() -> Destroy();
+	FVector MuzzleLoc = CurrentWeapon->GetMuzzleLocation();
+	FVector ShootDir = (TargetLoc - MuzzleLoc).GetSafeNormal();
+	FVector RealEnd = MuzzleLoc + (ShootDir * Range);
+
+	FHitResult RealHit;
+	GetWorld()->LineTraceSingleByChannel(
+		RealHit, MuzzleLoc, RealEnd, ECC_Visibility, Params
+	);
+
+	if (bDrawFireDebug) 
+	{
+		DrawDebugLine(GetWorld(), MuzzleLoc, TargetLoc, FColor::Red, false, 1.0f, 0, 1.0f);
 	}
+
+	/*데미지 처리
+	if (RealHit.bBlockingHit)
+	{
+		AActor* HitActor = RealHit.GetActor();
+		if (HitActor)
+		{
+			// 데미지 전달 (UGameplayStatics 필요)
+			UGameplayStatics::ApplyPointDamage(
+				HitActor,
+				CurrentWeapon->Damage, // 총의 데미지
+				ShootDir,
+				RealHit,
+				PlayerCharacter->GetController(),
+				PlayerCharacter,
+				nullptr
+			);
+
+			// 로그 출력
+		}
+	}
+	*/
 }
 
 void UBTPS_ShootingMachineComponent::DoInteract()
 {
+	if (!PlayerCharacter || !GetWorld()) return;
+
 	if (PlayerCharacter && InteractMontage)
 	{
 		PlayerCharacter->PlayAnimMontage(InteractMontage);
 	}
 
-	USkeletalMeshComponent* MeshComp = GetMesh();
+	FVector Start = PlayerCharacter->GetActorLocation();
+	FVector End = Start;
 
-	if (!MeshComp || !GetWorld())
-	{
-		return;
-	}
+	FCollisionShape Sphere = FCollisionShape::MakeSphere(InteractRange);
 
-	FVector Start = FVector::ZeroVector;
+	TArray<FHitResult> OutHits;
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(PlayerCharacter);
 
-	if (MeshComp->DoesSocketExist(LeftHandSocketName))
-	{
-		Start = MeshComp->GetSocketLocation(LeftHandSocketName);
-	}
-	else
-	{
-		const int32 BoneIndext = MeshComp->GetBoneIndex(LeftHandSocketName);
-		if (BoneIndext != INDEX_NONE)
-		{
-			Start = MeshComp->GetBoneLocation(LeftHandSocketName);
-		}
-		else
-		{
-			Start = GetActorLocation();
-		}
-	}
-
-	FVector Dir = GetActorForwardVector();
-	if (FollowCamera)
-	{
-		Dir = FollowCamera->GetForwardVector();
-	}
-	else if (Controller)
-	{
-		Dir = Controller->GetControlRotation().Vector();
-	}
-
-	const FVector Center = Start + Dir * InteractRange;
-
-	//FCollisionQueryParams Params(SCENE_QUERY_STAT());
-
-	const FCollisionShape Sphere = FCollisionShape::MakeSphere(InteractSphereRadius);
-
-	FHitResult Hit;
-
-	const bool bHit = GetWorld()->SweepSingleByChannel(
-		Hit,
-		Center,
-		Center,
-		FQuat::Identity,
-		InteractTraceChannel,
-		Sphere
+	bool bHit = GetWorld()->SweepMultiByChannel(
+		OutHits, Start, End, FQuat::Identity, ECC_WorldDynamic, Sphere, Params
 	);
 
-	if (DrawDebugSphere)
+	if (InteractDebug)
 	{
-		DrawDebugSphere(
-			GetWorld(),
-			Center,
-			InteractSphereRadius,
-			16,
-			bHit ? FColor::Green : FColor::Red,
-			false,
-			InteractDebugDuration
-		);
-
-		if (bHit)
-		{
-			DrawDebugPoint(GetWorld(), Hit.ImpactPoint, 12.0f, FColor::Yellow, false, InteractDebugDuration);
-		}
+		DrawDebugSphere(GetWorld(), Start, InteractRange, 12, FColor::Green, false, 1.0f);
 	}
 
-	if (bHit && Hit.GetActor())
+	if (bHit)
 	{
-		AActor* HitActor = Hit.GetActor();
-		if (IsValid(HitActor) && HitActor != this)
+		for (const FHitResult& Hit : OutHits)
 		{
-			const FString HitName = HitActor->GetName();
+			AActor* HitActor = Hit.GetActor();
+
+			ABTPS_WeaponBase* PickedWeapon = Cast<ABTPS_WeaponBase>(HitActor);
+
+			if (PickedWeapon)
+			{
+				EquipWeapon(PickedWeapon);
+				break; //일단 하나만 줍기
+			}
 		}
 	}
 }
-*/
+
+void UBTPS_ShootingMachineComponent::DoToggleCamera()
+{
+	if (!PlayerCharacter) return;
+
+	USpringArmComponent* SpringArm = PlayerCharacter->FindComponentByClass<USpringArmComponent>();
+	if (!SpringArm) return;
+
+	bIsFirstPerson = !bIsFirstPerson;
+
+	if (bIsFirstPerson)
+	{
+		// [FPS 모드]
+		SpringArm->TargetArmLength = FPSArmLength;
+		SpringArm->bUsePawnControlRotation = true;
+		PlayerCharacter->bUseControllerRotationYaw = true;
+	}
+	else
+	{
+		// [TPS 모드]
+		SpringArm->TargetArmLength = TPSArmLength;
+		PlayerCharacter->bUseControllerRotationYaw = true;
+	}
+}
+
+void UBTPS_ShootingMachineComponent::EquipWeapon(ABTPS_WeaponBase* NewWeapon)
+{
+	if (!NewWeapon || !PlayerCharacter) return;
+
+	if (CurrentWeapon)
+	{
+		CurrentWeapon->Destroy();
+	}
+
+	CurrentWeapon = NewWeapon;
+
+	CurrentWeapon->OnEquipped();
+
+	CurrentWeapon->AttachToComponent(
+		PlayerCharacter->GetMesh(),
+		FAttachmentTransformRules::SnapToTargetNotIncludingScale,
+		RightHandSocketName
+	);
+}
