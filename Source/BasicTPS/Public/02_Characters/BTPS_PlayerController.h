@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
@@ -26,6 +26,14 @@ public:
 	TObjectPtr<UInputAction> JumpAction;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Input")
 	TObjectPtr<UInputAction> SprintAction;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Input")
+	TObjectPtr<UInputAction> AimAction;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Input")
+	TObjectPtr<UInputAction> FireAction;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Input")
+	TObjectPtr<UInputAction> InteractAction;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Input")
+	TObjectPtr<UInputAction> ToggleCameraAction;
 
 	virtual void BeginPlay() override;
 };
