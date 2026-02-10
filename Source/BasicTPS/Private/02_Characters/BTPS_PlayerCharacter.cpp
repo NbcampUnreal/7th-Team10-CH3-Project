@@ -1,20 +1,30 @@
 #include "02_Characters/BTPS_PlayerCharacter.h"
+#include "02_Characters/BTPS_PlayerController.h"
+#include "Components/CapsuleComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "EnhancedInputComponent.h"
 
 
 ABTPS_PlayerCharacter::ABTPS_PlayerCharacter()
 {
 	PrimaryActorTick.bCanEverTick = false;
-	
-	// SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
-	// SpringArm->SetupAttachment(RootComponent);
-	// SpringArm->TargetArmLength = 300.0f;
-	// SpringArm->bUsePawnControllerRotation = true;
-	//
-	// CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
-	// CameraComp->SetupAttachment(SpringArm);
-	// CameraComp->bUsePawnControllerRotation = false;
+
+	SpringArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
+	SpringArmComp->SetupAttachment(GetCapsuleComponent());
+	SpringArmComp->TargetArmLength = 300.0f;
+	SpringArmComp->bUsePawnControlRotation = true;
+
+	CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
+	CameraComp->SetupAttachment(SpringArmComp, USpringArmComponent::SocketName);
+	CameraComp->bUsePawnControlRotation = false;
+
+	NormalSpeed = 800.f;
+	SprintSpeedMultiplier = 1.8f;
+	SprintSpeed = NormalSpeed * SprintSpeedMultiplier;
+
+	GetCharacterMovement()->MaxWalkSpeed = NormalSpeed;
 }
 
 // void ABTPS_PlayerCharacter::BeginPlay()
@@ -31,5 +41,130 @@ ABTPS_PlayerCharacter::ABTPS_PlayerCharacter()
 void ABTPS_PlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
+
+	if (UEnhancedInputComponent* EnhancedInput = Cast<UEnhancedInputComponent>(PlayerInputComponent))
+	{	
+		// IA를 가져오기 위해 소유중인 컨트롤러를 ABTPS_PlayerController로 캐스팅하는 과정 추가
+		if (ABTPS_PlayerController* PlayerController = Cast<ABTPS_PlayerController>(GetController()))
+		{
+			if(PlayerController->MoveAction) // ABTPS_PlayerController를 PlayerController로 수정
+			{
+				EnhancedInput->BindAction(
+					PlayerController->MoveAction,
+					ETriggerEvent::Triggered,
+					this,
+					&ABTPS_PlayerCharacter::Move
+				);
+			}
+
+			if (PlayerController->LookAction)
+			{
+				EnhancedInput->BindAction(
+					PlayerController->LookAction,
+					ETriggerEvent::Triggered,
+					this,
+					&ABTPS_PlayerCharacter::Look
+				);
+			}
+
+			if (PlayerController->JumpAction)
+			{
+				EnhancedInput->BindAction(
+					PlayerController->JumpAction,
+					ETriggerEvent::Triggered,
+					this,
+					&ABTPS_PlayerCharacter::StartJump
+				);
+			}
+
+			if (PlayerController->JumpAction)
+			{
+				EnhancedInput->BindAction(
+					PlayerController->JumpAction,
+					ETriggerEvent::Completed,
+					this,
+					&ABTPS_PlayerCharacter::StopJump
+				);
+			}
+
+			if (PlayerController->SprintAction)
+			{
+				EnhancedInput->BindAction(
+					PlayerController->SprintAction,
+					ETriggerEvent::Triggered,
+					this,
+					&ABTPS_PlayerCharacter::StartSprint
+				);
+			}
+
+			if (PlayerController->SprintAction)
+			{
+				EnhancedInput->BindAction(
+					PlayerController->SprintAction,
+					ETriggerEvent::Completed,
+					this,
+					&ABTPS_PlayerCharacter::StopSprint
+				);
+			}	
+		}
+	}
 }
 
+
+void ABTPS_PlayerCharacter::Move(const FInputActionValue& value)
+{
+	if (!Controller) return;
+
+	const FVector2D MoveInput = value.Get<FVector2D>();
+
+	if (!FMath::IsNearlyZero(MoveInput.X))
+	{
+		AddMovementInput(GetActorForwardVector(), MoveInput.X);
+	}
+
+	if (!FMath::IsNearlyZero(MoveInput.Y))
+	{
+		AddMovementInput(GetActorRightVector(), MoveInput.Y);
+	}
+}
+
+void ABTPS_PlayerCharacter::Look(const FInputActionValue& value)
+{
+	FVector2D LookInput = value.Get<FVector2D>();
+
+	AddControllerYawInput(LookInput.X);
+
+	AddControllerPitchInput(LookInput.Y);
+}
+
+void ABTPS_PlayerCharacter::StartJump(const FInputActionValue& value)
+{
+	if (value.Get<bool>())
+	{
+		Jump();
+	}
+}
+
+void ABTPS_PlayerCharacter::StopJump(const FInputActionValue& value)
+{
+	if (!value.Get<bool>())
+	{
+		StopJumping();
+	}
+}
+
+void ABTPS_PlayerCharacter::StartSprint(const FInputActionValue& value)
+{
+	if (GetCharacterMovement())
+	{
+		GetCharacterMovement()->MaxWalkSpeed = SprintSpeed;
+	}
+}
+
+void ABTPS_PlayerCharacter::StopSprint(const FInputActionValue& value)
+{
+	if (GetCharacterMovement())
+	{
+		GetCharacterMovement()->MaxWalkSpeed = NormalSpeed;
+	}
+}

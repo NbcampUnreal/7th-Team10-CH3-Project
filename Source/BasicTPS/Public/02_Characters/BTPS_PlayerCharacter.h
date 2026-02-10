@@ -6,15 +6,34 @@
 #include "Camera/CameraComponent.h"
 #include "BTPS_PlayerCharacter.generated.h"
 
+struct FInputActionValue;
+
 UCLASS()
 class BASICTPS_API ABTPS_PlayerCharacter : public ABTPS_BaseCharacter
 {
 	GENERATED_BODY()
 
-private:
+protected:
+	UFUNCTION()
+	void Move(const FInputActionValue& value);
+	UFUNCTION()
+	void Look(const FInputActionValue& value);
+	UFUNCTION()
+	void StartJump(const FInputActionValue& value);
+	UFUNCTION()
+	void StopJump(const FInputActionValue& value);
+	UFUNCTION()
+	void StartSprint(const FInputActionValue& value);
+	UFUNCTION()
+	void StopSprint(const FInputActionValue& value);
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Movement")
 	float NormalSpeed;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Movement")
 	float SprintSpeedMultiplier;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Movement")
 	float SprintSpeed;
+
+private:
 	float MaxStamina;
 	float CurrentStamina;
 	
@@ -22,15 +41,15 @@ private:
 public:
 	ABTPS_PlayerCharacter();
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Camera")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
 	TObjectPtr<USpringArmComponent> SpringArmComp;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Camera")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
 	TObjectPtr<UCameraComponent> CameraComp;
 	
 	// float HealHp(float HealAmount);
 	
 	// virtual void AttackEnemy() override;
-	// virtual float TakeDamage( 
+	// virtual float TakeDamage(
 	// 	float DamageAmount,
 	// 	FDamageEvent const& DamageEvent,
 	// 	AController* EventInstigator,
