@@ -2,8 +2,8 @@
 
 #include "01_Game/BTPS_GameMode.h"
 //TODO: 게임스테이트, 게임인스턴스 구현
-//#include "01_Game/BTPS_GameState.h"
-//#include "01_Game/BTPS_GameInstance.h"
+#include "01_Game/BTPS_GameState.h"
+#include "01_Game/BTPS_GameInstance.h"
 
 #include "02_Characters/BTPS_PlayerCharacter.h"
 //TODO: 플레이어 컨트롤러 추가시 해제
@@ -17,8 +17,7 @@ ABTPS_GameMode::ABTPS_GameMode()
 	
 	DefaultPawnClass = ABTPS_PlayerCharacter::StaticClass();
 	
-	//TODO: 게임모드 스테이트 구현
-	//GameStateClass = ABTPS_GameState::StaticClass();
+	GameStateClass = ABTPS_GameState::StaticClass();
 }
 
 ABTPS_GameMode* ABTPS_GameMode::Get(const UObject* WorldContext)
@@ -50,6 +49,11 @@ void ABTPS_GameMode::Tick(float DeltaSeconds)
 
 void ABTPS_GameMode::StartLevel()
 {
+	UBTPS_GameInstance* BTPS_GameInstance = UBTPS_GameInstance::Get(this);
+	if (BTPS_GameInstance == nullptr || BTPS_GameInstance->IsMenuLevel())
+	{
+		return;
+	}
 }
 
 void ABTPS_GameMode::EndLevel(bool bWin)
