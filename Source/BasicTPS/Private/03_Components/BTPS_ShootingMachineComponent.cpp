@@ -2,6 +2,7 @@
 #include "EnhancedInputComponent.h"
 #include "CollisionShape.h"
 #include "DrawDebugHelpers.h"
+#include "03_Components/BTPS_CombatComponent.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -23,6 +24,11 @@ void UBTPS_ShootingMachineComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	PlayerCharacter = Cast<ACharacter>(GetOwner());
+	
+	if (GetOwner())
+	{
+		CombatComp = GetOwner()->FindComponentByClass<UBTPS_CombatComponent>();
+	}
 }
 
 
@@ -149,27 +155,15 @@ void UBTPS_ShootingMachineComponent::DoFire()
 		DrawDebugLine(GetWorld(), MuzzleLoc, TargetLoc, FColor::Red, false, 1.0f, 0, 1.0f);
 	}
 
-	/*데미지 처리
-	if (RealHit.bBlockingHit)
+	//*데미지 처리
+	if (RealHit.bBlockingHit && RealHit.GetActor() && CombatComp)
 	{
-		AActor* HitActor = RealHit.GetActor();
-		if (HitActor)
-		{
-			// 데미지 전달 (UGameplayStatics 필요)
-			UGameplayStatics::ApplyPointDamage(
-				HitActor,
-				CurrentWeapon->Damage, // 총의 데미지
-				ShootDir,
-				RealHit,
-				PlayerCharacter->GetController(),
-				PlayerCharacter,
-				nullptr
-			);
-
-			// 로그 출력
-		}
+	CombatComp->ExecuteAttack(
+		RealHit.GetActor(),
+		10, // 추후 무기 데미지로 변경해주세요! ex: CurrentWeapon->Damage
+		RealHit
+		);
 	}
-	*/
 }
 
 void UBTPS_ShootingMachineComponent::DoInteract()
