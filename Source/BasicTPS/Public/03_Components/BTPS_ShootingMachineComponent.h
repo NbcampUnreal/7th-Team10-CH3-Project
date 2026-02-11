@@ -7,6 +7,7 @@
 
 class UInputAction;
 class ABTPS_WeaponBase;
+class UBTPS_CombatComponent;
 struct FInputActionValue;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -94,6 +95,9 @@ public:
 	virtual void DoToggleCamera();
 
 private:
+	UPROPERTY()
+	TObjectPtr<UBTPS_CombatComponent> CombatComp;
+	
 	UPROPERTY()
 	ACharacter* PlayerCharacter;
 
