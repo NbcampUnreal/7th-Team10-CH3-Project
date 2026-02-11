@@ -20,16 +20,6 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-	UPROPERTY(EditAnywhere, Category = "Input")
-	UInputAction* AimAction;
-	UPROPERTY(EditAnywhere, Category = "Input")
-	UInputAction* FireAction;
-	UPROPERTY(EditAnywhere, Category = "Input")
-	UInputAction* InteractAction;
-	//1인칭<->3인칭 시점변환
-	UPROPERTY(EditAnywhere, Category = "Input")
-	UInputAction* ToggleCameraAction;
-
 	UPROPERTY(EditAnywhere, Category = "Montage")
 	UAnimMontage* AimMontage;
 	UPROPERTY(EditAnywhere, Category = "Montage")
@@ -79,14 +69,14 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Camera")
 	float TPSArmLength = 300.0f;
 
+public:	
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
 	void AimStarted(const FInputActionValue& Value);
 	void AimCompleted(const FInputActionValue& Value);
 	void Fire(const FInputActionValue& Value);
 	void Interact(const FInputActionValue& Value);
 	void ToggleCamera(const FInputActionValue& Value);
-
-public:	
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UFUNCTION(BlueprintCallable, Category = "Input")
 	virtual void DoAimStart();

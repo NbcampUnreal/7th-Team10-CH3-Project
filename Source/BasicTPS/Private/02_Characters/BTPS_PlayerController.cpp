@@ -1,4 +1,4 @@
-#include "02_Characters/BTPS_PlayerController.h"
+﻿#include "02_Characters/BTPS_PlayerController.h"
 #include "EnhancedInputSubsystems.h"
 
 ABTPS_PlayerController::ABTPS_PlayerController()
@@ -6,7 +6,11 @@ ABTPS_PlayerController::ABTPS_PlayerController()
 	  MoveAction(nullptr),
 	  JumpAction(nullptr),
 	  LookAction(nullptr),
-	  SprintAction(nullptr)
+	  SprintAction(nullptr),
+	  AimAction(nullptr),
+	  FireAction(nullptr),
+	  InteractAction(nullptr),
+	  ToggleCameraAction(nullptr)
 {
 }
 
