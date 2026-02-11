@@ -14,13 +14,19 @@ void UBTPS_CombatComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	if (StatComp)
+	AActor* Owner = GetOwner();
+	if (Owner)
 	{
-		StatComp = GetOwner()->FindComponentByClass<UBTPS_StatComponent>();
+		StatComp = Owner->FindComponentByClass<UBTPS_StatComponent>();
+	}
+	
+	if (!StatComp)
+	{
+		UE_LOG(LogTemp, Error, TEXT("CombatComponent: Failed to find StatComponent on %s"), *GetOwner()->GetName());
 	}
 	else
 	{
-		UE_LOG(LogTemp, Error, TEXT("CombatComponent: Failed to find StatComponent on %s"), *GetOwner()->GetName());
+		UE_LOG(LogTemp, Log, TEXT("CombatComponent: StatComponent Linked Successfully!"));
 	}
 }
 
