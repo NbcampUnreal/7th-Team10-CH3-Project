@@ -28,8 +28,10 @@ class BASICTPS_API ABTPS_GameState : public AGameState
 public:
 	ABTPS_GameState();
 	
-	static ABTPS_GameState* Get(const UObject* WorldContext);
+	virtual void BeginPlay() override;
 	
+	static ABTPS_GameState* Get(const UObject* WorldContext);
+
 public:
 	//variables
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Score")
@@ -64,7 +66,19 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "Wave")
 	FOnWaveStateChanged OnWaveStateChanged;
 	
+public:
+	UFUNCTION(BlueprintPure, Category = "Score")
+	int32 GetScore() const;
+	UFUNCTION(BlueprintCallable, Category = "Score")
+	void AddScore(int32 Amount);
 	
+
+	void UpdateHUD();
 	
+	// 레벨을 시작할 때, 시작메뉴 및 몬스터 스폰 및 타이머 설정
+	void StartLevel();
+	// 게임이 완전히 끝났을 때 (모든 레벨 종료) 실행되는 함수
+	UFUNCTION(BlueprintCallable, Category = "Level")
+	void OnGameOver();
 	
 };

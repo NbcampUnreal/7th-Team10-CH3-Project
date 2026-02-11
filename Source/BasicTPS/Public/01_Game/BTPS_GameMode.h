@@ -30,7 +30,6 @@ public:
 	void EndLevel(bool bWin);
 	void GameOver();
 	void KilledMonsterCount();
-	
 	void SpawnMonstersForWave();
 	
 private:
