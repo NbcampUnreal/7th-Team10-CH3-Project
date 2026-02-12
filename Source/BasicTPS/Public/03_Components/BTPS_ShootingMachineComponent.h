@@ -51,7 +51,7 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Interact")
 	float FireDebugDuration = 1.0f;
 	UPROPERTY(EditAnywhere, Category = "Interact")
-	float InteractRange = 5.0f;
+	float InteractRange = 200.0f;
 
 	UPROPERTY(EditAnywhere, Category = "Interact")
 	TEnumAsByte<ECollisionChannel> InteractTraceChannel = ECC_Visibility;
