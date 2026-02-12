@@ -17,25 +17,22 @@ void UBTPS_CombatComponent::BeginPlay()
 	AActor* Owner = GetOwner();
 	if (Owner)
 	{
-		StatComp = Owner->FindComponentByClass<UBTPS_StatComponent>();
-	}
-	
-	if (!StatComp)
-	{
-		UE_LOG(LogTemp, Error, TEXT("CombatComponent: Failed to find StatComponent on %s"), *GetOwner()->GetName());
-	}
-	else
-	{
-		UE_LOG(LogTemp, Log, TEXT("CombatComponent: StatComponent Linked Successfully!"));
+		Owner->OnTakeAnyDamage.AddDynamic(this, &UBTPS_CombatComponent::OnDamageResponse);
 	}
 }
 
-void UBTPS_CombatComponent::OnTakeDamage(float IncomingDamage)
+void UBTPS_CombatComponent::OnDamageResponse(
+	AActor* DamagedActor, 
+	float Damage, 
+	const UDamageType* DamageType, 
+	AController* InstigatedBy, 
+	AActor* DamageCauser)
  {
+	if (Damage <= KINDA_SMALL_NUMBER) return;
  	if (StatComp)
  	{
- 		StatComp->OnTakeDamage(IncomingDamage);
- 		UE_LOG(LogTemp, Log, TEXT("Take Damage!: %f"), IncomingDamage);
+ 		StatComp->OnTakeDamage(Damage);
+ 		UE_LOG(LogTemp, Log, TEXT("CombatComponent: Take Damage!: %f"), Damage);
  	}
  }
 
@@ -50,6 +47,6 @@ void UBTPS_CombatComponent::ExecuteAttack(AActor* TargetActor, float DamageAmoun
 		GetOwner(),
 		UDamageType::StaticClass()
 	);
-	UE_LOG(LogTemp, Log, TEXT("Damage To Target!: %s, Damage: %f"), *TargetActor->GetName(), DamageAmount);
+	UE_LOG(LogTemp, Log, TEXT("CombatComponent: Damage To Target!: %s, Damage: %f"), *TargetActor->GetName(), DamageAmount);
 }
 

@@ -21,9 +21,17 @@ protected:
 	
 public:
 	void ExecuteAttack(AActor* TargetActor, float DamageAmount, FHitResult& HitInfo);
-	void OnTakeDamage(float IncomingDamage);
 	
 private:
 	UPROPERTY()
 	TObjectPtr<UBTPS_StatComponent> StatComp;
+	
+	UFUNCTION()
+	void OnDamageResponse(
+		AActor* DamagedActor, 
+		float Damage, 
+		const UDamageType* DamageType, 
+		AController* InstigatedBy, 
+		AActor* DamageCauser
+		);
 };

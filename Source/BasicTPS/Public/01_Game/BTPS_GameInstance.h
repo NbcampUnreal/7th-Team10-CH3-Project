@@ -31,7 +31,7 @@ public:
 	
 public:
 	// funtuions
-	void AddScore(int32 Amount);
+	void AddToScore(int32 Amount);
 	void SetCurrentLevelIndex(int32 Index);
 	void RestartGame();
 	
