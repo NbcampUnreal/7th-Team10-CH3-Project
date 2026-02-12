@@ -17,3 +17,17 @@ struct FXxData
 	GENERATED_BODY()
 	
 };
+
+USTRUCT(BlueprintType)
+struct FEnemySpawnRow : public FTableRowBase
+{
+	GENERATED_BODY();
+	
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FName EnemyName;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<APawn> EnemyClass;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float SpawnChance;
+};

@@ -4,7 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "Runtime/AIModule/Classes/AIController.h"
+#include "Perception/AIPerceptionTypes.h"
 #include "BTPS_AIController.generated.h"
+
+class UAISenseConfig_Sight;
 
 UCLASS()
 class BASICTPS_API ABTPS_AIController : public AAIController
@@ -12,14 +15,14 @@ class BASICTPS_API ABTPS_AIController : public AAIController
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this actor's properties
 	ABTPS_AIController();
 
 protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
-public:
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	virtual void OnPossess(APawn* InPawn) override;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="AI")
+	TObjectPtr<UAISenseConfig_Sight> SightConfig;
+	
+	UFUNCTION()
+	void OnTargetDetected(AActor* Actor, FAIStimulus Stimulus);
 };
