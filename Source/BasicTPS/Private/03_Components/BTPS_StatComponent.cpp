@@ -8,7 +8,6 @@ UBTPS_StatComponent::UBTPS_StatComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
 	PrimaryComponentTick.bStartWithTickEnabled = false;
-	bWantsInitializeComponent = true;
 }
 
 void UBTPS_StatComponent::BeginPlay()
@@ -33,6 +32,7 @@ void UBTPS_StatComponent::TickComponent(float DeltaTime, enum ELevelTick TickTyp
 void UBTPS_StatComponent::OnTakeDamage(float DamageAmount)
 {
 	CurrentHP = FMath::Clamp(CurrentHP - DamageAmount, 0.0f, MaxHP);
+	UE_LOG(LogTemp, Warning, TEXT("StatComp: %s HP Updated: %f / %f"), *GetOwner()->GetName(), CurrentHP, MaxHP);
 	if (OnHPChanged.IsBound())
 	{
 		OnHPChanged.Broadcast(CurrentHP, MaxHP);
@@ -40,6 +40,7 @@ void UBTPS_StatComponent::OnTakeDamage(float DamageAmount)
 	
 	if (CurrentHP <= KINDA_SMALL_NUMBER)
 	{
+		UE_LOG(LogTemp, Error, TEXT("StatComp: %s is Dead!"), *GetOwner()->GetName());
 		if (OnDeath.IsBound())
 		{
 			OnDeath.Broadcast();
@@ -50,6 +51,7 @@ void UBTPS_StatComponent::OnTakeDamage(float DamageAmount)
 void UBTPS_StatComponent::Heal(float HealAmount)
 {
 	CurrentHP = FMath::Clamp(CurrentHP + HealAmount, 0.0f, MaxHP);
+	UE_LOG(LogTemp, Log, TEXT("StatComp: Healed. HP: %f"), CurrentHP);
 	if (OnHPChanged.IsBound())
 	{
 		OnHPChanged.Broadcast(CurrentHP, MaxHP);
@@ -60,7 +62,7 @@ bool UBTPS_StatComponent::bUseStamina(float Cost)
 {
 	if (CurrentStamina < Cost)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Not Enough Stamina!"));
+		UE_LOG(LogTemp, Warning, TEXT("StatComp: Not Enough Stamina!"));
 		return false;
 	}
 	
