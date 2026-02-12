@@ -21,7 +21,8 @@ public:
 	static ABTPS_GameMode* Get(const UObject* WorldContext);
 	
 protected:
-	virtual void BeginPlay() override;
+	virtual void StartPlay() override;
+	//virtual void BeginPlay() override;
 	virtual void Tick(float DeltaSeconds) override;
 	
 public:
@@ -30,7 +31,6 @@ public:
 	void EndLevel(bool bWin);
 	void GameOver();
 	void KilledMonsterCount();
-	
 	void SpawnMonstersForWave();
 	
 private:
