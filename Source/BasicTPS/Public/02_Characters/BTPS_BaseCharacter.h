@@ -23,6 +23,11 @@ protected:
 	
 public:	
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	virtual float TakeDamage(float DamageAmount,
+		struct FDamageEvent const& DamageEvent,
+		class AController* EventInstigator,
+		AActor* DamageCauser
+		) override;
 	
 	UBTPS_StatComponent* GetStatComp() const { return StatComp; }
 	UBTPS_CombatComponent* GetCombatComp() const {return CombatComp;}
