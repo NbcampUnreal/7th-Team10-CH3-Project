@@ -9,21 +9,21 @@
 
 ABTPS_PlayerController::ABTPS_PlayerController()
 	: InputMappingContext(nullptr),
-	  MoveAction(nullptr),
-	  JumpAction(nullptr),
+	  MoveAction(nullptr),	
 	  LookAction(nullptr),
+	  JumpAction(nullptr),
 	  SprintAction(nullptr),
 	  AimAction(nullptr),
 	  FireAction(nullptr),
 	  InteractAction(nullptr),
 	  ToggleCameraAction(nullptr),
 	  ToggleMenuAction(nullptr),
+	  HUDWidgetClass(nullptr), 
+	  HUDWidgetInstance(nullptr),
 	  MainMenuWidgetClass(nullptr),
 	  MainMenuWidgetInstance(nullptr),
 	  PauseMenuWidgetClass(nullptr),
 	  PauseMenuWidgetInstance(nullptr), 
-	  HUDWidgetClass(nullptr), 
-	  HUDWidgetInstance(nullptr), 
 	  bIsGamePaused(false) 
 {
 }
