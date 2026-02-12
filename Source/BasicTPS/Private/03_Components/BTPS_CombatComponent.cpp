@@ -18,6 +18,7 @@ void UBTPS_CombatComponent::BeginPlay()
 	if (Owner)
 	{
 		Owner->OnTakeAnyDamage.AddDynamic(this, &UBTPS_CombatComponent::OnDamageResponse);
+		StatComp = Owner->FindComponentByClass<UBTPS_StatComponent>();
 	}
 }
 
