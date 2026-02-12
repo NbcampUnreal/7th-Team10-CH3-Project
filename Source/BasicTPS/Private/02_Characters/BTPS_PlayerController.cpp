@@ -23,8 +23,7 @@ ABTPS_PlayerController::ABTPS_PlayerController()
 	  MainMenuWidgetClass(nullptr),
 	  MainMenuWidgetInstance(nullptr),
 	  PauseMenuWidgetClass(nullptr),
-	  PauseMenuWidgetInstance(nullptr), 
-	  bIsGamePaused(false) 
+	  PauseMenuWidgetInstance(nullptr)
 {
 }
 
@@ -122,7 +121,6 @@ void ABTPS_PlayerController::ShowMainMenu(bool bIsRestart)
 			MainMenuWidgetInstance->AddToViewport();
 
 			bShowMouseCursor = true;
-			//UE_LOG(LogTemp, Warning, TEXT("SceneSwitchInputMode"))
 
 			SetInputMode(FInputModeUIOnly());
 		}
@@ -163,6 +161,35 @@ void ABTPS_PlayerController::ShowMainMenu(bool bIsRestart)
 	}
 }
 
+void ABTPS_PlayerController::ShowGameOverMenu(bool bIsRestart)
+{
+	if (HUDWidgetInstance)
+	{
+		HUDWidgetInstance->RemoveFromParent();
+		HUDWidgetInstance = nullptr;
+	}
+
+	if (MainMenuWidgetInstance)
+	{
+		MainMenuWidgetInstance->RemoveFromParent();
+		MainMenuWidgetInstance = nullptr;
+	}
+	
+	if (GameOverMenuWidgetClass) 
+	{
+		GameOverMenuWidgetInstance = CreateWidget<UUserWidget>(this, GameOverMenuWidgetClass);
+		if (GameOverMenuWidgetInstance)
+		{
+			GameOverMenuWidgetInstance->AddToViewport();
+
+			bShowMouseCursor = true;
+			SetInputMode(FInputModeUIOnly());
+		}
+	}
+	bIsGamePaused = true;
+	SetPause(true);
+}
+
 void ABTPS_PlayerController::ShowPauseMenu()
 {
 	if (PauseMenuWidgetInstance)
@@ -184,7 +211,6 @@ void ABTPS_PlayerController::ShowPauseMenu()
 			SetInputMode(InputMode);
 		}
 	}
-
 	bIsGamePaused = true;
 	SetPause(true);
 }
@@ -250,5 +276,20 @@ void ABTPS_PlayerController::SetupInputComponent()
 		{
 			UE_LOG(LogTemp, Error, TEXT("MenuAction is NULL!"));
 		}
+		
+		if (SkipLevelAction)
+		{
+			EnhancedInput->BindAction(SkipLevelAction, ETriggerEvent::Started, this, &ABTPS_PlayerController::OnSkipLevel);
+		}
+	}
+}
+
+void ABTPS_PlayerController::OnSkipLevel()
+{
+	if (ABTPS_GameState* BTPSGameState = Cast<ABTPS_GameState>(UGameplayStatics::GetGameState(GetWorld())))
+	{
+		BTPSGameState->EndLevel();
+        
+		UE_LOG(LogTemp, Warning, TEXT("Cheat Activated: Skipping to Next Level!"));
 	}
 }
