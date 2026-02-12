@@ -33,7 +33,7 @@ protected:
 	float SprintSpeedMultiplier;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Movement")
 	float SprintSpeed;
-
+	
 private:
 	float MaxStamina;
 	float CurrentStamina;

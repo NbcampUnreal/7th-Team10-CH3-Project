@@ -36,7 +36,10 @@ public:
 	TObjectPtr<UInputAction> ToggleCameraAction;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Input")
 	TObjectPtr<UInputAction> ToggleMenuAction;  // Tab 키 메뉴 액션
-
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* SkipLevelAction; // pgdown 레벨스킵 치트키
+	
+	
 	// Menu HUD
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HUD")
 	TSubclassOf<UUserWidget> HUDWidgetClass;
@@ -49,6 +52,11 @@ public:
 	UUserWidget* MainMenuWidgetInstance;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Menu")
+	TSubclassOf<UUserWidget> GameOverMenuWidgetClass;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Menu")
+	UUserWidget* GameOverMenuWidgetInstance;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Menu")
 	TSubclassOf<UUserWidget> PauseMenuWidgetClass;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Menu")
 	UUserWidget* PauseMenuWidgetInstance;
@@ -59,8 +67,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "HUD")
 	void ShowGameHUD();
 	
+	
+	
 	UFUNCTION(BlueprintCallable, Category = "Menu")
 	void ShowMainMenu(bool bIsRestart);
+	UFUNCTION(BlueprintCallable, Category = "Menu")
+	void ShowGameOverMenu(bool bIsRestart);
 	UFUNCTION(BlueprintCallable, Category = "Menu")
 	void ShowPauseMenu();
 	UFUNCTION(BlueprintCallable, Category = "Menu")
@@ -76,5 +88,5 @@ public:
 private:
 	bool bIsGamePaused = false;
 	virtual void SetupInputComponent() override;
-
+	void OnSkipLevel();
 };

@@ -11,6 +11,8 @@
 
 ABTPS_GameState::ABTPS_GameState()
 {
+	CurrentLevelIndex = 0;
+	MaxLevels = 1;
 }
 
 void ABTPS_GameState::BeginPlay()
@@ -65,7 +67,6 @@ void ABTPS_GameState::AddScore(int32 Amount)
 }
 
 
-//TODO: 게임 화면 갱신 구현시 주석 해제
 void ABTPS_GameState::UpdateHUD()
 {
 	if (APlayerController* PlayerController = GetWorld()->GetFirstPlayerController())
@@ -166,6 +167,30 @@ void ABTPS_GameState::StartLevel()
 	*/
 }
 
+void ABTPS_GameState::EndLevel()
+{
+	// TODO: 타이머 해제
+	// GetWorldTimerManager().ClearTimer(LevelTimerHandle);
+	CurrentLevelIndex++;
+
+	// 모든 레벨을 다 돌았다면 게임 오버 처리
+	if (CurrentLevelIndex >= MaxLevels)
+	{
+		OnGameOver();
+		return;
+	}
+		
+	// 레벨 맵 이름이 있다면 해당 맵 불러오기
+	if (LevelMapNames.IsValidIndex(CurrentLevelIndex))
+	{
+		UGameplayStatics::OpenLevel(GetWorld(), LevelMapNames[CurrentLevelIndex]);
+	}
+	else
+	{
+		OnGameOver();
+	}
+}
+
 void ABTPS_GameState::OnGameOver()
 {
 	if (APlayerController* PlayerController = GetWorld()->GetFirstPlayerController())
@@ -173,7 +198,8 @@ void ABTPS_GameState::OnGameOver()
 		if (ABTPS_PlayerController* BTPS_PlayerController = Cast<ABTPS_PlayerController>(PlayerController))
 		{
 			BTPS_PlayerController->SetPause(true);
-			BTPS_PlayerController->ShowMainMenu(true);
+			BTPS_PlayerController->ShowGameOverMenu(true);
 		}
 	}
 }
+

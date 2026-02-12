@@ -46,6 +46,12 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Level")
 	int32 CurrentLevelIndex = 0;
 	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Level")
+	int32 MaxLevels;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Level")
+	TArray<FName> LevelMapNames;
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Wave")
 	int32 CurrentWaveIndex = 0;
 	
@@ -71,14 +77,12 @@ public:
 	int32 GetScore() const;
 	UFUNCTION(BlueprintCallable, Category = "Score")
 	void AddScore(int32 Amount);
-	
-
-	void UpdateHUD();
-	
-	// 레벨을 시작할 때, 시작메뉴 및 몬스터 스폰 및 타이머 설정
-	void StartLevel();
-	// 게임이 완전히 끝났을 때 (모든 레벨 종료) 실행되는 함수
 	UFUNCTION(BlueprintCallable, Category = "Level")
 	void OnGameOver();
+
+	void UpdateHUD();
+	void StartLevel();
+	void EndLevel();
+
 	
 };
