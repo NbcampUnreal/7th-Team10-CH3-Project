@@ -37,9 +37,9 @@ ABTPS_GameMode* ABTPS_GameMode::Get(const UObject* WorldContext)
 }
 
 
-void ABTPS_GameMode::BeginPlay()
+void ABTPS_GameMode::StartPlay()
 {
-	Super::BeginPlay();
+	Super::StartPlay();
 }
 
 void ABTPS_GameMode::Tick(float DeltaSeconds)

@@ -34,6 +34,8 @@ public:
 	TObjectPtr<UInputAction> InteractAction;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Input")
 	TObjectPtr<UInputAction> ToggleCameraAction;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Input")
+	TObjectPtr<UInputAction> ToggleMenuAction;  // Tab 키 메뉴 액션
 
 	// Menu HUD
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HUD")
@@ -46,6 +48,11 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Menu")
 	UUserWidget* MainMenuWidgetInstance;
 	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Menu")
+	TSubclassOf<UUserWidget> PauseMenuWidgetClass;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Menu")
+	UUserWidget* PauseMenuWidgetInstance;
+	
 	UFUNCTION(BlueprintPure, Category = "HUD")
 	UUserWidget* GetHUDWidget() const;
 	// HUD 표시
@@ -54,9 +61,20 @@ public:
 	
 	UFUNCTION(BlueprintCallable, Category = "Menu")
 	void ShowMainMenu(bool bIsRestart);
+	UFUNCTION(BlueprintCallable, Category = "Menu")
+	void ShowPauseMenu();
+	UFUNCTION(BlueprintCallable, Category = "Menu")
+	void HidePauseMenu();
+	UFUNCTION(BlueprintCallable, Category = "Menu")
+	void TogglePauseMenu();
 	// 게임 시작
 	UFUNCTION(BlueprintCallable, Category = "Menu")
 	void StartGame();
 	
 	virtual void BeginPlay() override;
+
+private:
+	bool bIsGamePaused = false;
+	virtual void SetupInputComponent() override;
+
 };

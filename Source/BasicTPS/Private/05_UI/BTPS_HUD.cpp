@@ -8,6 +8,12 @@ void ABTPS_HUD::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	FString CurrentMapName = GetWorld()->GetMapName();
+	if (CurrentMapName.Contains("L_MenuLevel"))
+	{
+		return;  
+	}
+	
 	if (MainWidgetClass)
 	{
 		MainWidget = CreateWidget<UBTPS_MainWidget>(GetWorld(), MainWidgetClass);
