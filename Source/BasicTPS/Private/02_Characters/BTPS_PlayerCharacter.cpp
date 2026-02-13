@@ -118,7 +118,7 @@ void ABTPS_PlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInp
 					//BindAction parameter자체가 TObjectPtr<>를 못받아서 action binding이 안되요.
 					EnhancedInput->BindAction(
 						PlayerController->AimAction,
-						ETriggerEvent::Triggered,
+						ETriggerEvent::Started,
 						ShootingMachineComp,
 						&UBTPS_ShootingMachineComponent::AimStarted
 					);
@@ -133,7 +133,7 @@ void ABTPS_PlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInp
 				{
 					EnhancedInput->BindAction(
 						PlayerController->FireAction,
-						ETriggerEvent::Triggered,
+						ETriggerEvent::Started,
 						ShootingMachineComp,
 						&UBTPS_ShootingMachineComponent::Fire
 					);
@@ -142,7 +142,7 @@ void ABTPS_PlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInp
 				{
 					EnhancedInput->BindAction(
 						PlayerController->InteractAction,
-						ETriggerEvent::Triggered,
+						ETriggerEvent::Started,
 						ShootingMachineComp,
 						&UBTPS_ShootingMachineComponent::Interact
 					);
@@ -151,7 +151,7 @@ void ABTPS_PlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInp
 				{
 					EnhancedInput->BindAction(
 						PlayerController->ToggleCameraAction,
-						ETriggerEvent::Triggered,
+						ETriggerEvent::Started,
 						ShootingMachineComp,
 						&UBTPS_ShootingMachineComponent::ToggleCamera
 					);
