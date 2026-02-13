@@ -22,12 +22,6 @@ protected:
 
 	UPROPERTY(VisibleInstanceOnly, Category = "Combat")
 	TWeakObjectPtr<AActor> CurrentTarget;
-
-	virtual void SetTarget(AActor* NewTarget);
-	virtual AActor* GetTarget() const;
-	virtual bool HasTarget() const;
-	virtual void ClearTarget();
-
 	//몬스터용 사망판정 분기용
 	//virtual void OnDeath() override;
 
@@ -35,5 +29,10 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	virtual void SetTarget(AActor* NewTarget);
+	virtual AActor* GetTarget() const;
+	virtual bool HasTarget() const;
+	virtual void ClearTarget();
 
 };
