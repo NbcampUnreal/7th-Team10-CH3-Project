@@ -9,6 +9,8 @@ ABTPS_BaseCharacter::ABTPS_BaseCharacter()
 	
 	StatComp = CreateDefaultSubobject<UBTPS_StatComponent>(TEXT("StatComp"));
 	CombatComp = CreateDefaultSubobject<UBTPS_CombatComponent>(TEXT("CombatComp"));
+	
+	TeamID = FGenericTeamId(0);
 }
 
 
@@ -23,4 +25,9 @@ float ABTPS_BaseCharacter::TakeDamage(float DamageAmount,
 	AActor* DamageCauser)
 {
 	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+}
+
+FGenericTeamId ABTPS_BaseCharacter::GetGenericTeamId() const
+{
+	return TeamID;
 }

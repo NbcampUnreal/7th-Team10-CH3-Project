@@ -8,6 +8,8 @@ ABTPS_EnemyCharacterBase::ABTPS_EnemyCharacterBase()
 	
 	AIControllerClass = ABTPS_AIController::StaticClass();
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
+	
+	TeamID = FGenericTeamId(1);
 }
 
 void ABTPS_EnemyCharacterBase::BeginPlay()

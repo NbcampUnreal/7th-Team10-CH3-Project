@@ -2,13 +2,14 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "GenericTeamAgentInterface.h"
 #include "BTPS_BaseCharacter.generated.h"
 
 class UBTPS_StatComponent;
 class UBTPS_CombatComponent;
 
 UCLASS()
-class BASICTPS_API ABTPS_BaseCharacter : public ACharacter
+class BASICTPS_API ABTPS_BaseCharacter : public ACharacter, public IGenericTeamAgentInterface
 {
 	GENERATED_BODY()
 
@@ -21,8 +22,11 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<UBTPS_CombatComponent> CombatComp;
 	
+	FGenericTeamId TeamID = FGenericTeamId::NoTeam;
+	
 public:	
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	virtual FGenericTeamId GetGenericTeamId() const override;
 	virtual float TakeDamage(float DamageAmount,
 		struct FDamageEvent const& DamageEvent,
 		class AController* EventInstigator,
