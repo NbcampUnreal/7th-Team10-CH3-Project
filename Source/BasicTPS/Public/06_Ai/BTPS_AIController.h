@@ -7,7 +7,10 @@
 #include "Perception/AIPerceptionTypes.h"
 #include "BTPS_AIController.generated.h"
 
+
 class UAISenseConfig_Sight;
+class UBehaviorTree;
+class UBlackboardComponent;
 
 UCLASS()
 class BASICTPS_API ABTPS_AIController : public AAIController
@@ -22,6 +25,12 @@ protected:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="AI")
 	TObjectPtr<UAISenseConfig_Sight> SightConfig;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="AI")
+	TObjectPtr<UBehaviorTree> BehaviorTreeAsset;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="AI")
+	FName TargetKeyName = TEXT("TargetActor");
 	
 	UFUNCTION()
 	void OnTargetDetected(AActor* Actor, FAIStimulus Stimulus);
