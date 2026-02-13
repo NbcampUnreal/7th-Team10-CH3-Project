@@ -1,8 +1,13 @@
 #include "02_Characters/BTPS_EnemyCharacterBase.h"
 
+#include "06_Ai/BTPS_AIController.h"
+
 ABTPS_EnemyCharacterBase::ABTPS_EnemyCharacterBase()
 {
 	PrimaryActorTick.bCanEverTick = false;
+	
+	AIControllerClass = ABTPS_AIController::StaticClass();
+	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 }
 
 void ABTPS_EnemyCharacterBase::BeginPlay()
