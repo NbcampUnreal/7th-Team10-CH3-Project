@@ -42,7 +42,7 @@ void ABTPS_AIController::OnPossess(APawn* InPawn)
 void ABTPS_AIController::OnTargetDetected(AActor* Actor, FAIStimulus Stimulus)
 {
 	auto* MyPawn = Cast<ABTPS_EnemyCharacterBase>(GetPawn());
-	if (!MyPawn) return;
+	if (!MyPawn || !Actor) return;
 	if (Actor && Stimulus.WasSuccessfullySensed())
 	{
 		UE_LOG(LogTemp, Warning, TEXT("AI Controller: Target Found! : %s"), *Actor->GetName());
