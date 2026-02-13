@@ -1,19 +1,16 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "01_Game/BTPS_GameMode.h"
-//TODO: 게임스테이트, 게임인스턴스 구현
 #include "01_Game/BTPS_GameState.h"
 #include "01_Game/BTPS_GameInstance.h"
 
 #include "02_Characters/BTPS_PlayerCharacter.h"
-//TODO: 플레이어 컨트롤러 추가시 해제
-//#include "02_Characters/BTPS_PlayerController.h"
+#include "02_Characters/BTPS_PlayerController.h"
 
 
 ABTPS_GameMode::ABTPS_GameMode()
 {
-	//TODO: 플레이어 컨트롤러 추가시 해제
-	//PlayerControllerClass = ABTPS_PlayerController::StaticClass();
+	PlayerControllerClass = ABTPS_PlayerController::StaticClass();
 	
 	DefaultPawnClass = ABTPS_PlayerCharacter::StaticClass();
 	
