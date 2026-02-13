@@ -2,6 +2,7 @@
 
 
 #include "06_Ai/BTPS_AIController.h"
+#include "02_Characters/BTPS_EnemyCharacterBase.h"
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISenseConfig_Sight.h"
 
@@ -14,8 +15,8 @@ ABTPS_AIController::ABTPS_AIController()
 	
 	if (SightConfig)
 	{
-		SightConfig->SightRadius = 100.0f;
-		SightConfig->LoseSightRadius = 200.0f;
+		SightConfig->SightRadius = 1500.0f;
+		SightConfig->LoseSightRadius = 2000.0f;
 		SightConfig->PeripheralVisionAngleDegrees = 90.0f;
 		
 		SightConfig->DetectionByAffiliation.bDetectEnemies = true;
@@ -40,15 +41,17 @@ void ABTPS_AIController::OnPossess(APawn* InPawn)
 
 void ABTPS_AIController::OnTargetDetected(AActor* Actor, FAIStimulus Stimulus)
 {
+	auto* MyPawn = Cast<ABTPS_EnemyCharacterBase>(GetPawn());
+	if (!MyPawn) return;
 	if (Actor && Stimulus.WasSuccessfullySensed())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("AI Controller: I see you! Target: %s"), *Actor->GetName());
-        
-		// TODO/hyun 여기에 나중에 공격 로직을 넣을 예정
+		UE_LOG(LogTemp, Warning, TEXT("AI Controller: Target Found! : %s"), *Actor->GetName());
+		MyPawn->SetTarget(Actor);
 	}
 	else
 	{
 		UE_LOG(LogTemp, Log, TEXT("AI Controller: Target Lost: %s"), *Actor->GetName());
+		MyPawn->ClearTarget();
 	}
 }
 
