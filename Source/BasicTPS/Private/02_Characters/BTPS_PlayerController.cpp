@@ -11,21 +11,23 @@
 
 ABTPS_PlayerController::ABTPS_PlayerController()
 	: InputMappingContext(nullptr),
-	  MoveAction(nullptr),	
-	  LookAction(nullptr),
-	  JumpAction(nullptr),
-	  SprintAction(nullptr),
-	  AimAction(nullptr),
-	  FireAction(nullptr),
-	  InteractAction(nullptr),
-	  ToggleCameraAction(nullptr),
-	  ToggleMenuAction(nullptr),
-	  HUDWidgetClass(nullptr), 
-	  HUDWidgetInstance(nullptr),
-	  MainMenuWidgetClass(nullptr),
-	  MainMenuWidgetInstance(nullptr),
-	  PauseMenuWidgetClass(nullptr),
-	  PauseMenuWidgetInstance(nullptr)
+	MoveAction(nullptr),
+	LookAction(nullptr),
+	JumpAction(nullptr),
+	SprintAction(nullptr),
+	AimAction(nullptr),
+	FireAction(nullptr),
+	InteractAction(nullptr),
+	ToggleCameraAction(nullptr),
+	ToggleMenuAction(nullptr),
+	HUDWidgetClass(nullptr),
+	HUDWidgetInstance(nullptr),
+	MainMenuWidgetClass(nullptr),
+	MainMenuWidgetInstance(nullptr),
+	PauseMenuWidgetClass(nullptr),
+	PauseMenuWidgetInstance(nullptr),
+	GameOverMenuWidgetClass(nullptr),
+	GameOverMenuWidgetInstance(nullptr)
 {
 }
 
@@ -40,6 +42,7 @@ void ABTPS_PlayerController::BeginPlay()
 		{
 			if (InputMappingContext)
 			{
+				Subsystem->ClearAllMappings();
 				Subsystem->AddMappingContext(InputMappingContext, 0);
 			}
 		}
@@ -57,16 +60,21 @@ void ABTPS_PlayerController::BeginPlay()
 			SetViewTarget(FoundCameras[0]); // 시작 시점은 메뉴 카메라
 		}
 
-		// 3. 캐릭터 움직임 얼리기 (선택 사항: 걷기 방지)
 		if (ACharacter* MyChar = GetCharacter())
 		{
 			MyChar->GetCharacterMovement()->StopMovementImmediately();
-			MyChar->SetActorHiddenInGame(false); // 보이게 설정
+			MyChar->SetActorHiddenInGame(false); 
 		}
 	}
-	else
+	else if (CurrentMapName.Contains(TEXT("L_BasicLevel")))
 	{
-		ShowGameHUD();
+		bShowMouseCursor = false;
+
+		FInputModeGameOnly InputMode;
+		InputMode.SetConsumeCaptureMouseDown(false);
+		SetInputMode(InputMode);
+
+		SetPause(false);
 	}
 }
 
@@ -90,11 +98,20 @@ void ABTPS_PlayerController::ShowGameHUD()
 		PauseMenuWidgetInstance = nullptr;
 	}
 
+	if (GameOverMenuWidgetInstance)
+	{
+		GameOverMenuWidgetInstance->RemoveFromParent();
+		GameOverMenuWidgetInstance = nullptr;
+	}
+
 	if (HUDWidgetInstance)
 	{
 		HUDWidgetInstance->RemoveFromParent();
 		HUDWidgetInstance = nullptr;
 	}
+
+	SetPause(false);
+	bIsGamePaused = false;
 
 	if (HUDWidgetClass)
 	{
@@ -113,6 +130,8 @@ void ABTPS_PlayerController::ShowGameHUD()
 			BTPS_GameState->UpdateHUD();
 		}
 	}
+
+	
 }
 
 void ABTPS_PlayerController::ShowMainMenu(bool bIsRestart)
@@ -190,8 +209,8 @@ void ABTPS_PlayerController::ShowGameOverMenu(bool bIsRestart)
 		MainMenuWidgetInstance->RemoveFromParent();
 		MainMenuWidgetInstance = nullptr;
 	}
-	
-	if (GameOverMenuWidgetClass) 
+
+	if (GameOverMenuWidgetClass)
 	{
 		GameOverMenuWidgetInstance = CreateWidget<UUserWidget>(this, GameOverMenuWidgetClass);
 		if (GameOverMenuWidgetInstance)
@@ -266,13 +285,13 @@ void ABTPS_PlayerController::StartGame()
 		BTPS_GameInstance->TotalScore = 0;
 	}
 
-	/*
+	
 	if (MainMenuWidgetInstance)
 	{
 		MainMenuWidgetInstance->RemoveFromParent();
 		MainMenuWidgetInstance = nullptr;
 	}
-*/
+
 	bShowMouseCursor = false;
 	SetInputMode(FInputModeGameOnly());
 	SetPause(false);
@@ -284,7 +303,7 @@ void ABTPS_PlayerController::StartGame()
 		TargetRotation = StartRotation + FRotator(0.0f, 179.9f, 0.0f);
 
 		SequenceStartTime = GetWorld()->GetTimeSeconds();
-		RotationDuration = 0.5f; 
+		RotationDuration = 0.5f;
 
 		GetWorldTimerManager().SetTimer(RotationTimerHandle, this, &ABTPS_PlayerController::SmoothRotateStep, 0.01f, true);
 	}
@@ -307,13 +326,13 @@ void ABTPS_PlayerController::SetupInputComponent()
 		{
 			UE_LOG(LogTemp, Warning, TEXT("MenuAction binding success!"));
 			EnhancedInput->BindAction(ToggleMenuAction, ETriggerEvent::Triggered, this,
-			                          &ABTPS_PlayerController::TogglePauseMenu);
+				&ABTPS_PlayerController::TogglePauseMenu);
 		}
 		else
 		{
 			UE_LOG(LogTemp, Error, TEXT("MenuAction is NULL!"));
 		}
-		
+
 		if (SkipLevelAction)
 		{
 			EnhancedInput->BindAction(SkipLevelAction, ETriggerEvent::Started, this, &ABTPS_PlayerController::OnSkipLevel);
@@ -326,7 +345,7 @@ void ABTPS_PlayerController::OnSkipLevel()
 	if (ABTPS_GameState* BTPSGameState = Cast<ABTPS_GameState>(UGameplayStatics::GetGameState(GetWorld())))
 	{
 		BTPSGameState->EndLevel();
-        
+
 		UE_LOG(LogTemp, Warning, TEXT("Cheat Activated: Skipping to Next Level!"));
 	}
 }
