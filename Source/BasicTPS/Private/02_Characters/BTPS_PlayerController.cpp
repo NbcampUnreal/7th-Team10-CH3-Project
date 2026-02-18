@@ -6,24 +6,28 @@
 #include "Blueprint/UserWidget.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/TextBlock.h"
+#include "GameFramework/Character.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 ABTPS_PlayerController::ABTPS_PlayerController()
 	: InputMappingContext(nullptr),
-	  MoveAction(nullptr),	
-	  LookAction(nullptr),
-	  JumpAction(nullptr),
-	  SprintAction(nullptr),
-	  AimAction(nullptr),
-	  FireAction(nullptr),
-	  InteractAction(nullptr),
-	  ToggleCameraAction(nullptr),
-	  ToggleMenuAction(nullptr),
-	  HUDWidgetClass(nullptr), 
-	  HUDWidgetInstance(nullptr),
-	  MainMenuWidgetClass(nullptr),
-	  MainMenuWidgetInstance(nullptr),
-	  PauseMenuWidgetClass(nullptr),
-	  PauseMenuWidgetInstance(nullptr)
+	MoveAction(nullptr),
+	LookAction(nullptr),
+	JumpAction(nullptr),
+	SprintAction(nullptr),
+	AimAction(nullptr),
+	FireAction(nullptr),
+	InteractAction(nullptr),
+	ToggleCameraAction(nullptr),
+	ToggleMenuAction(nullptr),
+	HUDWidgetClass(nullptr),
+	HUDWidgetInstance(nullptr),
+	MainMenuWidgetClass(nullptr),
+	MainMenuWidgetInstance(nullptr),
+	PauseMenuWidgetClass(nullptr),
+	PauseMenuWidgetInstance(nullptr),
+	GameOverMenuWidgetClass(nullptr),
+	GameOverMenuWidgetInstance(nullptr)
 {
 }
 
@@ -38,6 +42,7 @@ void ABTPS_PlayerController::BeginPlay()
 		{
 			if (InputMappingContext)
 			{
+				Subsystem->ClearAllMappings();
 				Subsystem->AddMappingContext(InputMappingContext, 0);
 			}
 		}
@@ -47,10 +52,29 @@ void ABTPS_PlayerController::BeginPlay()
 	if (CurrentMapName.Contains("L_MenuLevel"))
 	{
 		ShowMainMenu(false);
+		TArray<AActor*> FoundCameras;
+		UGameplayStatics::GetAllActorsWithTag(GetWorld(), MenuCameraTag, FoundCameras);
+
+		if (FoundCameras.Num() > 0)
+		{
+			SetViewTarget(FoundCameras[0]); // 시작 시점은 메뉴 카메라
+		}
+
+		if (ACharacter* MyChar = GetCharacter())
+		{
+			MyChar->GetCharacterMovement()->StopMovementImmediately();
+			MyChar->SetActorHiddenInGame(false); 
+		}
 	}
-	else
+	else if (CurrentMapName.Contains(TEXT("L_BasicLevel")))
 	{
-		ShowGameHUD();
+		bShowMouseCursor = false;
+
+		FInputModeGameOnly InputMode;
+		InputMode.SetConsumeCaptureMouseDown(false);
+		SetInputMode(InputMode);
+
+		SetPause(false);
 	}
 }
 
@@ -74,11 +98,20 @@ void ABTPS_PlayerController::ShowGameHUD()
 		PauseMenuWidgetInstance = nullptr;
 	}
 
+	if (GameOverMenuWidgetInstance)
+	{
+		GameOverMenuWidgetInstance->RemoveFromParent();
+		GameOverMenuWidgetInstance = nullptr;
+	}
+
 	if (HUDWidgetInstance)
 	{
 		HUDWidgetInstance->RemoveFromParent();
 		HUDWidgetInstance = nullptr;
 	}
+
+	SetPause(false);
+	bIsGamePaused = false;
 
 	if (HUDWidgetClass)
 	{
@@ -97,6 +130,8 @@ void ABTPS_PlayerController::ShowGameHUD()
 			BTPS_GameState->UpdateHUD();
 		}
 	}
+
+	
 }
 
 void ABTPS_PlayerController::ShowMainMenu(bool bIsRestart)
@@ -174,8 +209,8 @@ void ABTPS_PlayerController::ShowGameOverMenu(bool bIsRestart)
 		MainMenuWidgetInstance->RemoveFromParent();
 		MainMenuWidgetInstance = nullptr;
 	}
-	
-	if (GameOverMenuWidgetClass) 
+
+	if (GameOverMenuWidgetClass)
 	{
 		GameOverMenuWidgetInstance = CreateWidget<UUserWidget>(this, GameOverMenuWidgetClass);
 		if (GameOverMenuWidgetInstance)
@@ -250,12 +285,33 @@ void ABTPS_PlayerController::StartGame()
 		BTPS_GameInstance->TotalScore = 0;
 	}
 
-	// 레벨 전환 전에 InputMode를 Game 모드로 변경
+	
+	if (MainMenuWidgetInstance)
+	{
+		MainMenuWidgetInstance->RemoveFromParent();
+		MainMenuWidgetInstance = nullptr;
+	}
+
 	bShowMouseCursor = false;
 	SetInputMode(FInputModeGameOnly());
-
-	UGameplayStatics::OpenLevel(GetWorld(), FName("L_BasicLevel"));
 	SetPause(false);
+
+	if (GetCharacter())
+	{
+		StartRotation = GetCharacter()->GetActorRotation();
+
+		TargetRotation = StartRotation + FRotator(0.0f, 179.9f, 0.0f);
+
+		SequenceStartTime = GetWorld()->GetTimeSeconds();
+		RotationDuration = 0.5f;
+
+		GetWorldTimerManager().SetTimer(RotationTimerHandle, this, &ABTPS_PlayerController::SmoothRotateStep, 0.01f, true);
+	}
+}
+
+void ABTPS_PlayerController::LoadGameplayLevel()
+{
+	UGameplayStatics::OpenLevel(GetWorld(), FName("L_BasicLevel"));
 }
 
 void ABTPS_PlayerController::SetupInputComponent()
@@ -270,13 +326,13 @@ void ABTPS_PlayerController::SetupInputComponent()
 		{
 			UE_LOG(LogTemp, Warning, TEXT("MenuAction binding success!"));
 			EnhancedInput->BindAction(ToggleMenuAction, ETriggerEvent::Triggered, this,
-			                          &ABTPS_PlayerController::TogglePauseMenu);
+				&ABTPS_PlayerController::TogglePauseMenu);
 		}
 		else
 		{
 			UE_LOG(LogTemp, Error, TEXT("MenuAction is NULL!"));
 		}
-		
+
 		if (SkipLevelAction)
 		{
 			EnhancedInput->BindAction(SkipLevelAction, ETriggerEvent::Started, this, &ABTPS_PlayerController::OnSkipLevel);
@@ -289,7 +345,36 @@ void ABTPS_PlayerController::OnSkipLevel()
 	if (ABTPS_GameState* BTPSGameState = Cast<ABTPS_GameState>(UGameplayStatics::GetGameState(GetWorld())))
 	{
 		BTPSGameState->EndLevel();
-        
+
 		UE_LOG(LogTemp, Warning, TEXT("Cheat Activated: Skipping to Next Level!"));
+	}
+}
+
+void ABTPS_PlayerController::SmoothRotateStep()
+{
+	if (!GetCharacter())
+	{
+		GetWorldTimerManager().ClearTimer(RotationTimerHandle);
+		return;
+	}
+
+	float CurrentTime = GetWorld()->GetTimeSeconds();
+	float Alpha = (CurrentTime - SequenceStartTime) / RotationDuration;
+
+	Alpha = FMath::Clamp(Alpha, 0.0f, 1.0f);
+
+	FRotator NewRot = FMath::InterpEaseInOut(StartRotation, TargetRotation, Alpha, 2.0f);
+
+	GetCharacter()->SetActorRotation(NewRot);
+	SetControlRotation(NewRot);
+
+	if (Alpha >= 1.0f)
+	{
+		GetCharacter()->SetActorRotation(TargetRotation);
+		SetControlRotation(TargetRotation);
+
+		GetWorldTimerManager().ClearTimer(RotationTimerHandle);
+
+		SetViewTargetWithBlend(GetCharacter(), 1.5f, VTBlend_Cubic, 0.0f, true);
 	}
 }

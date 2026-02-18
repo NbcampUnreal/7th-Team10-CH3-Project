@@ -38,7 +38,7 @@ public:
 	TObjectPtr<UInputAction> ToggleMenuAction;  // Tab 키 메뉴 액션
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* SkipLevelAction; // pgdown 레벨스킵 치트키
-	
+
 	
 	// Menu HUD
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HUD")
@@ -61,13 +61,14 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Menu")
 	UUserWidget* PauseMenuWidgetInstance;
 	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Menu")
+	FName MenuCameraTag = TEXT("MenuCam");
+	
 	UFUNCTION(BlueprintPure, Category = "HUD")
 	UUserWidget* GetHUDWidget() const;
 	// HUD 표시
 	UFUNCTION(BlueprintCallable, Category = "HUD")
 	void ShowGameHUD();
-	
-	
 	
 	UFUNCTION(BlueprintCallable, Category = "Menu")
 	void ShowMainMenu(bool bIsRestart);
@@ -82,11 +83,25 @@ public:
 	// 게임 시작
 	UFUNCTION(BlueprintCallable, Category = "Menu")
 	void StartGame();
+	UFUNCTION(BlueprintCallable, Category = "GameLogic")
+	void LoadGameplayLevel();
 	
 	virtual void BeginPlay() override;
 
 private:
+	UFUNCTION()
+	void SmoothRotateStep();
+	
 	bool bIsGamePaused = false;
 	virtual void SetupInputComponent() override;
 	void OnSkipLevel();
+	
+	// 시작메뉴 캐릭터 움직임 함수
+	FTimerHandle RotationTimerHandle;
+	FRotator StartRotation;  
+	FRotator TargetRotation; 
+	float SequenceStartTime;  
+	float RotationDuration = 0.5f;   
+	
+
 };
