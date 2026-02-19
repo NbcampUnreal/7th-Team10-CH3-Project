@@ -1,6 +1,7 @@
 ﻿#include "02_Characters/BTPS_PlayerCharacter.h"
 #include "02_Characters/BTPS_PlayerController.h"
 #include "03_Components/BTPS_ShootingMachineComponent.h"
+#include "03_Components/BTPS_StatComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
