@@ -43,8 +43,11 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Monster")
 	int32 KilledMonsterCount = 0;
 	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Level")
+	float LevelDuration;
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Level")
-	int32 CurrentLevelIndex = 0;
+	int32 CurrentLevelIndex;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Level")
 	int32 MaxLevels;
@@ -60,6 +63,9 @@ public:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Wave")
 	EBTPS_WaveState WaveState = EBTPS_WaveState::None;
+	
+	FTimerHandle LevelTimerHandle;
+	FTimerHandle HUDUpdateTimerHandle;
 	
 public:
 	// Delegate
@@ -78,8 +84,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Score")
 	void AddScore(int32 Amount);
 	UFUNCTION(BlueprintCallable, Category = "Level")
-	void OnGameOver();
 
+	void OnGameOver();
+	void OnLevelTimeUp();	
+	
 	void UpdateHUD();
 	void StartLevel();
 	void EndLevel();

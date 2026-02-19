@@ -11,6 +11,7 @@
 
 ABTPS_GameState::ABTPS_GameState()
 {
+	LevelDuration = 30.0f;
 	CurrentLevelIndex = 0;
 	MaxLevels = 1;
 }
@@ -18,19 +19,7 @@ ABTPS_GameState::ABTPS_GameState()
 void ABTPS_GameState::BeginPlay()
 {
 	Super::BeginPlay();
-
 	StartLevel();
-
-	//TODO: 타이머 설정시 해제
-	/*
-	GetWorldTimerManager().SetTimer(
-		HUDUpdateTimerHandle,
-		this,
-		&ABTPS_GameState::UpdateHUD,
-		0.1f,
-		true
-	);
-	*/
 }
 
 ABTPS_GameState* ABTPS_GameState::Get(const UObject* WorldContext)
@@ -66,6 +55,22 @@ void ABTPS_GameState::AddScore(int32 Amount)
 	}
 }
 
+void ABTPS_GameState::OnGameOver()
+{
+	if (APlayerController* PlayerController = GetWorld()->GetFirstPlayerController())
+	{
+		if (ABTPS_PlayerController* BTPS_PlayerController = Cast<ABTPS_PlayerController>(PlayerController))
+		{
+			BTPS_PlayerController->SetPause(true);
+			BTPS_PlayerController->ShowGameOverMenu(true);
+		}
+	}
+}
+
+void ABTPS_GameState::OnLevelTimeUp()
+{
+	EndLevel();
+}
 
 void ABTPS_GameState::UpdateHUD()
 {
@@ -154,23 +159,24 @@ void ABTPS_GameState::StartLevel()
 	*/
 	}
 
+	FString CurrentMapName = UGameplayStatics::GetCurrentLevelName(GetWorld());
 
-	// TODO: 타이머 설정시 주석 해제
-	/*
-	GetWorldTimerManager().SetTimer(
-		LevelTimerHandle,
-		this,
-		&ABTPS_GameState::OnLevelTimeUp,
-		LevelDuration,
-		false
-	);
-	*/
+	if (CurrentMapName != TEXT("L_MenuLevel"))
+	{
+		GetWorldTimerManager().SetTimer(
+			LevelTimerHandle,
+			this,
+			&ABTPS_GameState::OnLevelTimeUp,
+			LevelDuration,
+			false
+		);
+	}
 }
 
 void ABTPS_GameState::EndLevel()
 {
-	// TODO: 타이머 해제
-	// GetWorldTimerManager().ClearTimer(LevelTimerHandle);
+	GetWorldTimerManager().ClearTimer(LevelTimerHandle);
+	AddScore(LevelScore);
 	CurrentLevelIndex++;
 
 	// 모든 레벨을 다 돌았다면 게임 오버 처리
@@ -179,7 +185,7 @@ void ABTPS_GameState::EndLevel()
 		OnGameOver();
 		return;
 	}
-		
+
 	// 레벨 맵 이름이 있다면 해당 맵 불러오기
 	if (LevelMapNames.IsValidIndex(CurrentLevelIndex))
 	{
@@ -190,16 +196,3 @@ void ABTPS_GameState::EndLevel()
 		OnGameOver();
 	}
 }
-
-void ABTPS_GameState::OnGameOver()
-{
-	if (APlayerController* PlayerController = GetWorld()->GetFirstPlayerController())
-	{
-		if (ABTPS_PlayerController* BTPS_PlayerController = Cast<ABTPS_PlayerController>(PlayerController))
-		{
-			BTPS_PlayerController->SetPause(true);
-			BTPS_PlayerController->ShowGameOverMenu(true);
-		}
-	}
-}
-
