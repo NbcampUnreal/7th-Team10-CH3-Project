@@ -7,7 +7,6 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "EnhancedInputComponent.h"
 
-
 ABTPS_PlayerCharacter::ABTPS_PlayerCharacter()
 {
 	PrimaryActorTick.bCanEverTick = false;
@@ -109,7 +108,6 @@ void ABTPS_PlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInp
 					&ABTPS_PlayerCharacter::StopSprint
 				);
 			}	
-
 			if (ShootingMachineComp)
 			{
 				if (PlayerController->AimAction)
@@ -192,7 +190,15 @@ void ABTPS_PlayerCharacter::StartJump(const FInputActionValue& value)
 {
 	if (value.Get<bool>())
 	{
-		Jump();
+		if (!GetStatComp()) return;
+		
+		if (CanJump())
+		{
+			if (GetStatComp()->TryUseStamina(JumpStaminaCost))
+			{
+				Jump();
+			}
+		}
 	}
 }
 
@@ -206,9 +212,23 @@ void ABTPS_PlayerCharacter::StopJump(const FInputActionValue& value)
 
 void ABTPS_PlayerCharacter::StartSprint(const FInputActionValue& value)
 {
-	if (GetCharacterMovement())
+	if (!GetCharacterMovement() || !GetStatComp()) return;
+	
+	if (GetVelocity().SizeSquared() <= 0.0f)
+	{
+		GetCharacterMovement()->MaxWalkSpeed = NormalSpeed;
+		return;
+	}
+	
+	float CostThisFrame = SprintCostPerSecond * GetWorld()->GetDeltaSeconds();
+	
+	if (GetStatComp()->TryUseStamina(CostThisFrame))
 	{
 		GetCharacterMovement()->MaxWalkSpeed = SprintSpeed;
+	}
+	else
+	{
+		GetCharacterMovement()->MaxWalkSpeed = NormalSpeed;
 	}
 }
 
