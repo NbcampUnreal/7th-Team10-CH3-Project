@@ -15,6 +15,16 @@ void UBTPS_StatComponent::BeginPlay()
 	Super::BeginPlay();
 	CurrentHP = MaxHP;
 	CurrentStamina = MaxStamina;
+	
+	if (OnHPChanged.IsBound())
+	{
+		OnHPChanged.Broadcast(CurrentHP, MaxHP);
+	}
+    
+	if (OnStaminaChanged.IsBound())
+	{
+		OnStaminaChanged.Broadcast(CurrentStamina, MaxStamina);
+	}
 }
 
 void UBTPS_StatComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
