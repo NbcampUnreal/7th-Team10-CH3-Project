@@ -36,8 +36,14 @@ public:
 
 	
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat|Health")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat")
 	float MaxHP = 100.0f;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat")
+	float Defense = 0.0f;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat|System")
+	float HalfDamageDefense = 50.0f;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stat|Health")
 	float CurrentHP;
@@ -58,7 +64,7 @@ public:
 	
 	
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat|Stamina")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat")
 	float MaxStamina = 100.0f;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stat|Stamina")
@@ -80,12 +86,11 @@ public:
 	float GetCurrentStamina() const {return CurrentStamina;}
 	
 	UFUNCTION(BlueprintCallable, Category = "Stat|Stamina")
-	bool bUseStamina(float Cost);
+	bool TryUseStamina(float Cost);
 	
 	void RegenStamina();
 	void RecoverStamina(float RecoverAmount);
 
 private:
-	float LastStaminaUseTime;
 	void StartRegenTimer();
 };

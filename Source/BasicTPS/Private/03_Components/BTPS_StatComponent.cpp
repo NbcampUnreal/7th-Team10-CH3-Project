@@ -31,8 +31,18 @@ void UBTPS_StatComponent::TickComponent(float DeltaTime, enum ELevelTick TickTyp
 
 void UBTPS_StatComponent::OnTakeDamage(float DamageAmount)
 {
-	CurrentHP = FMath::Clamp(CurrentHP - DamageAmount, 0.0f, MaxHP);
-	UE_LOG(LogTemp, Warning, TEXT("StatComp: %s HP Updated: %f / %f"), *GetOwner()->GetName(), CurrentHP, MaxHP);
+	float ActualDamage = DamageAmount;
+	if (HalfDamageDefense > KINDA_SMALL_NUMBER)
+	{
+		float DamageMultiplier = HalfDamageDefense / (HalfDamageDefense + Defense);
+		ActualDamage = DamageAmount * DamageMultiplier;
+	}
+	
+	CurrentHP = FMath::Clamp(CurrentHP - ActualDamage, 0.0f, MaxHP);
+	
+	UE_LOG(LogTemp, Warning, TEXT("StatComp: %s HP Updated: %f / %f"), 
+		*GetOwner()->GetName(), CurrentHP, MaxHP);
+	
 	if (OnHPChanged.IsBound())
 	{
 		OnHPChanged.Broadcast(CurrentHP, MaxHP);
@@ -58,7 +68,7 @@ void UBTPS_StatComponent::Heal(float HealAmount)
 	}
 }
 
-bool UBTPS_StatComponent::bUseStamina(float Cost)
+bool UBTPS_StatComponent::TryUseStamina(float Cost)
 {
 	if (CurrentStamina < Cost)
 	{
