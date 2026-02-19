@@ -5,6 +5,9 @@
 #include "Engine/EngineTypes.h"
 #include "BTPS_ShootingMachineComponent.generated.h"
 
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnAmmoChangedDelegate, int32, CurrentAmmo, int32, MaxAmmo);
+
 class UInputAction;
 class ABTPS_WeaponBase;
 class UBTPS_CombatComponent;
@@ -40,9 +43,6 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Weapon")
 	FName RightHandSocketName = TEXT("hand_r");
 
-	UPROPERTY(VisibleInstanceOnly, Category = "Weapon")
-	ABTPS_WeaponBase* CurrentWeapon;
-
 	UPROPERTY(EditAnywhere, Category = "Interact")
 	FName LeftHandSocketName = TEXT("hand_l");
 
@@ -73,6 +73,9 @@ protected:
 public:	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	UPROPERTY(BlueprintAssignable, Category = "Events")
+	FOnAmmoChangedDelegate OnAmmoChanged;
+
 	void AimStarted(const FInputActionValue& Value);
 	void AimCompleted(const FInputActionValue& Value);
 	void Fire(const FInputActionValue& Value);
@@ -93,6 +96,12 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Input")
 	virtual void DoToggleCamera();
+
+	UFUNCTION(BlueprintCallable, Category = "Input")
+	virtual void DoReload();
+
+	UPROPERTY(VisibleInstanceOnly, Category = "Weapon")
+	ABTPS_WeaponBase* CurrentWeapon;
 
 private:
 	UPROPERTY()

@@ -38,30 +38,6 @@ void UBTPS_ShootingMachineComponent::TickComponent(float DeltaTime, ELevelTick T
 
 }
 
-/* action binding할때 여기 참조해서 같이 바인딩.
-void UBTPS_ShootingMachineComponent::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent)) {
-
-		if (AimAction)
-		{
-			EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Started, this, &UBTPS_ShootingMachineComponent::AimStarted);
-			EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Completed, this, &UBTPS_ShootingMachineComponent::AimCompleted);
-		}
-
-		if (FireAction)
-		{
-			EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Started, this, &UBTPS_ShootingMachineComponent::Fire);
-		}
-
-		if (InteractAction)
-		{
-			EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &UBTPS_ShootingMachineComponent::Interact);
-		}
-	}
-}
-*/
-
 
 void UBTPS_ShootingMachineComponent::AimStarted(const FInputActionValue& Value)
 {
@@ -115,6 +91,8 @@ void UBTPS_ShootingMachineComponent::DoFire()
 {
 	if (!CurrentWeapon || !PlayerCharacter) return;
 
+	if (CurrentWeapon->GetCurrentAmmo() <= 0) return;
+
 	if (PlayerCharacter && FireMontage)
 	{
 		PlayerCharacter->PlayAnimMontage(FireMontage);
@@ -163,6 +141,17 @@ void UBTPS_ShootingMachineComponent::DoFire()
 		10, // 추후 무기 데미지로 변경해주세요! ex: CurrentWeapon->Damage
 		RealHit
 		);
+	}
+
+	CurrentWeapon->ShootAmmo();
+	OnAmmoChanged.Broadcast(CurrentWeapon->GetCurrentAmmo(), CurrentWeapon->GetMaxAmmo());
+
+	if(CurrentWeapon->GetCurrentAmmo() == 0)
+	{
+		if (CurrentWeapon->Reload())
+		{
+			OnAmmoChanged.Broadcast(CurrentWeapon->GetCurrentAmmo(), CurrentWeapon->GetMaxAmmo());
+		}
 	}
 }
 
@@ -231,6 +220,15 @@ void UBTPS_ShootingMachineComponent::DoToggleCamera()
 		// [TPS 모드]
 		SpringArm->TargetArmLength = TPSArmLength;
 		PlayerCharacter->bUseControllerRotationYaw = true;
+	}
+}
+
+void UBTPS_ShootingMachineComponent::DoReload()
+{
+	if (CurrentWeapon)
+	{
+		CurrentWeapon->Reload();
+		OnAmmoChanged.Broadcast(CurrentWeapon->GetCurrentAmmo(), CurrentWeapon->GetMaxAmmo());
 	}
 }
 
