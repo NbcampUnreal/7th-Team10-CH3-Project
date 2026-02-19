@@ -4,7 +4,6 @@
 #include "BTPS_BaseCharacter.h"
 #include "BTPS_EnemyCharacterBase.generated.h"
 
-
 UCLASS()
 class BASICTPS_API ABTPS_EnemyCharacterBase : public ABTPS_BaseCharacter
 {
@@ -22,8 +21,8 @@ protected:
 
 	UPROPERTY(VisibleInstanceOnly, Category = "Combat")
 	TWeakObjectPtr<AActor> CurrentTarget;
-	//몬스터용 사망판정 분기용
-	//virtual void OnDeath() override;
+	
+	virtual void OnDeath() override;
 
 public:
 	virtual void Tick(float DeltaTime) override;
