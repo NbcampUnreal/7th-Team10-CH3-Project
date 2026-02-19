@@ -8,6 +8,7 @@
 
 class UProgressBar;
 class UBTPS_StatComponent;
+class UBTPS_ShootingMachineComponent;
 
 UCLASS()
 class BASICTPS_API UBTPS_MainWidget : public UUserWidget
@@ -16,6 +17,8 @@ class BASICTPS_API UBTPS_MainWidget : public UUserWidget
 	
 public:
 	void BindStatComp(UBTPS_StatComponent* StatComp);
+
+	void BindShootingComp(UBTPS_ShootingMachineComponent* ShootingMachineComp);
 	
 protected:
 	virtual void NativeConstruct() override;
@@ -25,6 +28,9 @@ protected:
 	
 	UFUNCTION()
 	void UpdateStamina(float CurrentStamina, float MaxStamina);
+
+	UFUNCTION()
+	void UpdateAmmo(int32 CurrentAmmo, int32 MaxAmmo);
 	
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UProgressBar> HPBar;
