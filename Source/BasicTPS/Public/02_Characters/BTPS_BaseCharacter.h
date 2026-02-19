@@ -17,12 +17,20 @@ public:
 	ABTPS_BaseCharacter();
 	
 protected:
+	virtual void BeginPlay() override;
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<UBTPS_StatComponent> StatComp;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<UBTPS_CombatComponent> CombatComp;
 	
 	FGenericTeamId TeamID = FGenericTeamId::NoTeam;
+	
+	UFUNCTION()
+	virtual void OnDeath();
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State")
+	bool bIsDead = false;
 	
 public:	
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;

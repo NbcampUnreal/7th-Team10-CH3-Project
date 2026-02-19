@@ -1,12 +1,15 @@
 #include "02_Characters/BTPS_EnemyCharacterBase.h"
 
+#include "BrainComponent.h"
+#include "03_Components/BTPS_StatComponent.h"
 #include "06_Ai/BTPS_AIController.h"
+#include "Components/CapsuleComponent.h"
+
 
 ABTPS_EnemyCharacterBase::ABTPS_EnemyCharacterBase()
 {
 	PrimaryActorTick.bCanEverTick = false;
 	
-	AIControllerClass = ABTPS_AIController::StaticClass();
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 	
 	TeamID = FGenericTeamId(1);
@@ -15,7 +18,6 @@ ABTPS_EnemyCharacterBase::ABTPS_EnemyCharacterBase()
 void ABTPS_EnemyCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 void ABTPS_EnemyCharacterBase::Tick(float DeltaTime)
@@ -52,4 +54,18 @@ bool ABTPS_EnemyCharacterBase::HasTarget() const
 void ABTPS_EnemyCharacterBase::ClearTarget()
 {
 	CurrentTarget = nullptr;
+}
+
+void ABTPS_EnemyCharacterBase::OnDeath()
+{
+	Super::OnDeath();
+
+	ABTPS_AIController* AIController = Cast<ABTPS_AIController>(GetController());
+	if (AIController && AIController->GetBrainComponent())
+	{
+		AIController->StopMovement();
+		AIController->GetBrainComponent()->StopLogic("Dead");
+	}
+	
+	SetLifeSpan(3.0f);
 }
