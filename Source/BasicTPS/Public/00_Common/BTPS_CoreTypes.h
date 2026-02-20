@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "CoreMinimal.h"
 #include "BTPS_CoreTypes.generated.h" 
@@ -9,6 +9,13 @@ enum class EXxType : uint8
 {
 	Ex,
 	Xx
+};
+
+UENUM(BlueprintType)
+enum class ESkillType : uint8
+{
+	None,
+	Grenade
 };
 
 USTRUCT(Atomic, BlueprintType)

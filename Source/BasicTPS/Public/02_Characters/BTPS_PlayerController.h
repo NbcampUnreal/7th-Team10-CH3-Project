@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
@@ -38,7 +38,8 @@ public:
 	TObjectPtr<UInputAction> ToggleMenuAction;  // Tab 키 메뉴 액션
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* SkipLevelAction; // pgdown 레벨스킵 치트키
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")
+	TObjectPtr<UInputAction> ThrowGrenadeAction;
 	
 	// Menu HUD
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HUD")
