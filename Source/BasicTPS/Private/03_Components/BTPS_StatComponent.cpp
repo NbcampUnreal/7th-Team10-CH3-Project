@@ -25,6 +25,9 @@ void UBTPS_StatComponent::BeginPlay()
 	{
 		OnStaminaChanged.Broadcast(CurrentStamina, MaxStamina);
 	}
+	
+	
+	
 }
 
 void UBTPS_StatComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)

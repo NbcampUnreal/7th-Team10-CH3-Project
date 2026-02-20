@@ -39,6 +39,7 @@ protected:
 	float SprintCostPerSecond = 15.0f; 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Movement")
 	float JumpStaminaCost = 20.0f;
+
 	
 private:
 	float MaxStamina;
@@ -47,8 +48,8 @@ private:
 	
 public:
 	ABTPS_PlayerCharacter();
-	//virtual void BeginPlay() override;
-
+	virtual void BeginPlay() override;
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
 	TObjectPtr<USpringArmComponent> SpringArmComp;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
@@ -68,4 +69,7 @@ public:
 	// virtual float ApplyDamage(float Damage) override;
 	// virtual bool IsDead(float CurrentHP) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	
+protected:
+	virtual void OnDeath() override;
 };
