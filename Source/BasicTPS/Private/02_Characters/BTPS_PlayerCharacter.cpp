@@ -25,7 +25,6 @@ ABTPS_PlayerCharacter::ABTPS_PlayerCharacter()
 
 	ShootingMachineComp = CreateDefaultSubobject<UBTPS_ShootingMachineComponent>(TEXT("ShootingMachine"));
 
-	SkillComp = CreateDefaultSubobject<UBTPS_SkillComponent>(TEXT("SkillComponent"));
 	GranadeSkillComp = CreateDefaultSubobject<UBTPS_GrenadeSkill>(TEXT("GrenadeSkillComp"));
 
 	NormalSpeed = 800.f;
@@ -35,12 +34,12 @@ ABTPS_PlayerCharacter::ABTPS_PlayerCharacter()
 	GetCharacterMovement()->MaxWalkSpeed = NormalSpeed;
 }
 
-// void ABTPS_PlayerCharacter::BeginPlay()
-// {
-// 	Super::BeginPlay();
-// 	
-// }
-//
+ void ABTPS_PlayerCharacter::BeginPlay()
+ {
+ 	Super::BeginPlay();
+ 	
+ }
+
 // void ABTPS_PlayerCharacter::Tick(float DeltaTime)
 // {
 // 	Super::Tick(DeltaTime);
@@ -161,7 +160,7 @@ void ABTPS_PlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInp
 					);
 				}
 			}
-			if (SkillComp)
+			if (GranadeSkillComp)
 			{
 				if (PlayerController->ThrowGrenadeAction)
 				{
@@ -260,9 +259,9 @@ void ABTPS_PlayerCharacter::StopSprint(const FInputActionValue& value)
 
 void ABTPS_PlayerCharacter::ThrowGrenade(const FInputActionValue& Value)
 {
-	if (SkillComp)
+	if (GranadeSkillComp)
 	{
-		SkillComp->ActivateSkill(ESkillType::Grenade);
+		GranadeSkillComp->TryActivate();
 	}
 }
 

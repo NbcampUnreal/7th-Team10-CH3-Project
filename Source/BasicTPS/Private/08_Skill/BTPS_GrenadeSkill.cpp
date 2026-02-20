@@ -4,14 +4,14 @@
 UBTPS_GrenadeSkill::UBTPS_GrenadeSkill()
 {
 	SkillCost = 20;
-	SkillCoolTime = 12.f;
+	SkillCoolTime = 8.f;
 }
 
 void UBTPS_GrenadeSkill::SkillActivation()
 {
 	//TODO_CSH 캐릭터 투척 애니메이션 구현 완료되면 호출구문 주석 해제 필요
 	//PlayThrowAnimation();
-	SpawnGrenadeProjectile();
+	UBTPS_GrenadeSkill::SpawnGrenadeProjectile();
 }
 
 void UBTPS_GrenadeSkill::SpawnGrenadeProjectile()

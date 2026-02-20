@@ -51,7 +51,7 @@ private:
 	
 public:
 	ABTPS_PlayerCharacter();
-	//virtual void BeginPlay() override;
+	virtual void BeginPlay() override;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
 	TObjectPtr<USpringArmComponent> SpringArmComp;
@@ -60,8 +60,6 @@ public:
 	//UBTPS_ShootingMachineComponent* ShootingMachineComp; TObjectPtr<>로 바꾸지 마세요
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UBTPS_ShootingMachineComponent* ShootingMachineComp;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-	TObjectPtr<UBTPS_SkillComponent> SkillComp;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<UBTPS_GrenadeSkill> GranadeSkillComp;
 	// float HealHp(float HealAmount);

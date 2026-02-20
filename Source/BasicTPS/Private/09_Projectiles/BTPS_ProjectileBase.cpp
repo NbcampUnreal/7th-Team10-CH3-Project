@@ -13,8 +13,10 @@ ABTPS_ProjectileBase::ABTPS_ProjectileBase()
 	CollisionComp = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionComponenet"));
 	RootComponent = CollisionComp;
 	CollisionComp->InitSphereRadius(CollisionRadius);
-	//CollisionComp->SetCollisionProfileName(TEXT("Projectile")); TODO_CSH-명명확인필요
 	CollisionComp->OnComponentHit.AddDynamic(this, &ABTPS_ProjectileBase::OnHit);
+	CollisionComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	CollisionComp->SetSimulatePhysics(true);
+	CollisionComp->SetEnableGravity(true);
 
 	ProjectileMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ProjectileMesh"));
 	ProjectileMesh->SetupAttachment(RootComponent);
