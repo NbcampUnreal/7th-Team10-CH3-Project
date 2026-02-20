@@ -35,11 +35,6 @@ ABTPS_PlayerCharacter::ABTPS_PlayerCharacter()
 void ABTPS_PlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-
-	if (StatComp)
-	{
-		StatComp->OnDeath.AddDynamic(this, &ABTPS_PlayerCharacter::OnDeath);
-	}
 }
 
 //
