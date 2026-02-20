@@ -9,6 +9,8 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "EnhancedInputComponent.h"
+#include "01_Game/BTPS_GameState.h"
+#include "Kismet/GameplayStatics.h"
 
 ABTPS_PlayerCharacter::ABTPS_PlayerCharacter()
 {
@@ -33,6 +35,7 @@ ABTPS_PlayerCharacter::ABTPS_PlayerCharacter()
 
 	GetCharacterMovement()->MaxWalkSpeed = NormalSpeed;
 }
+
 
  void ABTPS_PlayerCharacter::BeginPlay()
  {
@@ -265,3 +268,12 @@ void ABTPS_PlayerCharacter::ThrowGrenade(const FInputActionValue& Value)
 	}
 }
 
+void ABTPS_PlayerCharacter::OnDeath()
+{
+	Super::OnDeath();
+
+	if (ABTPS_GameState* BTPSGameState = Cast<ABTPS_GameState>(UGameplayStatics::GetGameState(GetWorld())))
+	{
+		BTPSGameState->OnGameOver();
+	}
+}
