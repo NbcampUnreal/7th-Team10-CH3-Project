@@ -36,5 +36,5 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<APawn> EnemyClass;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float SpawnChance;
+	float SpawnChance = 1.f;
 };
