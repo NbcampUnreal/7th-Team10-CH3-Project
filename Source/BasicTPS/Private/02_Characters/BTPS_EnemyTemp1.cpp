@@ -3,13 +3,10 @@
 
 ABTPS_EnemyTemp1::ABTPS_EnemyTemp1()
 {
-	PrimaryActorTick.bCanEverTick = false;
-	
-	Scene = CreateDefaultSubobject<USceneComponent>("Scene");
-	SetRootComponent(Scene);
+	PrimaryActorTick.bCanEverTick = true;
 	
 	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>("StaticMesh");
-	StaticMesh->SetupAttachment(Scene);
+	StaticMesh->SetupAttachment(RootComponent);
 }
 
 void ABTPS_EnemyTemp1::BeginPlay()
