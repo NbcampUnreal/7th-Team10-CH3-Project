@@ -5,6 +5,9 @@ void UBTPS_WaveManager::StartWave(int32 WaveIndex)
 	CurrentWaveIndex = WaveIndex;
 	CurrentState = EBTPS_WaveState::Begin;
 
+	if (WaveIndex > Waves.Num())
+		return;
+
 	const FBTPS_WaveData& Wave = Waves[WaveIndex];
 
 	AliveEnemyCount = Wave.EnemyCount;

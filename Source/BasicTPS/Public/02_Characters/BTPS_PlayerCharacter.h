@@ -1,9 +1,11 @@
-﻿#pragma once
+#pragma once
 
 #include "CoreMinimal.h"
 #include "BTPS_BaseCharacter.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
+#include "08_Skill/BTPS_SkillComponent.h"
+#include "08_Skill/BTPS_GrenadeSkill.h"
 #include "BTPS_PlayerCharacter.generated.h"
 
 struct FInputActionValue;
@@ -27,6 +29,8 @@ protected:
 	void StartSprint(const FInputActionValue& value);
 	UFUNCTION()
 	void StopSprint(const FInputActionValue& value);
+	UFUNCTION()
+	void ThrowGrenade(const FInputActionValue& Value);
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Movement")
 	float NormalSpeed;
@@ -49,7 +53,7 @@ private:
 public:
 	ABTPS_PlayerCharacter();
 	virtual void BeginPlay() override;
-	
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
 	TObjectPtr<USpringArmComponent> SpringArmComp;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
@@ -57,7 +61,8 @@ public:
 	//UBTPS_ShootingMachineComponent* ShootingMachineComp; TObjectPtr<>로 바꾸지 마세요
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UBTPS_ShootingMachineComponent* ShootingMachineComp;
-	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	TObjectPtr<UBTPS_GrenadeSkill> GranadeSkillComp;
 	// float HealHp(float HealAmount);
 	
 	// virtual void AttackEnemy() override;

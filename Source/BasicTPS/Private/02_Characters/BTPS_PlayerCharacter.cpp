@@ -1,7 +1,9 @@
-﻿#include "02_Characters/BTPS_PlayerCharacter.h"
+#include "02_Characters/BTPS_PlayerCharacter.h"
 #include "02_Characters/BTPS_PlayerController.h"
 #include "03_Components/BTPS_ShootingMachineComponent.h"
 #include "03_Components/BTPS_StatComponent.h"
+#include "08_Skill/BTPS_SkillComponent.h"
+#include "08_Skill/BTPS_GrenadeSkill.h"
 #include "Components/CapsuleComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -25,6 +27,8 @@ ABTPS_PlayerCharacter::ABTPS_PlayerCharacter()
 
 	ShootingMachineComp = CreateDefaultSubobject<UBTPS_ShootingMachineComponent>(TEXT("ShootingMachine"));
 
+	GranadeSkillComp = CreateDefaultSubobject<UBTPS_GrenadeSkill>(TEXT("GrenadeSkillComp"));
+
 	NormalSpeed = 800.f;
 	SprintSpeedMultiplier = 1.8f;
 	SprintSpeed = NormalSpeed * SprintSpeedMultiplier;
@@ -32,12 +36,13 @@ ABTPS_PlayerCharacter::ABTPS_PlayerCharacter()
 	GetCharacterMovement()->MaxWalkSpeed = NormalSpeed;
 }
 
-void ABTPS_PlayerCharacter::BeginPlay()
-{
-	Super::BeginPlay();
-}
 
-//
+ void ABTPS_PlayerCharacter::BeginPlay()
+ {
+ 	Super::BeginPlay();
+ 	
+ }
+
 // void ABTPS_PlayerCharacter::Tick(float DeltaTime)
 // {
 // 	Super::Tick(DeltaTime);
@@ -48,11 +53,11 @@ void ABTPS_PlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInp
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 	if (UEnhancedInputComponent* EnhancedInput = Cast<UEnhancedInputComponent>(PlayerInputComponent))
-	{	
-		
+	{
+
 		if (ABTPS_PlayerController* PlayerController = Cast<ABTPS_PlayerController>(GetController()))
 		{
-			if(PlayerController->MoveAction)
+			if (PlayerController->MoveAction)
 			{
 				EnhancedInput->BindAction(
 					PlayerController->MoveAction,
@@ -110,7 +115,7 @@ void ABTPS_PlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInp
 					this,
 					&ABTPS_PlayerCharacter::StopSprint
 				);
-			}	
+			}
 			if (ShootingMachineComp)
 			{
 				if (PlayerController->AimAction)
@@ -158,6 +163,18 @@ void ABTPS_PlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInp
 					);
 				}
 			}
+			if (GranadeSkillComp)
+			{
+				if (PlayerController->ThrowGrenadeAction)
+				{
+					EnhancedInput->BindAction(
+						PlayerController->ThrowGrenadeAction,
+						ETriggerEvent::Triggered,
+						this,
+						&ABTPS_PlayerCharacter::ThrowGrenade
+					);
+				}
+			}
 		}
 	}
 }
@@ -194,7 +211,7 @@ void ABTPS_PlayerCharacter::StartJump(const FInputActionValue& value)
 	if (value.Get<bool>())
 	{
 		if (!GetStatComp()) return;
-		
+
 		if (CanJump())
 		{
 			if (GetStatComp()->TryUseStamina(JumpStaminaCost))
@@ -216,15 +233,15 @@ void ABTPS_PlayerCharacter::StopJump(const FInputActionValue& value)
 void ABTPS_PlayerCharacter::StartSprint(const FInputActionValue& value)
 {
 	if (!GetCharacterMovement() || !GetStatComp()) return;
-	
+
 	if (GetVelocity().SizeSquared() <= 0.0f)
 	{
 		GetCharacterMovement()->MaxWalkSpeed = NormalSpeed;
 		return;
 	}
-	
+
 	float CostThisFrame = SprintCostPerSecond * GetWorld()->GetDeltaSeconds();
-	
+
 	if (GetStatComp()->TryUseStamina(CostThisFrame))
 	{
 		GetCharacterMovement()->MaxWalkSpeed = SprintSpeed;
@@ -240,6 +257,14 @@ void ABTPS_PlayerCharacter::StopSprint(const FInputActionValue& value)
 	if (GetCharacterMovement())
 	{
 		GetCharacterMovement()->MaxWalkSpeed = NormalSpeed;
+	}
+}
+
+void ABTPS_PlayerCharacter::ThrowGrenade(const FInputActionValue& Value)
+{
+	if (GranadeSkillComp)
+	{
+		GranadeSkillComp->TryActivate();
 	}
 }
 

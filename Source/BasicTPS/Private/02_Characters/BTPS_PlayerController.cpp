@@ -1,4 +1,4 @@
-﻿#include "02_Characters/BTPS_PlayerController.h"
+#include "02_Characters/BTPS_PlayerController.h"
 #include "01_Game/BTPS_GameState.h"
 #include "01_Game/BTPS_GameInstance.h"
 #include "EnhancedInputSubsystems.h"
@@ -20,6 +20,7 @@ ABTPS_PlayerController::ABTPS_PlayerController()
 	InteractAction(nullptr),
 	ToggleCameraAction(nullptr),
 	ToggleMenuAction(nullptr),
+	ThrowGrenadeAction(nullptr),
 	HUDWidgetClass(nullptr),
 	HUDWidgetInstance(nullptr),
 	MainMenuWidgetClass(nullptr),
