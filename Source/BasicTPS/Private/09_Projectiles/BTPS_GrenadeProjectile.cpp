@@ -7,6 +7,7 @@ ABTPS_GrenadeProjectile::ABTPS_GrenadeProjectile()
 {
 	ExplosionRadius = 400.f;
 	ExplosionDamage = 30.f;
+	UpwardForce = 500.f;
 
 	ExplosionComp = CreateDefaultSubobject<USphereComponent>(TEXT("ExplosionComponent"));
 	ExplosionComp->SetupAttachment(RootComponent);
@@ -29,6 +30,11 @@ void ABTPS_GrenadeProjectile::BeginPlay()
 		FuseTime,
 		false
 	);
+
+	FVector LunchDir = GetOwner()->GetActorForwardVector() + FVector(0, 0, 0.5f);
+	LunchDir.Normalize();
+
+	ProjectileMovement->Velocity = LunchDir * UpwardForce;
 }
 
 void ABTPS_GrenadeProjectile::Explode()

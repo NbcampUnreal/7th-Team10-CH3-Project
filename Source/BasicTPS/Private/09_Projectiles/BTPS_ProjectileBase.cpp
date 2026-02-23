@@ -15,11 +15,14 @@ ABTPS_ProjectileBase::ABTPS_ProjectileBase()
 	CollisionComp->InitSphereRadius(CollisionRadius);
 	CollisionComp->OnComponentHit.AddDynamic(this, &ABTPS_ProjectileBase::OnHit);
 	CollisionComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	CollisionComp->SetCollisionObjectType(ECC_PhysicsBody);
+	CollisionComp->SetCollisionResponseToAllChannels(ECR_Block);
 	CollisionComp->SetSimulatePhysics(true);
 	CollisionComp->SetEnableGravity(true);
 
 	ProjectileMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ProjectileMesh"));
 	ProjectileMesh->SetupAttachment(RootComponent);
+	ProjectileMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovement"));
 	ProjectileMovement->UpdatedComponent = RootComponent;
@@ -47,6 +50,11 @@ void ABTPS_ProjectileBase::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	AActor* OwnerActor = GetOwner();
+	if (OwnerActor)
+	{
+		CollisionComp->IgnoreActorWhenMoving(OwnerActor, true);
+	}
 }
 
 
