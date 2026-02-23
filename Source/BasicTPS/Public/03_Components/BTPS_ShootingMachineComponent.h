@@ -102,6 +102,9 @@ public:
 
 	UPROPERTY(VisibleInstanceOnly, Category = "Weapon")
 	ABTPS_WeaponBase* CurrentWeapon;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "BulletFactory")
+	TSubclassOf<class ABTPS_Bullet> BulletFactory;
 
 private:
 	UPROPERTY()

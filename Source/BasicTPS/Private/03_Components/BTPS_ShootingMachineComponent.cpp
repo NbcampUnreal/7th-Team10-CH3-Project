@@ -10,6 +10,7 @@
 #include "Animation/AnimMontage.h"
 #include "kismet/KismetSystemLibrary.h"
 #include "Engine/EngineTypes.h"
+#include "04_Items/A_Equipment/Weapon/BTPS_Bullet.h"
 #include "04_Items/A_Equipment/Weapon/BTPS_WeaponBase.h"
 // #include "CollisionAndTrace5_6Character.h" 팀플 camera component구현한 헤더 포함해야함, camera component는 public으로 해야함.
 
@@ -133,6 +134,13 @@ void UBTPS_ShootingMachineComponent::DoFire()
 		DrawDebugLine(GetWorld(), MuzzleLoc, TargetLoc, FColor::Red, false, 1.0f, 0, 1.0f);
 	}
 
+	//총알 발사
+	FRotator BulletRotation = ShootDir.Rotation();
+	FTransform FirePosition = CurrentWeapon->GetMuzzleTransform();
+	FirePosition.SetScale3D(FVector(1.f, 1.f, 1.f));
+	GetWorld()->SpawnActor<ABTPS_Bullet>(BulletFactory,FirePosition);
+	
+	
 	//*데미지 처리
 	if (RealHit.bBlockingHit && RealHit.GetActor() && CombatComp)
 	{
