@@ -69,9 +69,10 @@ void ABTPS_GameState::OnMonsterKilled(int32 ScoreReward)
 	if (SpawnMonsterCount > 0 && KilledMonsterCount >= SpawnMonsterCount)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Level Cleared! All monsters are dead."));
-        
+
 		GetWorldTimerManager().ClearTimer(LevelTimerHandle);
 		EndLevel();
+	}
 }
 
 void ABTPS_GameState::OnGameOver()
