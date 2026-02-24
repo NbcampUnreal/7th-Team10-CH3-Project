@@ -104,13 +104,11 @@ public:
 	UPROPERTY(VisibleInstanceOnly, Category = "Weapon")
 	ABTPS_WeaponBase* CurrentWeapon;
 	
-<<<<<<< Updated upstream
 	UPROPERTY(EditDefaultsOnly, Category = "BulletFactory")
 	TSubclassOf<class ABTPS_Bullet> BulletFactory;
-=======
+
 	UPROPERTY(BlueprintAssignable)
 	FOnWeaponChanged OnWeaponChanged;
->>>>>>> Stashed changes
 
 private:
 	UPROPERTY()

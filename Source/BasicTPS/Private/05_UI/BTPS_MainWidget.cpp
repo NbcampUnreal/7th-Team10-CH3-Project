@@ -6,6 +6,8 @@
 #include "03_Components/BTPS_ShootingMachineComponent.h"
 #include "04_Items/A_Equipment/Weapon/BTPS_WeaponBase.h"
 #include "Components/ProgressBar.h"
+#include "Styling/SlateBrush.h"
+#include "Components/Image.h"
 
 
 void UBTPS_MainWidget::NativeConstruct()
@@ -62,13 +64,12 @@ void UBTPS_MainWidget::BindShootingComp(UBTPS_ShootingMachineComponent* Shooting
 	}
 }
 
-void UBTPS_MainWidget::SetWeaponImage(UTexture2D* NewTexture)
-{
-	if (!WeaponImage || !NewTexture)
-		return;
-	// 수정필요 우정(무기 이미지
-	WeaponImage->SetBrushFromTexture(NewTexture);
-}
+// void UBTPS_MainWidget::SetWeaponImage(UTexture2D* NewTexture)
+// {
+// 	if (!WeaponImage || !NewTexture)
+// 		return;
+// 	WeaponImage->UImage::SetBrushFromTexture(NewTexture);
+// }
 
 void UBTPS_MainWidget::UpdateAmmo(int32 CurrentAmmo, int32 MaxAmmo)
 {
