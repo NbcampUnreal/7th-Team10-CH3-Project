@@ -25,8 +25,10 @@ ABTPS_Bullet::ABTPS_Bullet()
 	MovementComp->SetUpdatedComponent(CollisionComp);
 	MovementComp->InitialSpeed = 5000;
 	MovementComp->MaxSpeed = 5000;
-	MovementComp->bShouldBounce = true;
-	MovementComp->Bounciness = 0.3f;
+	MovementComp->bShouldBounce = false;
+	
+	//MovementComp->bShouldBounce = true;
+	//MovementComp->Bounciness = 0.3f;
 
 	//InitialLifeSpan = 2.0f;
 }
