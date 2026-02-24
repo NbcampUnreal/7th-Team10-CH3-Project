@@ -138,7 +138,13 @@ void UBTPS_ShootingMachineComponent::DoFire()
 	FRotator BulletRotation = ShootDir.Rotation();
 	FTransform FirePosition = CurrentWeapon->GetMuzzleTransform();
 	FirePosition.SetScale3D(FVector(1.f, 1.f, 1.f));
-	GetWorld()->SpawnActor<ABTPS_Bullet>(BulletFactory,FirePosition);
+	FirePosition.SetRotation(BulletRotation.Quaternion()); 
+
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = PlayerCharacter;
+	SpawnParams.Instigator = Cast<APawn>(PlayerCharacter);
+	
+	ABTPS_Bullet* SpawnedBullet = GetWorld()->SpawnActor<ABTPS_Bullet>(BulletFactory, FirePosition, SpawnParams);
 	
 	
 	//*데미지 처리

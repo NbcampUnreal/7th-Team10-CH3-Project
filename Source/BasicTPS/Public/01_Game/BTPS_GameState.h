@@ -74,6 +74,7 @@ public:
 	
 	UPROPERTY(BlueprintAssignable, Category = "Monster")
 	FOnKillCountChanged OnKillCountChanged;
+
 	
 	UPROPERTY(BlueprintAssignable, Category = "Wave")
 	FOnWaveStateChanged OnWaveStateChanged;
@@ -83,7 +84,8 @@ public:
 	int32 GetScore() const;
 	UFUNCTION(BlueprintCallable, Category = "Score")
 	void AddScore(int32 Amount);
-	UFUNCTION(BlueprintCallable, Category = "Level")
+	UFUNCTION(BlueprintCallable, Category = "Monster")
+	void OnMonsterKilled(int32 ScoreReward);
 
 	void OnGameOver();
 	void OnLevelTimeUp();	

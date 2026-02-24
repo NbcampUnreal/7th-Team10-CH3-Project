@@ -4,6 +4,7 @@
 #include "04_Items/A_Equipment/Weapon/BTPS_Bullet.h"
 #include <components/SphereComponent.h>
 #include <GameFramework/ProjectileMovementComponent.h>
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 ABTPS_Bullet::ABTPS_Bullet()
@@ -14,6 +15,7 @@ ABTPS_Bullet::ABTPS_Bullet()
 	CollisionComp = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionComp"));
 	CollisionComp->SetCollisionProfileName(TEXT("BlockAll"));
 	CollisionComp->SetSphereRadius(13.f);
+	CollisionComp->SetNotifyRigidBodyCollision(true);
 	RootComponent = CollisionComp;
 
 	BulletMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BulletMesh"));
@@ -38,6 +40,17 @@ void ABTPS_Bullet::BeginPlay()
 {
 	Super::BeginPlay();
 
+	CollisionComp->OnComponentHit.AddDynamic(this, &ABTPS_Bullet::OnHit);
+	
+	if (GetInstigator())
+	{
+		CollisionComp->IgnoreActorWhenMoving(GetInstigator(), true);
+	}
+	if (GetOwner())
+	{
+		CollisionComp->IgnoreActorWhenMoving(GetOwner(), true);
+	}
+	
 	FTimerHandle DeathTimer;
 	GetWorld()->GetTimerManager().SetTimer(
 		DeathTimer,
@@ -55,6 +68,32 @@ void ABTPS_Bullet::BeginPlay()
 void ABTPS_Bullet::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+}
+
+void ABTPS_Bullet::OnHit(
+	UPrimitiveComponent* HitComponent, 
+	AActor* OtherActor, 
+	UPrimitiveComponent* OtherComp,
+	FVector NormalImpulse, 
+	const FHitResult& Hit)
+{
+	FString ActorName = OtherActor ? OtherActor->GetName() : TEXT("None");
+	FString CompName = OtherComp ? OtherComp->GetName() : TEXT("None");
+	UE_LOG(LogTemp, Error, TEXT("Bullet Hit! Actor: %s / Component: %s"), *ActorName, *CompName);
+	
+	if (OtherActor && OtherActor != this && OtherActor != GetInstigator())
+	{
+		UGameplayStatics::ApplyDamage(
+			OtherActor,                 
+			BulletDamage,               
+			GetInstigatorController(),  
+			this,                       
+			UDamageType::StaticClass()  
+		);
+	}
+    
+	// 적중 후 총알 파괴
+	Destroy();
 }
 
 void ABTPS_Bullet::Die()
