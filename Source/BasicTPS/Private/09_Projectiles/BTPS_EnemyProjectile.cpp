@@ -1,14 +1,14 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "09_Projectiles/ABTPS_Bullet.h"
+#include "09_Projectiles/BTPS_EnemyProjectile.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Components/SphereComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "GenericTeamAgentInterface.h"
 
 
-AABTPS_Bullet::AABTPS_Bullet()
+ABTPS_EnemyProjectile::ABTPS_EnemyProjectile()
 {
 	if (CollisionComp)
 	{
@@ -21,7 +21,7 @@ AABTPS_Bullet::AABTPS_Bullet()
 	}
 }
 
-void AABTPS_Bullet::OnHit(
+void ABTPS_EnemyProjectile::OnHit(
 	UPrimitiveComponent* HitComp, 
 	AActor* OtherActor,
 	UPrimitiveComponent* OtherComp,

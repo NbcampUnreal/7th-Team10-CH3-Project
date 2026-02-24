@@ -4,16 +4,16 @@
 
 #include "CoreMinimal.h"
 #include "BTPS_ProjectileBase.h"
-#include "ABTPS_Bullet.generated.h"
+#include "BTPS_EnemyProjectile.generated.h"
 
 UCLASS()
-class BASICTPS_API AABTPS_Bullet : public ABTPS_ProjectileBase
+class BASICTPS_API ABTPS_EnemyProjectile : public ABTPS_ProjectileBase
 {
 	GENERATED_BODY()
 
 public:
 
-	AABTPS_Bullet();
+	ABTPS_EnemyProjectile();
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
