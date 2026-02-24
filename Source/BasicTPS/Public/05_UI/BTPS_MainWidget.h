@@ -20,6 +20,9 @@ public:
 
 	void BindShootingComp(UBTPS_ShootingMachineComponent* ShootingMachineComp);
 	
+	UFUNCTION()
+	void SetWeaponImage(UTexture2D* NewTexture);
+	
 protected:
 	virtual void NativeConstruct() override;
 	
@@ -37,4 +40,7 @@ protected:
 	
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UProgressBar> StaminaBar;
+	
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UTexture2D> WeaponImage;
 };

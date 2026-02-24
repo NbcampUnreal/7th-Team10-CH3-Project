@@ -62,6 +62,14 @@ void UBTPS_MainWidget::BindShootingComp(UBTPS_ShootingMachineComponent* Shooting
 	}
 }
 
+void UBTPS_MainWidget::SetWeaponImage(UTexture2D* NewTexture)
+{
+	if (!WeaponImage || !NewTexture)
+		return;
+	// 수정필요 우정(무기 이미지
+	WeaponImage->SetBrushFromTexture(NewTexture);
+}
+
 void UBTPS_MainWidget::UpdateAmmo(int32 CurrentAmmo, int32 MaxAmmo)
 {
 	//AmmoText->SetText(FText::FromString(FString::Printf(TEXT("%d / %d"), CurrentAmmo, MaxAmmo)));

@@ -34,6 +34,9 @@ public:
 	int32 CurrentAmmo = 30;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon|Ammo")
 	int32 ReserveAmmo = 90;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
+	TObjectPtr<UTexture2D> WeaponIcon;
 
 	int32 GetMaxAmmo() const { return MaxAmmo; }
 	int32 GetCurrentAmmo() const { return CurrentAmmo; }
