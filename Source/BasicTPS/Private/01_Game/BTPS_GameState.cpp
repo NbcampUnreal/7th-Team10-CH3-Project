@@ -38,6 +38,7 @@ ABTPS_GameState* ABTPS_GameState::Get(const UObject* WorldContext)
 	return World->GetGameState<ABTPS_GameState>();
 }
 
+
 int32 ABTPS_GameState::GetScore() const
 {
 	return LevelScore;
@@ -53,6 +54,24 @@ void ABTPS_GameState::AddScore(int32 Amount)
 			BTPS_GameInstance->AddToScore(Amount);
 		}
 	}
+}
+
+void ABTPS_GameState::OnMonsterKilled(int32 ScoreReward)
+{
+	KilledMonsterCount++;
+	LevelScore += ScoreReward;
+
+	UE_LOG(LogTemp, Log, TEXT("Monster Killed! (%d / %d)"), KilledMonsterCount, SpawnMonsterCount);
+
+	// TODO: UI 업데이트
+	// UpdateHUD(); 
+
+	if (SpawnMonsterCount > 0 && KilledMonsterCount >= SpawnMonsterCount)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Level Cleared! All monsters are dead."));
+        
+		GetWorldTimerManager().ClearTimer(LevelTimerHandle);
+		EndLevel();
 }
 
 void ABTPS_GameState::OnGameOver()
