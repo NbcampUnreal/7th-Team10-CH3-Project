@@ -32,19 +32,9 @@ ABTPS_AIController::ABTPS_AIController()
 	}
 }
 
-void ABTPS_AIController::OnPossess(APawn* InPawn)
+void ABTPS_AIController::BeginPlay()
 {
-	Super::OnPossess(InPawn);
-	
-	if (IGenericTeamAgentInterface* TeamAgent = Cast<IGenericTeamAgentInterface>(InPawn))
-	{
-		SetGenericTeamId(TeamAgent->GetGenericTeamId());
-	}
-	
-	if (BehaviorTreeAsset)
-	{
-		RunBehaviorTree(BehaviorTreeAsset);
-	}
+	Super::BeginPlay();
 	
 	if (PerceptionComponent)
 	{
@@ -52,10 +42,35 @@ void ABTPS_AIController::OnPossess(APawn* InPawn)
 	}
 }
 
+void ABTPS_AIController::OnPossess(APawn* InPawn)
+{
+	Super::OnPossess(InPawn);
+	
+	ABTPS_EnemyCharacterBase* Enemy = Cast<ABTPS_EnemyCharacterBase>(InPawn);
+	if (Enemy)
+	{
+		if (Enemy->GetBehaviorTree())
+		{
+			RunBehaviorTree(Enemy->GetBehaviorTree());
+		}
+	}
+}
+
 void ABTPS_AIController::OnTargetDetected(AActor* Actor, FAIStimulus Stimulus)
 {
 	auto* MyPawn = Cast<ABTPS_EnemyCharacterBase>(GetPawn());
 	if (!MyPawn || !Actor) return;
+	
+	IGenericTeamAgentInterface* MyTeamAgent = Cast<IGenericTeamAgentInterface>(MyPawn);
+	IGenericTeamAgentInterface* TargetTeamAgent = Cast<IGenericTeamAgentInterface>(Actor);
+
+	if (MyTeamAgent && TargetTeamAgent)
+	{
+		if (MyTeamAgent->GetGenericTeamId() == TargetTeamAgent->GetGenericTeamId())
+		{
+			return; 
+		}
+	}
 	
 	UBlackboardComponent* BB = GetBlackboardComponent();
 	

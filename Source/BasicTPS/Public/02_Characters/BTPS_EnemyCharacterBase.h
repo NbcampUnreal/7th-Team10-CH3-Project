@@ -22,6 +22,9 @@ protected:
 	UPROPERTY(VisibleInstanceOnly, Category = "Combat")
 	TWeakObjectPtr<AActor> CurrentTarget;
 	
+	UPROPERTY(EditDefaultsOnly, Category = "AI")
+	class UBehaviorTree* TreeToRun;
+	
 	virtual void OnDeath() override;
 
 public:
@@ -29,6 +32,8 @@ public:
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	UBehaviorTree* GetBehaviorTree() const { return TreeToRun; }
+	
 	virtual void SetTarget(AActor* NewTarget);
 	virtual AActor* GetTarget() const;
 	virtual bool HasTarget() const;
