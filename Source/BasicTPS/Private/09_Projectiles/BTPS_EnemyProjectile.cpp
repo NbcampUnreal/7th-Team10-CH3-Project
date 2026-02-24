@@ -30,29 +30,36 @@ void ABTPS_EnemyProjectile::OnHit(
 {
 	Super::OnHit(HitComp, OtherActor, OtherComp, NormalImpules, Hit);
 	
-	bool bCanDamage = true;
 	if (OtherActor && OtherActor != this && OtherActor != GetInstigator())
 	{
+		bool bCanDamage = true;
 		IGenericTeamAgentInterface* MyTeamAgent = Cast<IGenericTeamAgentInterface>(GetInstigator());
 		IGenericTeamAgentInterface* OtherTeamAgent = Cast<IGenericTeamAgentInterface>(OtherActor);
-		
-		if (MyTeamAgent->GetGenericTeamId() == OtherTeamAgent->GetGenericTeamId())
+       
+		if (MyTeamAgent && OtherTeamAgent) 
 		{
-			bCanDamage = false;
+			if (MyTeamAgent->GetGenericTeamId() == OtherTeamAgent->GetGenericTeamId())
+			{
+				bCanDamage = false;
+			}
+		}
+		
+		if (bCanDamage)
+		{
+			UGameplayStatics::ApplyDamage(
+			   OtherActor,
+			   DamageAmount,
+			   GetInstigatorController(),
+			   this,
+			   UDamageType::StaticClass()
+			);
+          
+			UE_LOG(LogTemp, Warning, TEXT("[Bullet] %s hit %s! Damage: %f"), 
+			   *GetName(), *OtherActor->GetName(), DamageAmount);
 		}
 	}
-	
-	if (bCanDamage)
-	{
-		UGameplayStatics::ApplyDamage(
-			OtherActor,
-			DamageAmount,
-			GetInstigatorController(),
-			this,
-			UDamageType::StaticClass()
-		);
-		UE_LOG(LogTemp, Warning, TEXT("[Bullet] %s hit %s! Damage: %f"), 
-			*GetName(), *OtherActor->GetName(), DamageAmount);
-	}
+    
+	// 3. 누구를 맞췄든, 벽에 맞았든 투사체는 파괴됩니다.
+	Destroy();
 }
 
