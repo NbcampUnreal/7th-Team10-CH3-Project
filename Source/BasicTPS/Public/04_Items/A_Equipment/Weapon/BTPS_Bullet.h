@@ -22,7 +22,7 @@ protected:
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-	
+
 public:
 	UPROPERTY(visibleAnywhere, BlueprintReadOnly, Category = "Movement")
 	class UProjectileMovementComponent* MovementComp;
@@ -30,8 +30,16 @@ public:
 	class USphereComponent* CollisionComp;
 	UPROPERTY(VIsibleAnywhere, BlueprintReadOnly, Category = "Mesh")
 	class UStaticMeshComponent* BulletMeshComp;
-	
+
+	UPROPERTY(EditDefaultsOnly, Category = "Combat")
+	float BulletDamage = 20.0f;
+
+	UFUNCTION()
+	void OnHit(
+		UPrimitiveComponent* HitComponent,
+		AActor* OtherActor,
+		UPrimitiveComponent* OtherComp,
+		FVector NormalImpulse,
+		const FHitResult& Hit);
 	void Die();
-	
-	
 };
