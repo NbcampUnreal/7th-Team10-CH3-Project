@@ -7,6 +7,7 @@
 #include "BTPS_MainWidget.generated.h"
 
 class UProgressBar;
+class UTextBlock;
 class UImage;
 class UBTPS_StatComponent;
 class UBTPS_ShootingMachineComponent;
@@ -41,6 +42,9 @@ protected:
 	
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UProgressBar> StaminaBar;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UTextBlock> Text_AmmoInfo;
 	
 	// UPROPERTY(meta = (BindWidget))
 	// TObjectPtr<UImage> WeaponImage;

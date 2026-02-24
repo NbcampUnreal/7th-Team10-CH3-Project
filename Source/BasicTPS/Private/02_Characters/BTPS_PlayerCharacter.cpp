@@ -153,7 +153,7 @@ void ABTPS_PlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInp
 						&UBTPS_ShootingMachineComponent::Interact
 					);
 				}
-				/*
+				
 				if (PlayerController->ReloadAction)
 				{
 					EnhancedInput->BindAction(
@@ -163,7 +163,7 @@ void ABTPS_PlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInp
 						&UBTPS_ShootingMachineComponent::Reload
 					);
 				}
-				*/
+				
 				if (PlayerController->ToggleCameraAction)
 				{
 					EnhancedInput->BindAction(

@@ -33,6 +33,11 @@ void ABTPS_HUD::BeginPlay()
 
 					MainWidget->BindStatComp(PlayerChar->GetStatComp());
 				}
+
+				if (PlayerChar && PlayerChar->GetShootingComp())
+				{
+					MainWidget->BindShootingComp(PlayerChar->GetShootingComp());
+				}
 			}
 		}
 	}

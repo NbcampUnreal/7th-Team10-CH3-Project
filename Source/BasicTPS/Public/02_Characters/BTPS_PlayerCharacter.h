@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "CoreMinimal.h"
 #include "BTPS_BaseCharacter.h"
@@ -64,6 +64,7 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<UBTPS_GrenadeSkill> GranadeSkillComp;
 	
+	UBTPS_ShootingMachineComponent* GetShootingComp() const { return ShootingMachineComp; }
 
 	
 	// float HealHp(float HealAmount);

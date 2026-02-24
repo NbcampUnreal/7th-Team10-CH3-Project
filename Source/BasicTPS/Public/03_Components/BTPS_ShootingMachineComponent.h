@@ -82,6 +82,7 @@ public:
 	void Fire(const FInputActionValue& Value);
 	void Interact(const FInputActionValue& Value);
 	void ToggleCamera(const FInputActionValue& Value);
+	void Reload(const FInputActionValue& Value);
 
 	UFUNCTION(BlueprintCallable, Category = "Input")
 	virtual void DoAimStart();
