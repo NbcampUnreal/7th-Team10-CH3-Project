@@ -8,6 +8,7 @@
 #include "Components/ProgressBar.h"
 #include "Styling/SlateBrush.h"
 #include "Components/Image.h"
+#include "Components/TextBlock.h"
 
 
 void UBTPS_MainWidget::NativeConstruct()
@@ -73,5 +74,11 @@ void UBTPS_MainWidget::BindShootingComp(UBTPS_ShootingMachineComponent* Shooting
 
 void UBTPS_MainWidget::UpdateAmmo(int32 CurrentAmmo, int32 MaxAmmo)
 {
-	//AmmoText->SetText(FText::FromString(FString::Printf(TEXT("%d / %d"), CurrentAmmo, MaxAmmo)));
+	if (Text_AmmoInfo.Get())
+	{
+		FString AmmoString = FString::Printf(TEXT("%d / %d"), CurrentAmmo, MaxAmmo);
+		Text_AmmoInfo->SetText(FText::FromString(AmmoString));
+
+		Text_AmmoInfo->SetVisibility(ESlateVisibility::Visible);
+	}
 }

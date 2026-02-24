@@ -65,6 +65,11 @@ void UBTPS_ShootingMachineComponent::ToggleCamera(const FInputActionValue& Value
 	DoToggleCamera();
 }
 
+void UBTPS_ShootingMachineComponent::Reload(const FInputActionValue& Value)
+{
+	DoReload();
+}
+
 
 //move에 추가 	if (bIsAiming) return;
 
@@ -264,4 +269,8 @@ void UBTPS_ShootingMachineComponent::EquipWeapon(ABTPS_WeaponBase* NewWeapon)
 		FAttachmentTransformRules::SnapToTargetNotIncludingScale,
 		RightHandSocketName
 	);
+	if (CurrentWeapon)
+	{
+		OnAmmoChanged.Broadcast(CurrentWeapon->GetCurrentAmmo(), CurrentWeapon->GetMaxAmmo());
+	}
 }
