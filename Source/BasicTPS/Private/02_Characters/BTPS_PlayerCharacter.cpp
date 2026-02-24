@@ -1,4 +1,4 @@
-#include "02_Characters/BTPS_PlayerCharacter.h"
+﻿#include "02_Characters/BTPS_PlayerCharacter.h"
 #include "02_Characters/BTPS_PlayerController.h"
 #include "03_Components/BTPS_ShootingMachineComponent.h"
 #include "03_Components/BTPS_StatComponent.h"
@@ -153,6 +153,17 @@ void ABTPS_PlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInp
 						&UBTPS_ShootingMachineComponent::Interact
 					);
 				}
+				/*
+				if (PlayerController->ReloadAction)
+				{
+					EnhancedInput->BindAction(
+						PlayerController->ReloadAction,
+						ETriggerEvent::Started,
+						ShootingMachineComp,
+						&UBTPS_ShootingMachineComponent::Reload
+					);
+				}
+				*/
 				if (PlayerController->ToggleCameraAction)
 				{
 					EnhancedInput->BindAction(
