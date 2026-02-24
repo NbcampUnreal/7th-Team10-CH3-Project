@@ -1,5 +1,6 @@
 #include "02_Characters/BTPS_EnemyCharacterBase.h"
 
+#include "01_Game/BTPS_GameState.h"
 #include "BrainComponent.h"
 #include "03_Components/BTPS_StatComponent.h"
 #include "06_Ai/BTPS_AIController.h"
@@ -65,6 +66,27 @@ void ABTPS_EnemyCharacterBase::OnDeath()
 	{
 		AIController->StopMovement();
 		AIController->GetBrainComponent()->StopLogic("Dead");
+	}
+	
+	// 에너미 사망시 물리 시뮬
+	UCapsuleComponent* Capsule = GetCapsuleComponent();
+	if (Capsule)
+	{
+		Capsule->SetCollisionProfileName(TEXT("PhysicsActor"));
+        
+		Capsule->BodyInstance.bLockXRotation = false;
+		Capsule->BodyInstance.bLockYRotation = false;
+        
+		Capsule->SetEnableGravity(true);
+		Capsule->SetSimulatePhysics(true);
+        
+		FVector PushDirection = GetActorForwardVector() * -1.0f; // 캐릭터의 뒤쪽 방향
+		Capsule->AddImpulse(PushDirection * 1500.0f, NAME_None, true); // 힘(1500)을 가함
+	}
+	
+	if (ABTPS_GameState* GS = GetWorld()->GetGameState<ABTPS_GameState>())
+	{
+		GS->OnMonsterKilled(10);
 	}
 	
 	SetLifeSpan(3.0f);
