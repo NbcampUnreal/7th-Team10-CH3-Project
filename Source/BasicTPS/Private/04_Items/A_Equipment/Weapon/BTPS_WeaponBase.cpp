@@ -76,6 +76,16 @@ FVector ABTPS_WeaponBase::GetMuzzleLocation() const
 		return WeaponMesh->GetSocketLocation(MuzzleSocketName);
 	}
 	return GetActorLocation();
+	
+}
+
+FTransform ABTPS_WeaponBase::GetMuzzleTransform() const
+{
+	if (WeaponMesh && WeaponMesh->DoesSocketExist(MuzzleSocketName))
+	{
+		return WeaponMesh->GetSocketTransform(MuzzleSocketName);
+	}
+	return GetActorTransform();
 }
 
 /*

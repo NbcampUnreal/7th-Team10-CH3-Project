@@ -47,4 +47,5 @@ public:
 	virtual void OnEquipped();
 
 	FVector GetMuzzleLocation() const;
+	FTransform GetMuzzleTransform() const;
 };

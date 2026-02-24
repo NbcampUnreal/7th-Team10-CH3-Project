@@ -63,6 +63,9 @@ public:
 	UBTPS_ShootingMachineComponent* ShootingMachineComp;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<UBTPS_GrenadeSkill> GranadeSkillComp;
+	
+
+	
 	// float HealHp(float HealAmount);
 	
 	// virtual void AttackEnemy() override;
