@@ -7,6 +7,7 @@
 
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnAmmoChangedDelegate, int32, CurrentAmmo, int32, MaxAmmo);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnWeaponChanged, UTexture2D*, NewIcon);
 
 class UInputAction;
 class ABTPS_WeaponBase;
@@ -99,12 +100,15 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Input")
 	virtual void DoReload();
-
+	
 	UPROPERTY(VisibleInstanceOnly, Category = "Weapon")
 	ABTPS_WeaponBase* CurrentWeapon;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "BulletFactory")
 	TSubclassOf<class ABTPS_Bullet> BulletFactory;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnWeaponChanged OnWeaponChanged;
 
 private:
 	UPROPERTY()
