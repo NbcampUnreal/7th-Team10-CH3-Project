@@ -11,25 +11,27 @@
 
 ABTPS_PlayerController::ABTPS_PlayerController()
 	: InputMappingContext(nullptr),
-	MoveAction(nullptr),
-	LookAction(nullptr),
-	JumpAction(nullptr),
-	SprintAction(nullptr),
-	AimAction(nullptr),
-	FireAction(nullptr),
-	InteractAction(nullptr),
-	ReloadAction(nullptr),
-	ToggleCameraAction(nullptr),
-	ToggleMenuAction(nullptr),
-	ThrowGrenadeAction(nullptr),
-	HUDWidgetClass(nullptr),
-	HUDWidgetInstance(nullptr),
-	MainMenuWidgetClass(nullptr),
-	MainMenuWidgetInstance(nullptr),
-	PauseMenuWidgetClass(nullptr),
-	PauseMenuWidgetInstance(nullptr),
-	GameOverMenuWidgetClass(nullptr),
-	GameOverMenuWidgetInstance(nullptr)
+	  MoveAction(nullptr),
+	  LookAction(nullptr),
+	  JumpAction(nullptr),
+	  SprintAction(nullptr),
+	  AimAction(nullptr),
+	  FireAction(nullptr),
+	  InteractAction(nullptr),
+	  ReloadAction(nullptr),
+	  ToggleCameraAction(nullptr),
+	  ToggleMenuAction(nullptr),
+	  ThrowGrenadeAction(nullptr),
+	  HUDWidgetClass(nullptr),
+	  HUDWidgetInstance(nullptr),
+	  MainMenuWidgetClass(nullptr),
+	  MainMenuWidgetInstance(nullptr),
+	  PauseMenuWidgetClass(nullptr),
+	  PauseMenuWidgetInstance(nullptr),
+	  GameOverMenuWidgetClass(nullptr),
+	  GameOverMenuWidgetInstance(nullptr),
+	  GameClearMenuWidgetClass(nullptr),
+	  GameClearMenuWidgetInstance(nullptr)
 {
 }
 
@@ -65,7 +67,7 @@ void ABTPS_PlayerController::BeginPlay()
 		if (ACharacter* MyChar = GetCharacter())
 		{
 			MyChar->GetCharacterMovement()->StopMovementImmediately();
-			MyChar->SetActorHiddenInGame(false); 
+			MyChar->SetActorHiddenInGame(false);
 		}
 	}
 	else if (CurrentMapName.Contains(TEXT("L_BasicLevel")))
@@ -88,29 +90,7 @@ UUserWidget* ABTPS_PlayerController::GetHUDWidget() const
 
 void ABTPS_PlayerController::ShowGameHUD()
 {
-	if (MainMenuWidgetInstance)
-	{
-		MainMenuWidgetInstance->RemoveFromParent();
-		MainMenuWidgetInstance = nullptr;
-	}
-
-	if (PauseMenuWidgetInstance)
-	{
-		PauseMenuWidgetInstance->RemoveFromParent();
-		PauseMenuWidgetInstance = nullptr;
-	}
-
-	if (GameOverMenuWidgetInstance)
-	{
-		GameOverMenuWidgetInstance->RemoveFromParent();
-		GameOverMenuWidgetInstance = nullptr;
-	}
-
-	if (HUDWidgetInstance)
-	{
-		HUDWidgetInstance->RemoveFromParent();
-		HUDWidgetInstance = nullptr;
-	}
+	ClearAllWidgets();
 
 	SetPause(false);
 	bIsGamePaused = false;
@@ -132,23 +112,11 @@ void ABTPS_PlayerController::ShowGameHUD()
 			BTPS_GameState->UpdateHUD();
 		}
 	}
-
-	
 }
 
 void ABTPS_PlayerController::ShowMainMenu(bool bIsRestart)
 {
-	if (HUDWidgetInstance)
-	{
-		HUDWidgetInstance->RemoveFromParent();
-		HUDWidgetInstance = nullptr;
-	}
-
-	if (MainMenuWidgetInstance)
-	{
-		MainMenuWidgetInstance->RemoveFromParent();
-		MainMenuWidgetInstance = nullptr;
-	}
+	ClearAllWidgets();
 
 	if (MainMenuWidgetClass)
 	{
@@ -196,35 +164,6 @@ void ABTPS_PlayerController::ShowMainMenu(bool bIsRestart)
 			}
 		}
 	}
-}
-
-void ABTPS_PlayerController::ShowGameOverMenu(bool bIsRestart)
-{
-	if (HUDWidgetInstance)
-	{
-		HUDWidgetInstance->RemoveFromParent();
-		HUDWidgetInstance = nullptr;
-	}
-
-	if (MainMenuWidgetInstance)
-	{
-		MainMenuWidgetInstance->RemoveFromParent();
-		MainMenuWidgetInstance = nullptr;
-	}
-
-	if (GameOverMenuWidgetClass)
-	{
-		GameOverMenuWidgetInstance = CreateWidget<UUserWidget>(this, GameOverMenuWidgetClass);
-		if (GameOverMenuWidgetInstance)
-		{
-			GameOverMenuWidgetInstance->AddToViewport();
-
-			bShowMouseCursor = true;
-			SetInputMode(FInputModeUIOnly());
-		}
-	}
-	bIsGamePaused = true;
-	SetPause(true);
 }
 
 void ABTPS_PlayerController::ShowPauseMenu()
@@ -279,6 +218,47 @@ void ABTPS_PlayerController::TogglePauseMenu()
 	}
 }
 
+void ABTPS_PlayerController::ShowGameOverMenu(bool bIsRestart)
+{
+	ClearAllWidgets();
+
+	if (GameOverMenuWidgetClass)
+	{
+		GameOverMenuWidgetInstance = CreateWidget<UUserWidget>(this, GameOverMenuWidgetClass);
+		if (GameOverMenuWidgetInstance)
+		{
+			GameOverMenuWidgetInstance->AddToViewport();
+
+			bShowMouseCursor = true;
+			SetInputMode(FInputModeUIOnly());
+		}
+	}
+	bIsGamePaused = true;
+	SetPause(true);
+}
+
+void ABTPS_PlayerController::ShowGameClearMenu()
+{
+	ClearAllWidgets();
+
+	if (GameClearMenuWidgetClass)
+	{
+		GameClearMenuWidgetInstance = CreateWidget<UUserWidget>(this, GameClearMenuWidgetClass);
+		if (GameClearMenuWidgetInstance)
+		{
+			GameClearMenuWidgetInstance->AddToViewport();
+          
+			bShowMouseCursor = true;
+			SetInputMode(FInputModeUIOnly());
+		}
+	}
+
+	bIsGamePaused = true;
+	SetPause(true);
+	
+}
+
+
 void ABTPS_PlayerController::StartGame()
 {
 	if (UBTPS_GameInstance* BTPS_GameInstance = Cast<UBTPS_GameInstance>(UGameplayStatics::GetGameInstance(this)))
@@ -287,12 +267,8 @@ void ABTPS_PlayerController::StartGame()
 		BTPS_GameInstance->TotalScore = 0;
 	}
 
-	
-	if (MainMenuWidgetInstance)
-	{
-		MainMenuWidgetInstance->RemoveFromParent();
-		MainMenuWidgetInstance = nullptr;
-	}
+
+	ClearAllWidgets();
 
 	bShowMouseCursor = false;
 	SetInputMode(FInputModeGameOnly());
@@ -307,7 +283,8 @@ void ABTPS_PlayerController::StartGame()
 		SequenceStartTime = GetWorld()->GetTimeSeconds();
 		RotationDuration = 0.5f;
 
-		GetWorldTimerManager().SetTimer(RotationTimerHandle, this, &ABTPS_PlayerController::SmoothRotateStep, 0.01f, true);
+		GetWorldTimerManager().SetTimer(RotationTimerHandle, this, &ABTPS_PlayerController::SmoothRotateStep, 0.01f,
+		                                true);
 	}
 }
 
@@ -328,7 +305,7 @@ void ABTPS_PlayerController::SetupInputComponent()
 		{
 			UE_LOG(LogTemp, Warning, TEXT("MenuAction binding success!"));
 			EnhancedInput->BindAction(ToggleMenuAction, ETriggerEvent::Triggered, this,
-				&ABTPS_PlayerController::TogglePauseMenu);
+			                          &ABTPS_PlayerController::TogglePauseMenu);
 		}
 		else
 		{
@@ -337,7 +314,8 @@ void ABTPS_PlayerController::SetupInputComponent()
 
 		if (SkipLevelAction)
 		{
-			EnhancedInput->BindAction(SkipLevelAction, ETriggerEvent::Started, this, &ABTPS_PlayerController::OnSkipLevel);
+			EnhancedInput->BindAction(SkipLevelAction, ETriggerEvent::Started, this,
+			                          &ABTPS_PlayerController::OnSkipLevel);
 		}
 	}
 }
@@ -378,5 +356,25 @@ void ABTPS_PlayerController::SmoothRotateStep()
 		GetWorldTimerManager().ClearTimer(RotationTimerHandle);
 
 		SetViewTargetWithBlend(GetCharacter(), 1.5f, VTBlend_Cubic, 0.0f, true);
+	}
+}
+
+void ABTPS_PlayerController::ClearAllWidgets()
+{
+	TObjectPtr<UUserWidget> WidgetsToClear[] = {
+		HUDWidgetInstance,
+		MainMenuWidgetInstance,
+		PauseMenuWidgetInstance,
+		GameOverMenuWidgetInstance,
+		GameClearMenuWidgetInstance
+	};
+
+	for (TObjectPtr<UUserWidget>& Widget : WidgetsToClear)
+	{
+		if (Widget)
+		{
+			Widget->RemoveFromParent();
+			Widget = nullptr;
+		}
 	}
 }

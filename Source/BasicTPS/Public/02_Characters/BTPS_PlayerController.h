@@ -55,14 +55,21 @@ public:
 	UUserWidget* MainMenuWidgetInstance;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Menu")
+	TSubclassOf<UUserWidget> PauseMenuWidgetClass;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Menu")
+	UUserWidget* PauseMenuWidgetInstance;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Menu")
 	TSubclassOf<UUserWidget> GameOverMenuWidgetClass;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Menu")
 	UUserWidget* GameOverMenuWidgetInstance;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Menu")
-	TSubclassOf<UUserWidget> PauseMenuWidgetClass;
+	TSubclassOf<UUserWidget> GameClearMenuWidgetClass;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Menu")
-	UUserWidget* PauseMenuWidgetInstance;
+	TObjectPtr<UUserWidget> GameClearMenuWidgetInstance;
+	
+
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Menu")
 	FName MenuCameraTag = TEXT("MenuCam");
@@ -72,17 +79,19 @@ public:
 	// HUD 표시
 	UFUNCTION(BlueprintCallable, Category = "HUD")
 	void ShowGameHUD();
-	
 	UFUNCTION(BlueprintCallable, Category = "Menu")
 	void ShowMainMenu(bool bIsRestart);
-	UFUNCTION(BlueprintCallable, Category = "Menu")
-	void ShowGameOverMenu(bool bIsRestart);
 	UFUNCTION(BlueprintCallable, Category = "Menu")
 	void ShowPauseMenu();
 	UFUNCTION(BlueprintCallable, Category = "Menu")
 	void HidePauseMenu();
 	UFUNCTION(BlueprintCallable, Category = "Menu")
 	void TogglePauseMenu();
+	UFUNCTION(BlueprintCallable, Category = "Menu")
+	void ShowGameOverMenu(bool bIsRestart);
+	UFUNCTION(BlueprintCallable, Category = "Menu")
+	void ShowGameClearMenu();
+	
 	// 게임 시작
 	UFUNCTION(BlueprintCallable, Category = "Menu")
 	void StartGame();
@@ -98,6 +107,7 @@ private:
 	bool bIsGamePaused = false;
 	virtual void SetupInputComponent() override;
 	void OnSkipLevel();
+	void ClearAllWidgets();
 	
 	// 시작메뉴 캐릭터 움직임 함수
 	FTimerHandle RotationTimerHandle;
@@ -105,6 +115,5 @@ private:
 	FRotator TargetRotation; 
 	float SequenceStartTime;  
 	float RotationDuration = 0.5f;   
-	
 
 };

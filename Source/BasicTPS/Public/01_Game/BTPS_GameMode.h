@@ -30,7 +30,10 @@ public:
 	void StartLevel();
 	void EndLevel(bool bWin);
 	void GameOver();
-	void KilledMonsterCount();
+	
+	//TODO: 게임스테이트 관리, 리팩토링시 사용
+	//void KilledMonsterCount();
+	
 	void SpawnMonstersForWave();
 	
 private:
