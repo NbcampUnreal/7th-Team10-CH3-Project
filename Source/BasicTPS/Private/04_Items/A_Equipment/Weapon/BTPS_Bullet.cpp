@@ -51,7 +51,10 @@ void ABTPS_Bullet::BeginPlay()
 		CollisionComp->IgnoreActorWhenMoving(GetOwner(), true);
 	}
 	
-	FTimerHandle DeathTimer;
+	
+	SetLifeSpan(2.0f); //타이머 함수 이걸로 변경
+	
+	 /*FTimerHandle DeathTimer;
 	GetWorld()->GetTimerManager().SetTimer(
 		DeathTimer,
 		FTimerDelegate::CreateLambda(
@@ -61,7 +64,8 @@ void ABTPS_Bullet::BeginPlay()
 			}),
 		2.0f,
 		false
-	);
+	);*/
+	
 }
 
 // Called every frame
