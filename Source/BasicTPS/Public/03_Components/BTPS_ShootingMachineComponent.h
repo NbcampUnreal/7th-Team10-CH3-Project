@@ -33,6 +33,9 @@ protected:
 
 	UPROPERTY(VisibleInstanceOnly, Category = "Aim")
 	bool bIsAiming = false;
+	UPROPERTY(VisibleInstanceOnly, Category = "Aim")
+	bool bIsFiring = false;
+	float LastFireTime = 0.0f;
 
 	UPROPERTY(EditAnywhere, Category = "Weapon")
 	float FireRange = 10000.0f;
@@ -107,8 +110,13 @@ public:
 	FOnWeaponChanged OnWeaponChanged;
 
 	bool IsAiming() const { return bIsAiming; }
+	bool IsFiring() const { return bIsFiring; }
 
 	FTimerHandle FireDelayTimer;
+	FTimerHandle ActionEndTimer;
+
+	void ExecuteFire();
+	void EndFireAction();
 
 private:
 	UPROPERTY()
