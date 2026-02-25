@@ -24,9 +24,8 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
-	UPROPERTY(EditAnywhere, Category = "Montage")
-	UAnimMontage* AimMontage;
 	UPROPERTY(EditAnywhere, Category = "Montage")
 	UAnimMontage* FireMontage;
 	UPROPERTY(EditAnywhere, Category = "Montage")
@@ -77,18 +76,14 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FOnAmmoChangedDelegate OnAmmoChanged;
 
-	void AimStarted(const FInputActionValue& Value);
-	void AimCompleted(const FInputActionValue& Value);
+	void ToggleAim(const FInputActionValue& Value);
 	void Fire(const FInputActionValue& Value);
 	void Interact(const FInputActionValue& Value);
 	void ToggleCamera(const FInputActionValue& Value);
 	void Reload(const FInputActionValue& Value);
 
 	UFUNCTION(BlueprintCallable, Category = "Input")
-	virtual void DoAimStart();
-
-	UFUNCTION(BlueprintCallable, Category = "Input")
-	virtual void DoAimEnd();
+	virtual void DoToggleAim();
 
 	UFUNCTION(BlueprintCallable, Category = "Input")
 	virtual void DoFire();
@@ -110,6 +105,10 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FOnWeaponChanged OnWeaponChanged;
+
+	bool IsAiming() const { return bIsAiming; }
+
+	FTimerHandle FireDelayTimer;
 
 private:
 	UPROPERTY()

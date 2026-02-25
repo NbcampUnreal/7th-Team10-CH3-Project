@@ -1,5 +1,6 @@
-#include "02_Characters/BTPS_Player_AnimInstance.h"
+﻿#include "02_Characters/BTPS_Player_AnimInstance.h"
 #include "02_Characters/BTPS_PlayerCharacter.h"
+#include "03_Components/BTPS_ShootingMachineComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 void UBTPS_Player_AnimInstance::NativeUpdateAnimation(float DeltaSeconsds)
@@ -20,4 +21,9 @@ void UBTPS_Player_AnimInstance::NativeUpdateAnimation(float DeltaSeconsds)
 		.IsNearlyZero());
 
 	bIsFalling = Character->GetCharacterMovement()->IsFalling();
+
+	if (UBTPS_ShootingMachineComponent* ShootingComp = Character->GetShootingComp())
+	{
+		bIsAiming = ShootingComp->IsAiming();
+	}
 }
