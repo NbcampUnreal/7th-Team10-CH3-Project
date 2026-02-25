@@ -21,6 +21,8 @@ protected:
 	bool bIsFalling;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Animation|MovementData")
 	bool bIsAiming;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Animation|MovementData")
+	bool bIsFiring;
 
 public:
 	void NativeUpdateAnimation(float DeltaSeconsds) override;

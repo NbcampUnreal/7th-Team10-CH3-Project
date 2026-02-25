@@ -12,7 +12,7 @@
 #include "Engine/EngineTypes.h"
 #include "04_Items/A_Equipment/Weapon/BTPS_Bullet.h"
 #include "04_Items/A_Equipment/Weapon/BTPS_WeaponBase.h"
-// #include "CollisionAndTrace5_6Character.h" 팀플 camera component구현한 헤더 포함해야함, camera component는 public으로 해야함.
+#include "GameFramework/CharacterMovementComponent.h"
 
 
 UBTPS_ShootingMachineComponent::UBTPS_ShootingMachineComponent()
@@ -55,13 +55,24 @@ void UBTPS_ShootingMachineComponent::Fire(const FInputActionValue& Value)
 		PlayerCharacter->PlayAnimMontage(FireMontage);
 	}
 
-	if (bIsAiming)
+	bIsFiring = true;
+
+	if (PlayerCharacter->GetCharacterMovement())
+	{
+		PlayerCharacter->GetCharacterMovement()->MaxWalkSpeed = 300.0f;
+	}
+
+	GetWorld()->GetTimerManager().SetTimer(ActionEndTimer, this, &UBTPS_ShootingMachineComponent::EndFireAction, 0.25f, false);
+
+	float CurrentTime = GetWorld()->GetTimeSeconds();
+
+	if (bIsAiming || (CurrentTime - LastFireTime < 0.25f))
 	{
 		DoFire();
 	}
 	else
 	{
-		GetWorld()->GetTimerManager().SetTimer(FireDelayTimer, this, &UBTPS_ShootingMachineComponent::DoFire, 0.25f, false);
+		GetWorld()->GetTimerManager().SetTimer(FireDelayTimer, this, &UBTPS_ShootingMachineComponent::DoFire, 0.1f, false);
 	}
 }
 
@@ -91,6 +102,8 @@ void UBTPS_ShootingMachineComponent::DoToggleAim()
 void UBTPS_ShootingMachineComponent::DoFire()
 {
 	if (!CurrentWeapon || !PlayerCharacter) return;
+
+	LastFireTime = GetWorld()->GetTimeSeconds();
 
 	FVector CameraLoc;
 	FRotator CameraRot;
@@ -263,12 +276,26 @@ void UBTPS_ShootingMachineComponent::EquipWeapon(ABTPS_WeaponBase* NewWeapon)
 	}
 }
 
+void UBTPS_ShootingMachineComponent::EndFireAction()
+{
+	bIsFiring = false;
+
+	if (PlayerCharacter && PlayerCharacter->GetCharacterMovement())
+	{
+		PlayerCharacter->GetCharacterMovement()->MaxWalkSpeed = 800.0f;
+	}
+}
+
 void UBTPS_ShootingMachineComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	if (GetWorld())
 	{
 		GetWorld()->GetTimerManager().ClearTimer(FireDelayTimer);
+		GetWorld()->GetTimerManager().ClearTimer(ActionEndTimer);
 	}
+
+	OnAmmoChanged.Clear();
+	OnWeaponChanged.Clear();
 
 	Super::EndPlay(EndPlayReason);
 }

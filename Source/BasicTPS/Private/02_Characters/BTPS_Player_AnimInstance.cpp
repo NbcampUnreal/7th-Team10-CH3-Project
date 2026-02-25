@@ -25,5 +25,6 @@ void UBTPS_Player_AnimInstance::NativeUpdateAnimation(float DeltaSeconsds)
 	if (UBTPS_ShootingMachineComponent* ShootingComp = Character->GetShootingComp())
 	{
 		bIsAiming = ShootingComp->IsAiming();
+		bIsFiring = ShootingComp->IsFiring();
 	}
 }
