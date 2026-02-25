@@ -126,13 +126,7 @@ void ABTPS_PlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInp
 						PlayerController->AimAction,
 						ETriggerEvent::Started,
 						ShootingMachineComp,
-						&UBTPS_ShootingMachineComponent::AimStarted
-					);
-					EnhancedInput->BindAction(
-						PlayerController->AimAction,
-						ETriggerEvent::Completed,
-						ShootingMachineComp,
-						&UBTPS_ShootingMachineComponent::AimCompleted
+						&UBTPS_ShootingMachineComponent::ToggleAim
 					);
 				}
 				if (PlayerController->FireAction)

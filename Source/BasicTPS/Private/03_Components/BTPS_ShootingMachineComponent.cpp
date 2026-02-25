@@ -40,19 +40,29 @@ void UBTPS_ShootingMachineComponent::TickComponent(float DeltaTime, ELevelTick T
 }
 
 
-void UBTPS_ShootingMachineComponent::AimStarted(const FInputActionValue& Value)
+void UBTPS_ShootingMachineComponent::ToggleAim(const FInputActionValue& Value)
 {
-	DoAimStart();
-}
-
-void UBTPS_ShootingMachineComponent::AimCompleted(const FInputActionValue& Value)
-{
-	DoAimEnd();
+	DoToggleAim();
 }
 
 void UBTPS_ShootingMachineComponent::Fire(const FInputActionValue& Value)
 {
-	DoFire();
+	if (!CurrentWeapon || !PlayerCharacter) return;
+	if (CurrentWeapon->GetCurrentAmmo() <= 0) return;
+
+	if (PlayerCharacter && FireMontage)
+	{
+		PlayerCharacter->PlayAnimMontage(FireMontage);
+	}
+
+	if (bIsAiming)
+	{
+		DoFire();
+	}
+	else
+	{
+		GetWorld()->GetTimerManager().SetTimer(FireDelayTimer, this, &UBTPS_ShootingMachineComponent::DoFire, 0.25f, false);
+	}
 }
 
 void UBTPS_ShootingMachineComponent::Interact(const FInputActionValue& Value)
@@ -73,36 +83,14 @@ void UBTPS_ShootingMachineComponent::Reload(const FInputActionValue& Value)
 
 //move에 추가 	if (bIsAiming) return;
 
-void UBTPS_ShootingMachineComponent::DoAimStart()
+void UBTPS_ShootingMachineComponent::DoToggleAim()
 {
-	bIsAiming = true;
-
-	if (PlayerCharacter && AimMontage)
-	{
-		PlayerCharacter->PlayAnimMontage(AimMontage);
-	}
-}
-
-void UBTPS_ShootingMachineComponent::DoAimEnd()
-{
-	bIsAiming = false;
-
-	if (PlayerCharacter && AimMontage)
-	{
-		PlayerCharacter->StopAnimMontage(AimMontage);
-	}
+	bIsAiming = !bIsAiming;
 }
 
 void UBTPS_ShootingMachineComponent::DoFire()
 {
 	if (!CurrentWeapon || !PlayerCharacter) return;
-
-	if (CurrentWeapon->GetCurrentAmmo() <= 0) return;
-
-	if (PlayerCharacter && FireMontage)
-	{
-		PlayerCharacter->PlayAnimMontage(FireMontage);
-	}
 
 	FVector CameraLoc;
 	FRotator CameraRot;
@@ -273,4 +261,14 @@ void UBTPS_ShootingMachineComponent::EquipWeapon(ABTPS_WeaponBase* NewWeapon)
 	{
 		OnAmmoChanged.Broadcast(CurrentWeapon->GetCurrentAmmo(), CurrentWeapon->GetMaxAmmo());
 	}
+}
+
+void UBTPS_ShootingMachineComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	if (GetWorld())
+	{
+		GetWorld()->GetTimerManager().ClearTimer(FireDelayTimer);
+	}
+
+	Super::EndPlay(EndPlayReason);
 }
