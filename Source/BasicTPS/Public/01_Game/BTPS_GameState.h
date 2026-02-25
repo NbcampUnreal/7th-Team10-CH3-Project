@@ -43,6 +43,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Monster")
 	int32 KilledMonsterCount = 0;
 	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Level Settings")
+	int32 TotalToSpawn;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Level")
 	float LevelDuration;
 	
@@ -93,6 +96,9 @@ public:
 	void UpdateHUD();
 	void StartLevel();
 	void EndLevel();
+	
+protected:
+	void OnGameClear();
 
 	
 };

@@ -3,6 +3,7 @@
 
 #include "01_Game/BTPS_GameState.h"
 #include "01_Game/BTPS_GameInstance.h"
+#include "01_Game/BTPS_SpawnManager.h"
 #include "02_Characters/BTPS_PlayerController.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/TextBlock.h"
@@ -14,6 +15,8 @@ ABTPS_GameState::ABTPS_GameState()
 	LevelDuration = 30.0f;
 	CurrentLevelIndex = 0;
 	MaxLevels = 1;
+	TotalToSpawn = 15;
+	
 }
 
 void ABTPS_GameState::BeginPlay()
@@ -64,7 +67,7 @@ void ABTPS_GameState::OnMonsterKilled(int32 ScoreReward)
 	UE_LOG(LogTemp, Log, TEXT("Monster Killed! (%d / %d)"), KilledMonsterCount, SpawnMonsterCount);
 
 	// TODO: UI 업데이트
-	// UpdateHUD(); 
+	UpdateHUD();
 
 	if (SpawnMonsterCount > 0 && KilledMonsterCount >= SpawnMonsterCount)
 	{
@@ -89,7 +92,10 @@ void ABTPS_GameState::OnGameOver()
 
 void ABTPS_GameState::OnLevelTimeUp()
 {
-	EndLevel();
+	if (ABTPS_GameState* BTPSGameState = Cast<ABTPS_GameState>(UGameplayStatics::GetGameState(GetWorld())))
+	{
+		BTPSGameState->OnGameOver();
+	}
 }
 
 void ABTPS_GameState::UpdateHUD()
@@ -102,10 +108,8 @@ void ABTPS_GameState::UpdateHUD()
 			{
 				if (UTextBlock* TimeText = Cast<UTextBlock>(HUDWidget->GetWidgetFromName(TEXT("Time"))))
 				{
-					/*
 					float RemainingTime = GetWorldTimerManager().GetTimerRemaining(LevelTimerHandle);
 					TimeText->SetText(FText::FromString(FString::Printf(TEXT("Time: %.1f"), RemainingTime)));
-					*/
 				}
 
 				if (UTextBlock* ScoreText = Cast<UTextBlock>(HUDWidget->GetWidgetFromName(TEXT("Score"))))
@@ -154,30 +158,19 @@ void ABTPS_GameState::StartLevel()
 	KilledMonsterCount = 0;
 
 	TArray<AActor*> FoundVolumes;
-
-	//TODO: 스폰볼륭 생성시 주석 해제
-	//UGameplayStatics::GetAllActorsOfClass(GetWorld(), ASpawnVolume::StaticClass(), FoundVolumes);
-
-
-	const int32 ItemToSpawn = 40;
-
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABTPS_SpawnManager::StaticClass(), FoundVolumes);
+	
 	if (FoundVolumes.Num() > 0)
 	{
-		/*
-		ASpawnVolume* SpawnVolume = Cast<ASpawnVolume>(FoundVolumes[0]);
-		if (SpawnVolume)
+		if (ABTPS_SpawnManager* Manager = Cast<ABTPS_SpawnManager>(FoundVolumes[0]))
 		{
-			for (int32 i = 0; i < ItemToSpawn; i++)
-			{
-				AActor* SpawnedActor = SpawnVolume->SpawnRandomItem();
-				if (SpawnedActor && SpawnedActor->IsA(ACoinItem::StaticClass()))
-				{
-					SpawnedCoinCount++;
-				}
-			}
+			SpawnMonsterCount = Manager->SpawnMultipleEnemies(TotalToSpawn);
 		}
-	*/
 	}
+	
+	UE_LOG(LogTemp, Log, TEXT("Level %d Started. Total Monsters: %d"), CurrentLevelIndex + 1, SpawnMonsterCount);
+	
+	UpdateHUD();
 
 	FString CurrentMapName = UGameplayStatics::GetCurrentLevelName(GetWorld());
 
@@ -202,7 +195,7 @@ void ABTPS_GameState::EndLevel()
 	// 모든 레벨을 다 돌았다면 게임 오버 처리
 	if (CurrentLevelIndex >= MaxLevels)
 	{
-		OnGameOver();
+		OnGameClear();
 		return;
 	}
 
@@ -213,6 +206,17 @@ void ABTPS_GameState::EndLevel()
 	}
 	else
 	{
-		OnGameOver();
+		OnGameClear();
+	}
+}
+
+void ABTPS_GameState::OnGameClear()
+{
+	if (APlayerController* PlayerController = GetWorld()->GetFirstPlayerController())
+	{
+		if (ABTPS_PlayerController* BTPS_PlayerController = Cast<ABTPS_PlayerController>(PlayerController))
+		{
+			BTPS_PlayerController->ShowGameClearMenu();
+		}
 	}
 }

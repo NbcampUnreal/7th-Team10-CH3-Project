@@ -16,9 +16,18 @@ class BASICTPS_API ABTPS_SpawnManager : public AActor
 public:
 	ABTPS_SpawnManager();
 	
-	UFUNCTION(BlueprintCallable, Category = "Spawning")
-	void SpawnRandomEnemy();
+	//UFUNCTION(BlueprintCallable, Category = "Spawning")
+	//void SpawnRandomEnemy();
 
+	UFUNCTION(BlueprintCallable, Category = "Spawning")
+	AActor* SpawnRandomEnemy(); // void에서 AActor*로 변경
+	
+	UFUNCTION(BlueprintCallable, Category = "Spawning")
+	AActor* SpawnEnemy(TSubclassOf<APawn> EnemyClass); // void에서 AActor*로 변경
+
+	int32 SpawnMultipleEnemies(int32 Amount);
+	
+	
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Spawning")
 	TObjectPtr<USceneComponent> Scene;
@@ -31,7 +40,7 @@ protected:
 	
 	FVector GetRandomPointInVolume() const;
 	FEnemySpawnRow* GetRandomEnemy() const;
-	void SpawnEnemy(TSubclassOf<APawn> EnemyClass);
+	//void SpawnEnemy(TSubclassOf<APawn> EnemyClass);
 	
 
 };

@@ -13,15 +13,16 @@ ABTPS_SpawnManager::ABTPS_SpawnManager()
 	SpawningBox->SetupAttachment(Scene);
 }
 
-void ABTPS_SpawnManager::SpawnRandomEnemy()
+AActor* ABTPS_SpawnManager::SpawnRandomEnemy()
 {
 	if (FEnemySpawnRow* SelectedRow = GetRandomEnemy())
 	{
 		if (UClass* ActualClass = SelectedRow->EnemyClass.Get())
 		{
-			SpawnEnemy(ActualClass);
+			return SpawnEnemy(ActualClass);
 		}
 	}
+	return nullptr;
 }
 
 FVector ABTPS_SpawnManager::GetRandomPointInVolume() const
@@ -68,14 +69,26 @@ FEnemySpawnRow* ABTPS_SpawnManager::GetRandomEnemy() const
 	return nullptr;
 }
 
-void ABTPS_SpawnManager::SpawnEnemy(TSubclassOf<APawn> EnemyClass)
+AActor* ABTPS_SpawnManager::SpawnEnemy(TSubclassOf<APawn> EnemyClass)
 {
-	if (!EnemyClass) {return;}
+	if (!EnemyClass) {return nullptr;}
 	
-	GetWorld()->SpawnActor<APawn>(
+	return GetWorld()->SpawnActor<APawn>(
 		EnemyClass,
 		GetRandomPointInVolume(),
 		FRotator(0.0f, 0.0f, 0.0f)
 		);
 }
 
+int32 ABTPS_SpawnManager::SpawnMultipleEnemies(int32 Amount)
+{
+	int32 SuccessCount = 0;
+	for (int32 i = 0; i < Amount; i++)
+	{
+		if (SpawnRandomEnemy())
+		{
+			SuccessCount++;
+		}
+	}
+	return SuccessCount;
+}
