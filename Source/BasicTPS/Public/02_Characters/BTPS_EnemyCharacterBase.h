@@ -1,8 +1,10 @@
-#pragma once
+﻿#pragma once
 
 #include "CoreMinimal.h"
 #include "BTPS_BaseCharacter.h"
 #include "BTPS_EnemyCharacterBase.generated.h"
+
+class UWidgetComponent;
 
 UCLASS()
 class BASICTPS_API ABTPS_EnemyCharacterBase : public ABTPS_BaseCharacter
@@ -26,6 +28,9 @@ protected:
 	class UBehaviorTree* TreeToRun;
 	
 	virtual void OnDeath() override;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI")
+	UWidgetComponent* HealthBarWidgetComponent;
 
 public:
 	virtual void Tick(float DeltaTime) override;
