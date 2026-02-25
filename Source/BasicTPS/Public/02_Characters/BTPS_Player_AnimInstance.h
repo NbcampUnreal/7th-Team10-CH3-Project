@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "CoreMinimal.h"
 #include "Animation/AnimInstance.h"
@@ -19,6 +19,8 @@ protected:
 	bool bSouldMove;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Animation|MovementData")
 	bool bIsFalling;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Animation|MovementData")
+	bool bIsAiming;
 
 public:
 	void NativeUpdateAnimation(float DeltaSeconsds) override;
