@@ -157,7 +157,8 @@ void UBTPS_ShootingMachineComponent::DoFire()
 	
 	
 	//*데미지 처리
-	if (RealHit.bBlockingHit && RealHit.GetActor() && CombatComp)
+	/*
+	 if (RealHit.bBlockingHit && RealHit.GetActor() && CombatComp)
 	{
 	CombatComp->ExecuteAttack(
 		RealHit.GetActor(),
@@ -165,6 +166,7 @@ void UBTPS_ShootingMachineComponent::DoFire()
 		RealHit
 		);
 	}
+	*/
 
 	CurrentWeapon->ShootAmmo();
 	OnAmmoChanged.Broadcast(CurrentWeapon->GetCurrentAmmo(), CurrentWeapon->GetMaxAmmo());
