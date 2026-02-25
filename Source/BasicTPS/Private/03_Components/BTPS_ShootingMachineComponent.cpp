@@ -66,13 +66,16 @@ void UBTPS_ShootingMachineComponent::Fire(const FInputActionValue& Value)
 
 	float CurrentTime = GetWorld()->GetTimeSeconds();
 
-	if (bIsAiming || (CurrentTime - LastFireTime < 0.25f))
+	if (bIsAiming || (CurrentTime - LastFireTime < 0.7f))
 	{
 		DoFire();
 	}
 	else
 	{
-		GetWorld()->GetTimerManager().SetTimer(FireDelayTimer, this, &UBTPS_ShootingMachineComponent::DoFire, 0.25f, false);
+		if (!GetWorld()->GetTimerManager().IsTimerActive(FireDelayTimer))
+		{
+			GetWorld()->GetTimerManager().SetTimer(FireDelayTimer, this, &UBTPS_ShootingMachineComponent::DoFire, 0.25f, false);
+		}
 	}
 }
 
