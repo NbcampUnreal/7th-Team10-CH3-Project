@@ -41,11 +41,14 @@ public:
 	
 public:
 	// variables
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category ="GmaeData", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category ="GameData", meta = (AllowPrivateAccess = "true"))
 	int32 TotalScore = 0;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category ="GmaeData", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category ="GameData", meta = (AllowPrivateAccess = "true"))
 	int32 CurrentLevelIndex = 0;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "GameData", meta = (AllowPrivateAccess = "true"))
+	int32 CurrentWaveIndex = 0;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Level", meta = (AllowPrivateAccess = "true"))
 	TSoftObjectPtr<UWorld> MenuLevel;
