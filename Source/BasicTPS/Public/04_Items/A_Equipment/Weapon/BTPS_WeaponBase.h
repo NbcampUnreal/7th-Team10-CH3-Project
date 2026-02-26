@@ -40,6 +40,7 @@ public:
 
 	int32 GetMaxAmmo() const { return MaxAmmo; }
 	int32 GetCurrentAmmo() const { return CurrentAmmo; }
+	int32 GetReserveAmmo() const { return ReserveAmmo; }
 
 	virtual void ShootAmmo();
 

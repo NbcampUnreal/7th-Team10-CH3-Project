@@ -9,6 +9,7 @@
 class UProgressBar;
 class UTextBlock;
 class UImage;
+class UOverlay;
 class UBTPS_StatComponent;
 class UBTPS_ShootingMachineComponent;
 
@@ -23,6 +24,8 @@ public:
 	void BindShootingComp(UBTPS_ShootingMachineComponent* ShootingMachineComp);
 	
 	void TickReadTime();
+
+	void ShowWeaponUI();
 	// UFUNCTION()
 	// void SetWeaponImage(UTexture2D* NewTexture);
 	
@@ -37,7 +40,7 @@ protected:
 	void UpdateStamina(float CurrentStamina, float MaxStamina);
 
 	UFUNCTION()
-	void UpdateAmmo(int32 CurrentAmmo, int32 MaxAmmo);
+	void UpdateAmmo(int32 CurrentAmmo, int32 MaxAmmo, int32 ReserveAmmo);
 	
 	UFUNCTION()
 	void UpdateLevelDuration();
@@ -56,6 +59,9 @@ protected:
 
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UTextBlock> Text_AmmoInfo;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UOverlay> WeaponInfoBox;
 	
 	UPROPERTY(meta=(BindWidget))
 	class UTextBlock* Timer;

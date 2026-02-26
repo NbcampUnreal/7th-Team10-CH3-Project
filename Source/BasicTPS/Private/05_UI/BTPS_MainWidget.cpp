@@ -2,7 +2,6 @@
 
 
 #include "05_UI/BTPS_MainWidget.h"
-
 #include "01_Game/BTPS_GameState.h"
 #include "03_Components/BTPS_StatComponent.h"
 #include "03_Components/BTPS_ShootingMachineComponent.h"
@@ -11,7 +10,7 @@
 #include "Styling/SlateBrush.h"
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
-
+#include "Components/Overlay.h"
 
 void UBTPS_MainWidget::NativeConstruct()
 {
@@ -108,7 +107,10 @@ void UBTPS_MainWidget::BindShootingComp(UBTPS_ShootingMachineComponent* Shooting
 
 		if (ShootingMachineComp->CurrentWeapon)
 		{
-			UpdateAmmo(ShootingMachineComp->CurrentWeapon->GetCurrentAmmo(), ShootingMachineComp->CurrentWeapon->GetMaxAmmo());
+			UpdateAmmo(ShootingMachineComp->CurrentWeapon->GetCurrentAmmo(), 
+				ShootingMachineComp->CurrentWeapon->GetMaxAmmo(),
+				ShootingMachineComp->CurrentWeapon->GetReserveAmmo()
+			);
 		}
 	}
 }
@@ -120,14 +122,22 @@ void UBTPS_MainWidget::BindShootingComp(UBTPS_ShootingMachineComponent* Shooting
 // 	WeaponImage->UImage::SetBrushFromTexture(NewTexture);
 // }
 
-void UBTPS_MainWidget::UpdateAmmo(int32 CurrentAmmo, int32 MaxAmmo)
+void UBTPS_MainWidget::ShowWeaponUI()
+{
+	if (WeaponInfoBox)
+	{
+		WeaponInfoBox->SetVisibility(ESlateVisibility::Visible);
+	}
+}
+
+void UBTPS_MainWidget::UpdateAmmo(int32 CurrentAmmo, int32 MaxAmmo, int32 ReserveAmmo)
 {
 	if (Text_AmmoInfo.Get())
 	{
-		FString AmmoString = FString::Printf(TEXT("%d / %d"), CurrentAmmo, MaxAmmo);
+		FString AmmoString = FString::Printf(TEXT("%d / %d (%d)"), CurrentAmmo, MaxAmmo, ReserveAmmo);
 		Text_AmmoInfo->SetText(FText::FromString(AmmoString));
 
-		Text_AmmoInfo->SetVisibility(ESlateVisibility::Visible);
+		ShowWeaponUI();
 	}
 }
 
