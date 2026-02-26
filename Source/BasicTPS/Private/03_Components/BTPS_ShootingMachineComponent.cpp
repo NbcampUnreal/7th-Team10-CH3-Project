@@ -99,6 +99,8 @@ void UBTPS_ShootingMachineComponent::Reload(const FInputActionValue& Value)
 
 void UBTPS_ShootingMachineComponent::DoToggleAim()
 {
+	if (!PlayerCharacter || !CurrentWeapon) return;
+
 	bIsAiming = !bIsAiming;
 }
 
@@ -169,13 +171,13 @@ void UBTPS_ShootingMachineComponent::DoFire()
 	*/
 
 	CurrentWeapon->ShootAmmo();
-	OnAmmoChanged.Broadcast(CurrentWeapon->GetCurrentAmmo(), CurrentWeapon->GetMaxAmmo());
+	OnAmmoChanged.Broadcast(CurrentWeapon->GetCurrentAmmo(), CurrentWeapon->GetMaxAmmo(), CurrentWeapon->GetReserveAmmo());
 
 	if(CurrentWeapon->GetCurrentAmmo() == 0)
 	{
 		if (CurrentWeapon->Reload())
 		{
-			OnAmmoChanged.Broadcast(CurrentWeapon->GetCurrentAmmo(), CurrentWeapon->GetMaxAmmo());
+			OnAmmoChanged.Broadcast(CurrentWeapon->GetCurrentAmmo(), CurrentWeapon->GetMaxAmmo(), CurrentWeapon->GetReserveAmmo());
 		}
 	}
 }
@@ -253,7 +255,7 @@ void UBTPS_ShootingMachineComponent::DoReload()
 	if (CurrentWeapon)
 	{
 		CurrentWeapon->Reload();
-		OnAmmoChanged.Broadcast(CurrentWeapon->GetCurrentAmmo(), CurrentWeapon->GetMaxAmmo());
+		OnAmmoChanged.Broadcast(CurrentWeapon->GetCurrentAmmo(), CurrentWeapon->GetMaxAmmo(), CurrentWeapon->GetReserveAmmo());
 	}
 }
 
@@ -277,7 +279,7 @@ void UBTPS_ShootingMachineComponent::EquipWeapon(ABTPS_WeaponBase* NewWeapon)
 	);
 	if (CurrentWeapon)
 	{
-		OnAmmoChanged.Broadcast(CurrentWeapon->GetCurrentAmmo(), CurrentWeapon->GetMaxAmmo());
+		OnAmmoChanged.Broadcast(CurrentWeapon->GetCurrentAmmo(), CurrentWeapon->GetMaxAmmo(), CurrentWeapon->GetReserveAmmo());
 	}
 }
 

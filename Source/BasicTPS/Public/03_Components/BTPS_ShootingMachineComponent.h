@@ -6,7 +6,7 @@
 #include "BTPS_ShootingMachineComponent.generated.h"
 
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnAmmoChangedDelegate, int32, CurrentAmmo, int32, MaxAmmo);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnAmmoChangedDelegate, int32, CurrentAmmo, int32, MaxAmmo, int32, ReserveAmmo);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnWeaponChanged, UTexture2D*, NewIcon);
 
 class UInputAction;
