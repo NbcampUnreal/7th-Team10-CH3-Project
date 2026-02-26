@@ -89,6 +89,9 @@ public:
 	void AddScore(int32 Amount);
 	UFUNCTION(BlueprintCallable, Category = "Monster")
 	void OnMonsterKilled(int32 ScoreReward);
+	UFUNCTION(BlueprintPure)
+	float GetLevelRemainingTime() const;
+	
 
 	void OnGameOver();
 	void OnLevelTimeUp();	

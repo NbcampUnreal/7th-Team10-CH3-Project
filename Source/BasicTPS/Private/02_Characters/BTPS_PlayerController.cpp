@@ -233,8 +233,11 @@ void ABTPS_PlayerController::ShowGameOverMenu(bool bIsRestart)
 			SetInputMode(FInputModeUIOnly());
 		}
 	}
+	
 	bIsGamePaused = true;
 	SetPause(true);
+	
+	
 }
 
 void ABTPS_PlayerController::ShowGameClearMenu()
@@ -252,7 +255,7 @@ void ABTPS_PlayerController::ShowGameClearMenu()
 			SetInputMode(FInputModeUIOnly());
 		}
 	}
-
+	
 	bIsGamePaused = true;
 	SetPause(true);
 	

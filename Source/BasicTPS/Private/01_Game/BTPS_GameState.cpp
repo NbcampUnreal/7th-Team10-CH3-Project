@@ -65,7 +65,9 @@ void ABTPS_GameState::OnMonsterKilled(int32 ScoreReward)
 	LevelScore += ScoreReward;
 
 	UE_LOG(LogTemp, Log, TEXT("Monster Killed! (%d / %d)"), KilledMonsterCount, SpawnMonsterCount);
-
+	
+	AddScore(ScoreReward);
+	
 	// TODO: UI 업데이트
 	UpdateHUD();
 
@@ -76,6 +78,15 @@ void ABTPS_GameState::OnMonsterKilled(int32 ScoreReward)
 		GetWorldTimerManager().ClearTimer(LevelTimerHandle);
 		EndLevel();
 	}
+}
+
+float ABTPS_GameState::GetLevelRemainingTime() const
+{
+	if (!GetWorld()) return 0.f;
+
+	const float Remaining = GetWorldTimerManager().GetTimerRemaining(LevelTimerHandle);
+
+	return FMath::Max(0.f, Remaining);
 }
 
 void ABTPS_GameState::OnGameOver()
@@ -98,8 +109,10 @@ void ABTPS_GameState::OnLevelTimeUp()
 	}
 }
 
+
 void ABTPS_GameState::UpdateHUD()
 {
+	
 	if (APlayerController* PlayerController = GetWorld()->GetFirstPlayerController())
 	{
 		ABTPS_PlayerController* BTPS_PlayerController = Cast<ABTPS_PlayerController>(PlayerController);
@@ -133,7 +146,9 @@ void ABTPS_GameState::UpdateHUD()
 			}
 		}
 	}
+	
 }
+
 
 void ABTPS_GameState::StartLevel()
 {
