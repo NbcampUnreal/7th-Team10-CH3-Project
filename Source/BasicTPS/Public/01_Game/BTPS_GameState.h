@@ -15,8 +15,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnKillCountChanged, int32, KilledC
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnWaveStateChanged, EBTPS_WaveState, NewWaveState);
 
 
-
-
+class UBTPS_WaveManager;
+class UDataTable;
 /**
  * 
  */
@@ -46,9 +46,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Level Settings")
 	int32 TotalToSpawn;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Level")
-	float LevelDuration;
-	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Level")
 	int32 CurrentLevelIndex;
 	
@@ -66,8 +63,10 @@ public:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Wave")
 	EBTPS_WaveState WaveState = EBTPS_WaveState::None;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Wave")
+	TObjectPtr<UBTPS_WaveManager> WaveManager;
 	
-	FTimerHandle LevelTimerHandle;
 	FTimerHandle HUDUpdateTimerHandle;
 	
 public:
@@ -77,11 +76,13 @@ public:
 	
 	UPROPERTY(BlueprintAssignable, Category = "Monster")
 	FOnKillCountChanged OnKillCountChanged;
-
 	
 	UPROPERTY(BlueprintAssignable, Category = "Wave")
 	FOnWaveStateChanged OnWaveStateChanged;
 	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Wave|Data")
+	UDataTable* WaveDataTable;
+
 public:
 	UFUNCTION(BlueprintPure, Category = "Score")
 	int32 GetScore() const;

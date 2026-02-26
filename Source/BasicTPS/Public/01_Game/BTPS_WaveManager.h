@@ -1,20 +1,25 @@
-#pragma once
+﻿#pragma once
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
 #include "01_Game/BTPS_SpawnManager.h"
 #include "01_Game/BTPS_WaveState.h"
+#include "Engine/DataTable.h"
 #include "BTPS_WaveManager.generated.h"
 
+class ABTPS_GameState;
+
 USTRUCT(BlueprintType)
-struct FBTPS_WaveData
+struct FBTPS_WaveData : public FTableRowBase
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 EnemyCount = 5;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float SpawnInterval = 0.5f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float WaveDuration = 30.0f;
 };
 
 
@@ -24,9 +29,13 @@ class BASICTPS_API UBTPS_WaveManager : public UObject
 	GENERATED_BODY()
 	
 public:
-
+	void Init(ABTPS_GameState* InGameState);
 	void StartWave(int32 WaveIndex);
+	void EndWave();
 	void OnEnemyDead();
+
+	UFUNCTION(BlueprintCallable, Category = "Wave")
+	float GetWaveRemainingTime() const;
 
 protected:
 	int32 AliveEnemyCount;
@@ -37,4 +46,15 @@ protected:
 	TArray<ABTPS_SpawnManager*> SpawnManagers;
 	UPROPERTY()
 	TArray<FBTPS_WaveData> Waves;
+
+	FTimerHandle SpawnTimerHandle;
+	FTimerHandle WaveTimerHandle;
+
+	int32 SpawnedEnemyCount;
+
+	UFUNCTION()
+	void SpawnEnemyByTimer();
+
+private:
+	ABTPS_GameState* GameStateRef;
 };

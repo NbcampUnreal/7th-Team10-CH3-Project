@@ -3,6 +3,7 @@
 
 #include "01_Game/BTPS_GameState.h"
 #include "01_Game/BTPS_GameInstance.h"
+#include "01_Game/BTPS_WaveManager.h"
 #include "01_Game/BTPS_SpawnManager.h"
 #include "02_Characters/BTPS_PlayerController.h"
 #include "Kismet/GameplayStatics.h"
@@ -12,11 +13,9 @@
 
 ABTPS_GameState::ABTPS_GameState()
 {
-	LevelDuration = 30.0f;
 	CurrentLevelIndex = 0;
 	MaxLevels = 1;
 	TotalToSpawn = 15;
-	
 }
 
 void ABTPS_GameState::BeginPlay()
@@ -71,22 +70,20 @@ void ABTPS_GameState::OnMonsterKilled(int32 ScoreReward)
 	// TODO: UI 업데이트
 	UpdateHUD();
 
-	if (SpawnMonsterCount > 0 && KilledMonsterCount >= SpawnMonsterCount)
+	if (WaveManager)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Level Cleared! All monsters are dead."));
-
-		GetWorldTimerManager().ClearTimer(LevelTimerHandle);
-		EndLevel();
+		WaveManager->OnEnemyDead();
 	}
 }
 
 float ABTPS_GameState::GetLevelRemainingTime() const
 {
-	if (!GetWorld()) return 0.f;
-
-	const float Remaining = GetWorldTimerManager().GetTimerRemaining(LevelTimerHandle);
-
-	return FMath::Max(0.f, Remaining);
+	if (WaveManager)
+	{
+		float RemainingTime = WaveManager->GetWaveRemainingTime();
+		return FMath::Max(0.f, RemainingTime);
+	}
+	return 0.f;
 }
 
 void ABTPS_GameState::OnGameOver()
@@ -121,7 +118,11 @@ void ABTPS_GameState::UpdateHUD()
 			{
 				if (UTextBlock* TimeText = Cast<UTextBlock>(HUDWidget->GetWidgetFromName(TEXT("Time"))))
 				{
-					float RemainingTime = GetWorldTimerManager().GetTimerRemaining(LevelTimerHandle);
+					float RemainingTime = 0.0f;
+					if (WaveManager)
+					{
+						RemainingTime = WaveManager->GetWaveRemainingTime();
+					}
 					TimeText->SetText(FText::FromString(FString::Printf(TEXT("Time: %.1f"), RemainingTime)));
 				}
 
@@ -169,41 +170,23 @@ void ABTPS_GameState::StartLevel()
 		}
 	}
 
-	SpawnMonsterCount = 0;
-	KilledMonsterCount = 0;
-
-	TArray<AActor*> FoundVolumes;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABTPS_SpawnManager::StaticClass(), FoundVolumes);
-	
-	if (FoundVolumes.Num() > 0)
+	WaveManager = NewObject<UBTPS_WaveManager>(this);
+	if (WaveManager)
 	{
-		if (ABTPS_SpawnManager* Manager = Cast<ABTPS_SpawnManager>(FoundVolumes[0]))
-		{
-			SpawnMonsterCount = Manager->SpawnMultipleEnemies(TotalToSpawn);
-		}
+		WaveManager->Init(this);
+		WaveManager->StartWave(0);
 	}
 	
-	UE_LOG(LogTemp, Log, TEXT("Level %d Started. Total Monsters: %d"), CurrentLevelIndex + 1, SpawnMonsterCount);
+	//UE_LOG(LogTemp, Log, TEXT("Level %d Started. Total Monsters: %d"), CurrentLevelIndex + 1, SpawnMonsterCount);
 	
 	UpdateHUD();
 
 	FString CurrentMapName = UGameplayStatics::GetCurrentLevelName(GetWorld());
 
-	if (CurrentMapName != TEXT("L_MenuLevel"))
-	{
-		GetWorldTimerManager().SetTimer(
-			LevelTimerHandle,
-			this,
-			&ABTPS_GameState::OnLevelTimeUp,
-			LevelDuration,
-			false
-		);
-	}
 }
 
 void ABTPS_GameState::EndLevel()
 {
-	GetWorldTimerManager().ClearTimer(LevelTimerHandle);
 	AddScore(LevelScore);
 	CurrentLevelIndex++;
 
