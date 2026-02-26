@@ -19,7 +19,10 @@ protected:
 	TSubclassOf<ABTPS_GrenadeProjectile> GrenadeClass;
 
 protected:
-
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Grenade")
+	float UpwardForce;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Grenade")
+	FRotator RiseAngle;
 	void SkillActivation() override;
 	ESkillType GetSkillType() const override { return ESkillType::Grenade; }
 
