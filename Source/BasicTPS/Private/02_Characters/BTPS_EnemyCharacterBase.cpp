@@ -1,4 +1,4 @@
-#include "02_Characters/BTPS_EnemyCharacterBase.h"
+﻿#include "02_Characters/BTPS_EnemyCharacterBase.h"
 #include "01_Game/BTPS_GameState.h"
 #include "BrainComponent.h"
 #include "03_Components/BTPS_StatComponent.h"
@@ -45,9 +45,8 @@ void ABTPS_EnemyCharacterBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	//tick함수가 무거워서 timer를 써볼까 했는데, 그래도 UI는  쓰는걸 추천합니다.
-	//스폰된 지 1초가 안 지났거나, 이 몬스터의 메시가 최근 0.1초 내에 화면에 그려졌을(보였을) 때만 연산
-	if (HealthBarWidgetComponent && (GetGameTimeSinceCreation() < 1.0f || GetMesh()->WasRecentlyRendered(0.1f)))
+	
+	if (HealthBarWidgetComponent)
 	{
 		APlayerCameraManager* CameraManager = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0);
 		if (CameraManager)

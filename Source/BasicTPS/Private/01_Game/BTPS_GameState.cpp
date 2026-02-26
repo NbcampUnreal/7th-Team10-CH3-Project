@@ -78,11 +78,12 @@ void ABTPS_GameState::OnMonsterKilled(int32 ScoreReward)
 
 float ABTPS_GameState::GetLevelRemainingTime() const
 {
-	if (!GetWorld()) return 0.f;
-
-	const float Remaining = GetWorldTimerManager().GetTimerRemaining(LevelTimerHandle);
-
-	return FMath::Max(0.f, Remaining);
+	if (WaveManager)
+	{
+		float RemainingTime = WaveManager->GetWaveRemainingTime();
+		return FMath::Max(0.f, RemainingTime);
+	}
+	return 0.f;
 }
 
 void ABTPS_GameState::OnGameOver()
