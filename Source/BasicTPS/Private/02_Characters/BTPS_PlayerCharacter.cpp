@@ -1,4 +1,4 @@
-﻿#include "02_Characters/BTPS_PlayerCharacter.h"
+#include "02_Characters/BTPS_PlayerCharacter.h"
 #include "02_Characters/BTPS_PlayerController.h"
 #include "03_Components/BTPS_ShootingMachineComponent.h"
 #include "03_Components/BTPS_StatComponent.h"
@@ -42,11 +42,6 @@ ABTPS_PlayerCharacter::ABTPS_PlayerCharacter()
  	Super::BeginPlay();
  	
  }
-
-// void ABTPS_PlayerCharacter::Tick(float DeltaTime)
-// {
-// 	Super::Tick(DeltaTime);
-// }
 
 void ABTPS_PlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
