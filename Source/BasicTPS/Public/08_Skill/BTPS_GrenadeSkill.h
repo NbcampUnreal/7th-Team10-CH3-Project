@@ -23,8 +23,7 @@ protected:
 	float UpwardForce;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Grenade")
 	FRotator RiseAngle;
-	void SkillActivation() override;
-	ESkillType GetSkillType() const override { return ESkillType::Grenade; }
 
+	void SkillActivation() override;
 	void SpawnGrenadeProjectile();
 };

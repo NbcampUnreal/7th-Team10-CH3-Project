@@ -19,26 +19,18 @@ public:
 
 	void TryActivate();
 
-	void ActivateSkill(ESkillType Type);
-
-public:
-	UPROPERTY()
-	TMap<ESkillType, UBTPS_SkillComponent*> SkillMap;
-
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SkillCost")
 	int32 SkillCost = 0;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SkillCost")
 	float SkillCoolTime = 0;
-	float CurrentCoolTime = 0;
-	bool bCanActivate = true;
-
 
 protected:
-	virtual void SkillActivation();
+	virtual void SkillActivation() {}
+	float CurrentCoolTime = 0;
+	bool bCanActivate = true;
 
 public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	virtual void BeginPlay() override;
-	virtual ESkillType GetSkillType() const { return ESkillType::None; }
 };
