@@ -19,13 +19,11 @@ protected:
 	float ExplosionRadius;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Grenade")
 	float ExplosionDamage;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Grenade")
-	float UpwardForce;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<USphereComponent> ExplosionComp;
 
 protected:
-	virtual void BeginPlay() override;\
+	virtual void BeginPlay() override;
 
 	void Explode();
 

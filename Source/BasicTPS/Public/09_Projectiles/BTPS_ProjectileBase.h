@@ -15,13 +15,15 @@ class BASICTPS_API ABTPS_ProjectileBase : public AActor
 public:	
 	ABTPS_ProjectileBase();
 
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement")
+	TObjectPtr<UProjectileMovementComponent> ProjectileMovement;
+
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<USphereComponent> CollisionComp;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<UStaticMeshComponent> ProjectileMesh;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement")
-	TObjectPtr<UProjectileMovementComponent> ProjectileMovement;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components")
 	float CollisionRadius;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components")
