@@ -9,6 +9,7 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISenseConfig_Sight.h"
+#include "Perception/AISenseConfig_Damage.h"
 
 ABTPS_AIController::ABTPS_AIController()
 {
@@ -16,6 +17,7 @@ ABTPS_AIController::ABTPS_AIController()
 	
 	PerceptionComponent = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("PerceptionComponent"));
 	SightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("SightConfig"));
+	DamageConfig = CreateDefaultSubobject<UAISenseConfig_Damage>(TEXT("DamageConfig"));
 	
 	if (SightConfig)
 	{
@@ -29,6 +31,11 @@ ABTPS_AIController::ABTPS_AIController()
 		
 		PerceptionComponent->ConfigureSense(*SightConfig);
 		PerceptionComponent->SetDominantSense((SightConfig->GetSenseImplementation()));
+	}
+	
+	if (DamageConfig)
+	{
+		PerceptionComponent->ConfigureSense((*DamageConfig));
 	}
 }
 

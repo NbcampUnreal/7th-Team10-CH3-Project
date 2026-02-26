@@ -9,6 +9,7 @@
 
 
 class UAISenseConfig_Sight;
+class UAISenseConfig_Damage;
 class UBehaviorTree;
 class UBlackboardComponent;
 
@@ -26,6 +27,9 @@ protected:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="AI")
 	TObjectPtr<UAISenseConfig_Sight> SightConfig;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="AI")
+	TObjectPtr<UAISenseConfig_Damage> DamageConfig;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="AI")
 	TObjectPtr<UBehaviorTree> BehaviorTreeAsset;
