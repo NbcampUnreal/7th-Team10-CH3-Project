@@ -1,5 +1,4 @@
-﻿#include "02_Characters/BTPS_EnemyCharacterBase.h"
-
+#include "02_Characters/BTPS_EnemyCharacterBase.h"
 #include "01_Game/BTPS_GameState.h"
 #include "BrainComponent.h"
 #include "03_Components/BTPS_StatComponent.h"

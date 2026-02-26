@@ -25,20 +25,6 @@ void UBTPS_SkillComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 void UBTPS_SkillComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
-	AActor* Owner = GetOwner();
-
-	TArray<UBTPS_SkillComponent*> FoundSkills;
-	Owner->GetComponents< UBTPS_SkillComponent>(FoundSkills);
-	
-	for (UBTPS_SkillComponent* Skill : FoundSkills)
-	{
-		if (Skill != this)
-		{
-			SkillMap.Add(Skill->GetSkillType(), Skill);
-		}
-	}
-
 }
 
 bool UBTPS_SkillComponent::CanActivate() const
@@ -57,13 +43,3 @@ void UBTPS_SkillComponent::TryActivate()
 
 	SkillActivation();
 }
-
-void UBTPS_SkillComponent::ActivateSkill(ESkillType Type)
-{
-	if (UBTPS_SkillComponent** Found = SkillMap.Find(Type))
-	{
-		(*Found)->SkillActivation();
-	}
-}
-
-void UBTPS_SkillComponent::SkillActivation() {}

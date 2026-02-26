@@ -11,13 +11,6 @@ enum class EXxType : uint8
 	Xx
 };
 
-UENUM(BlueprintType)
-enum class ESkillType : uint8
-{
-	None,
-	Grenade
-};
-
 USTRUCT(Atomic, BlueprintType)
 struct FXxData
 {

@@ -1,13 +1,13 @@
 #include "09_Projectiles/BTPS_GrenadeProjectile.h"
-#include "02_Characters/BTPS_PlayerController.h"
 #include "Components/SphereComponent.h"
+#include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 
 ABTPS_GrenadeProjectile::ABTPS_GrenadeProjectile()
 {
-	ExplosionRadius = 400.f;
-	ExplosionDamage = 30.f;
-	UpwardForce = 500.f;
+	ExplosionRadius = 600.f;
+	ExplosionDamage = 300.f;
+
 
 	ExplosionComp = CreateDefaultSubobject<USphereComponent>(TEXT("ExplosionComponent"));
 	ExplosionComp->SetupAttachment(RootComponent);
@@ -15,7 +15,12 @@ ABTPS_GrenadeProjectile::ABTPS_GrenadeProjectile()
 	ExplosionComp->InitSphereRadius(ExplosionRadius);
 
 	ProjectileMovement->bShouldBounce = true;
-	ProjectileMovement->Bounciness = 0.5f;
+	ProjectileMovement->Bounciness = 0.3f;
+	ProjectileMovement->Friction = 0.8f;
+
+	CollisionComp->SetLinearDamping(0.8f);
+	CollisionComp->SetAngularDamping(2.f);
+
 	InitialLifeSpan = 4.f;
 }
 
@@ -30,11 +35,6 @@ void ABTPS_GrenadeProjectile::BeginPlay()
 		FuseTime,
 		false
 	);
-
-	FVector LunchDir = GetOwner()->GetActorForwardVector() + FVector(0, 0, 0.5f);
-	LunchDir.Normalize();
-
-	ProjectileMovement->Velocity = LunchDir * UpwardForce;
 }
 
 void ABTPS_GrenadeProjectile::Explode()
@@ -46,24 +46,39 @@ void ABTPS_GrenadeProjectile::Explode()
 
 	GetWorld()->GetTimerManager().ClearTimer(FuseTimerHandle);
 
-	TArray<AActor*> OverlappingActors;
+	DrawDebugSphere(GetWorld(), GetActorLocation(), ExplosionComp->GetUnscaledSphereRadius(), 32, FColor::Red, false, 2.f);
 
+	TArray<AActor*> OverlappingActors;
+	ExplosionComp->UpdateOverlaps();
 	ExplosionComp->GetOverlappingActors(OverlappingActors);
 
-	AController* OwnerController = Cast<ABTPS_PlayerController>(GetOwner());
+	UE_LOG(LogTemp, Warning, TEXT("Found %d actors in explosion range"), OverlappingActors.Num());
+
+	AActor* TempOwner = GetOwner();
+	if (!TempOwner)
+		return;
+
+	APawn* OwningPawn = Cast<APawn>(TempOwner);
+	if (!OwningPawn)
+		return;
+
+	AController* OwnerController = OwningPawn->GetController();
 	if (!OwnerController)
 		return;
 
 	for (AActor* Actor : OverlappingActors)
 	{
-		//TODO_CSH 데미지를 받을 예외처리 구문을 위한 태그 추가 필요, 추가시 여기에서 예외처리
-		UGameplayStatics::ApplyDamage(
-			Actor,
-			ExplosionDamage,
-			OwnerController,
-			this,
-			UDamageType::StaticClass()
-		);
+		if (Actor && Actor != TempOwner)
+		{
+			UGameplayStatics::ApplyDamage(
+				Actor,
+				ExplosionDamage,
+				OwnerController,
+				this,
+				UDamageType::StaticClass()
+			);
+			UE_LOG(LogTemp, Warning, TEXT("[Grenade] Hit %s! Damage: %f"), *Actor->GetName(), ExplosionDamage);
+		}
 	}
 
 	Destroy();
