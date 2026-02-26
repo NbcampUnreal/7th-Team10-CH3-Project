@@ -28,6 +28,9 @@ void UBTPS_SkillComponent::BeginPlay()
 
 	AActor* Owner = GetOwner();
 
+	if (!Owner)
+		return;
+
 	TArray<UBTPS_SkillComponent*> FoundSkills;
 	Owner->GetComponents< UBTPS_SkillComponent>(FoundSkills);
 	
