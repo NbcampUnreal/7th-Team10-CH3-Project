@@ -45,6 +45,12 @@ void UBTPS_StatComponent::TickComponent(float DeltaTime, enum ELevelTick TickTyp
 void UBTPS_StatComponent::OnTakeDamage(float DamageAmount)
 {
 	float ActualDamage = DamageAmount;
+	
+	if (OnDamageReceived.IsBound())
+	{
+		OnDamageReceived.Broadcast(ActualDamage);
+	}
+	
 	if (HalfDamageDefense > KINDA_SMALL_NUMBER)
 	{
 		float DamageMultiplier = HalfDamageDefense / (HalfDamageDefense + Defense);
