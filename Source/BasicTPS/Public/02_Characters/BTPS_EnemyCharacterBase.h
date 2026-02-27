@@ -32,6 +32,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI")
 	UWidgetComponent* HealthBarWidgetComponent;
 
+	UPROPERTY()
+	AController* LastAttacker;
+
 	static constexpr float VISIBLE_DISTANCE_MAX = 3000.0f;
 	static constexpr float VISIBLE_DISTANCE_MAX_SQ = VISIBLE_DISTANCE_MAX * VISIBLE_DISTANCE_MAX;
 
@@ -52,6 +55,8 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	UBehaviorTree* GetBehaviorTree() const { return TreeToRun; }
+
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 	
 	virtual void SetTarget(AActor* NewTarget);
 	virtual AActor* GetTarget() const;

@@ -3,6 +3,8 @@
 #include "BrainComponent.h"
 #include "03_Components/BTPS_StatComponent.h"
 #include "05_UI/BTPS_EnemyHealthBarWidget.h"
+#include "05_UI/BTPS_HUD.h"
+#include "05_UI/BTPS_MainWidget.h"
 #include "06_Ai/BTPS_AIController.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/WidgetComponent.h"
@@ -118,6 +120,18 @@ void ABTPS_EnemyCharacterBase::SetupPlayerInputComponent(UInputComponent* Player
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
+float ABTPS_EnemyCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+
+	if (EventInstigator)
+	{
+		LastAttacker = EventInstigator;
+	}
+
+	return ActualDamage;
+}
+
 void ABTPS_EnemyCharacterBase::SetTarget(AActor* NewTarget)
 {
 	if (!IsValid(NewTarget)) return;
@@ -184,5 +198,20 @@ void ABTPS_EnemyCharacterBase::OnDeath()
 	{
 		HealthBarWidgetComponent->SetVisibility(false);
 		HealthBarWidgetComponent->SetComponentTickEnabled(false);
+	}
+
+	if (LastAttacker)
+	{
+		APlayerController* PC = Cast<APlayerController>(LastAttacker);
+		if (PC)
+		{
+			if (ABTPS_HUD* HUD = Cast<ABTPS_HUD>(PC->GetHUD()))
+			{
+				if (UBTPS_MainWidget* MainWidget = HUD->GetMainWidget())
+				{
+					MainWidget->ShowKillMarker();
+				}
+			}
+		}
 	}
 }
