@@ -32,6 +32,20 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI")
 	UWidgetComponent* HealthBarWidgetComponent;
 
+	static constexpr float VISIBLE_DISTANCE_MAX = 3000.0f;
+	static constexpr float VISIBLE_DISTANCE_MAX_SQ = VISIBLE_DISTANCE_MAX * VISIBLE_DISTANCE_MAX;
+
+	static constexpr float FADE_START_DISTANCE = 2000.0f;
+	static constexpr float FADE_START_DISTANCE_SQ = FADE_START_DISTANCE * FADE_START_DISTANCE;
+
+	static constexpr float TICK_INTERVAL_THRESHOLD = 1000.0f;
+	static constexpr float TICK_INTERVAL_THRESHOLD_SQ = TICK_INTERVAL_THRESHOLD * TICK_INTERVAL_THRESHOLD;
+
+	bool bIsHealthBarFullyOpaque = false;
+
+	FTimerHandle DistanceCheckTimer;
+	void CheckDistanceFromCamera();
+
 public:
 	virtual void Tick(float DeltaTime) override;
 

@@ -59,7 +59,7 @@ void UBTPS_ShootingMachineComponent::Fire(const FInputActionValue& Value)
 
 	if (PlayerCharacter->GetCharacterMovement())
 	{
-		PlayerCharacter->GetCharacterMovement()->MaxWalkSpeed = 300.0f;
+		PlayerCharacter->GetCharacterMovement()->MaxWalkSpeed = FIRE_SPEED;
 	}
 
 	GetWorld()->GetTimerManager().SetTimer(ActionEndTimer, this, &UBTPS_ShootingMachineComponent::EndFireAction, 0.5f, false);
@@ -289,7 +289,7 @@ void UBTPS_ShootingMachineComponent::EndFireAction()
 
 	if (PlayerCharacter && PlayerCharacter->GetCharacterMovement())
 	{
-		PlayerCharacter->GetCharacterMovement()->MaxWalkSpeed = 800.0f;
+		PlayerCharacter->GetCharacterMovement()->MaxWalkSpeed = NORMAL_SPEED;
 	}
 }
 
