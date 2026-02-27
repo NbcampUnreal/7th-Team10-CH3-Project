@@ -21,10 +21,6 @@ ABTPS_AIController::ABTPS_AIController()
 	
 	if (SightConfig)
 	{
-		SightConfig->SightRadius = 1500.0f;
-		SightConfig->LoseSightRadius = 2000.0f;
-		SightConfig->PeripheralVisionAngleDegrees = 90.0f;
-		
 		SightConfig->DetectionByAffiliation.bDetectEnemies = true;
 		SightConfig->DetectionByAffiliation.bDetectNeutrals = false;
 		SightConfig->DetectionByAffiliation.bDetectFriendlies = false;
@@ -56,6 +52,15 @@ void ABTPS_AIController::OnPossess(APawn* InPawn)
 	ABTPS_EnemyCharacterBase* Enemy = Cast<ABTPS_EnemyCharacterBase>(InPawn);
 	if (Enemy)
 	{
+		if (SightConfig)
+		{
+			SightConfig->SightRadius = Enemy->SightRadius;
+			SightConfig->LoseSightRadius = Enemy->LoseSightRadius;
+			SightConfig->PeripheralVisionAngleDegrees = Enemy->PeripheralVisionAngle;
+			
+			PerceptionComponent->ConfigureSense(*SightConfig);
+		}
+		
 		if (Enemy->GetBehaviorTree())
 		{
 			RunBehaviorTree(Enemy->GetBehaviorTree());

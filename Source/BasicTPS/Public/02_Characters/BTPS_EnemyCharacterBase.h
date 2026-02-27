@@ -5,6 +5,7 @@
 #include "BTPS_EnemyCharacterBase.generated.h"
 
 class UWidgetComponent;
+class UDecalComponent;
 
 UCLASS()
 class BASICTPS_API ABTPS_EnemyCharacterBase : public ABTPS_BaseCharacter
@@ -25,12 +26,18 @@ protected:
 	TWeakObjectPtr<AActor> CurrentTarget;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "AI")
-	class UBehaviorTree* TreeToRun;
+	TObjectPtr <class UBehaviorTree> TreeToRun;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI")
+	TObjectPtr<UDecalComponent> VisionConeDecal;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI")
+	TObjectPtr<UWidgetComponent> HealthBarWidgetComponent;
+	
+	UPROPERTY()
+	TObjectPtr<UMaterialInstanceDynamic> VisionMatInstance;
 	
 	virtual void OnDeath() override;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI")
-	UWidgetComponent* HealthBarWidgetComponent;
 
 	static constexpr float VISIBLE_DISTANCE_MAX = 3000.0f;
 	static constexpr float VISIBLE_DISTANCE_MAX_SQ = VISIBLE_DISTANCE_MAX * VISIBLE_DISTANCE_MAX;
@@ -47,6 +54,29 @@ protected:
 	void CheckDistanceFromCamera();
 
 public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Vision")
+	float SightRadius = 1500.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Vision")
+	float LoseSightRadius = 2000.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Vision")
+	float PeripheralVisionAngle = 90.0f;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Vision")
+	float DecalFadeMaxDistance = 100.0f;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Vision")
+	float DecalFadeMinDistance = 100.0f;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Vision")
+	FLinearColor NormalVisionColor = 
+		FLinearColor(0.0f, 1.0f, 0.0f, 0.5f);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Vision")
+	FLinearColor AlertVisionColor = 
+		FLinearColor(1.0f, 0.0f, 0.0f, 0.5f);
+	
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -57,5 +87,6 @@ public:
 	virtual AActor* GetTarget() const;
 	virtual bool HasTarget() const;
 	virtual void ClearTarget();
+	virtual void OnConstruction(const FTransform& Transform) override;
 
 };
