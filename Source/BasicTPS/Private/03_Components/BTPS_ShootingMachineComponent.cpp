@@ -3,6 +3,7 @@
 #include "CollisionShape.h"
 #include "DrawDebugHelpers.h"
 #include "03_Components/BTPS_CombatComponent.h"
+#include "02_Characters/BTPS_EnemyCharacterBase.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -24,6 +25,8 @@ UBTPS_ShootingMachineComponent::UBTPS_ShootingMachineComponent()
 void UBTPS_ShootingMachineComponent::BeginPlay()
 {
 	Super::BeginPlay();
+	GetWorld()->GetTimerManager().SetTimer(AimCheckTimer, this, &UBTPS_ShootingMachineComponent::CheckAimTarget, 0.1f, true);
+
 	PlayerCharacter = Cast<ACharacter>(GetOwner());
 	
 	if (GetOwner())
@@ -37,6 +40,42 @@ void UBTPS_ShootingMachineComponent::TickComponent(float DeltaTime, ELevelTick T
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
+}
+
+void UBTPS_ShootingMachineComponent::CheckAimTarget()
+{
+	if (!PlayerCharacter || !PlayerCharacter->GetController()) return;
+	APlayerController* PC = Cast<APlayerController>(PlayerCharacter->GetController());
+	if (!PC || !PC->PlayerCameraManager) return;
+
+	bool bIsCurrentlyAimingAtEnemy = false;
+	if (CurrentWeapon)
+	{
+		FVector Start = PC->PlayerCameraManager->GetCameraLocation();
+		FVector ForwardVector = PC->PlayerCameraManager->GetActorForwardVector();
+		FVector End = Start + (ForwardVector * 5000.0f);
+
+		FHitResult HitResult;
+		FCollisionQueryParams CollisionParams;
+		CollisionParams.AddIgnoredActor(PlayerCharacter);
+
+		bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility, CollisionParams);
+
+		if (bHit && HitResult.GetActor())
+		{
+			if (HitResult.GetActor()->IsA(ABTPS_EnemyCharacterBase::StaticClass()))
+			{
+				bIsCurrentlyAimingAtEnemy = true;
+			}
+		}
+	}
+
+
+	if (bIsCurrentlyAimingAtEnemy != bWasAimingAtEnemy)
+	{
+		bWasAimingAtEnemy = bIsCurrentlyAimingAtEnemy;
+		OnAimTargetChanged.Broadcast(bIsCurrentlyAimingAtEnemy);
+	}
 }
 
 
@@ -299,10 +338,12 @@ void UBTPS_ShootingMachineComponent::EndPlay(const EEndPlayReason::Type EndPlayR
 	{
 		GetWorld()->GetTimerManager().ClearTimer(FireDelayTimer);
 		GetWorld()->GetTimerManager().ClearTimer(ActionEndTimer);
+		GetWorld()->GetTimerManager().ClearTimer(AimCheckTimer);
 	}
 
 	OnAmmoChanged.Clear();
 	OnWeaponChanged.Clear();
+	OnAimTargetChanged.Clear();
 
 	Super::EndPlay(EndPlayReason);
 }

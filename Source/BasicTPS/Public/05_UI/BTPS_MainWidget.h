@@ -10,6 +10,7 @@ class UProgressBar;
 class UTextBlock;
 class UImage;
 class UOverlay;
+class UBorder;
 class UBTPS_StatComponent;
 class UBTPS_ShootingMachineComponent;
 
@@ -26,6 +27,16 @@ public:
 	void TickReadTime();
 
 	void ShowWeaponUI();
+
+	UFUNCTION()
+	void UpdateCrosshairColor(bool bIsAimingAtEnemy);
+
+	UFUNCTION()
+	void ShowKillMarker();
+
+	UFUNCTION()
+	void HideKillMarker();
+
 	// UFUNCTION()
 	// void SetWeaponImage(UTexture2D* NewTexture);
 	
@@ -65,9 +76,16 @@ protected:
 	
 	UPROPERTY(meta=(BindWidget))
 	class UTextBlock* Timer;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UBorder> Crosshair;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UImage> Image_KillMarker;
 	
 protected:
 	FTimerHandle RetryBindHandle;
+	FTimerHandle KillMarkerTimerHandle;
 	
 	// UPROPERTY(meta = (BindWidget))
 	// TObjectPtr<UImage> WeaponImage;

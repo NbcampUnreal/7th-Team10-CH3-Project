@@ -8,6 +8,7 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnAmmoChangedDelegate, int32, CurrentAmmo, int32, MaxAmmo, int32, ReserveAmmo);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnWeaponChanged, UTexture2D*, NewIcon);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAimTargetChangedDelegate, bool, bIsAimingAtEnemy);
 
 class UInputAction;
 class ABTPS_WeaponBase;
@@ -73,11 +74,16 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Camera")
 	float TPSArmLength = 300.0f;
 
+	void CheckAimTarget();
+	bool bWasAimingAtEnemy = false;
+
 public:	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FOnAmmoChangedDelegate OnAmmoChanged;
+	UPROPERTY(BlueprintAssignable, Category = "Events")
+	FOnAimTargetChangedDelegate OnAimTargetChanged;
 
 	void ToggleAim(const FInputActionValue& Value);
 	void Fire(const FInputActionValue& Value);
@@ -114,6 +120,7 @@ public:
 
 	FTimerHandle FireDelayTimer;
 	FTimerHandle ActionEndTimer;
+	FTimerHandle AimCheckTimer;
 
 	static constexpr float FIRE_SPEED = 300.0f;
 	static constexpr float NORMAL_SPEED = 800.0f;
