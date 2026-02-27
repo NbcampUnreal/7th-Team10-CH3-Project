@@ -81,6 +81,7 @@ void ABTPS_GrenadeProjectile::Explode()
 		}
 	}
 
+	BP_Explosion();
 	Destroy();
 }
 
