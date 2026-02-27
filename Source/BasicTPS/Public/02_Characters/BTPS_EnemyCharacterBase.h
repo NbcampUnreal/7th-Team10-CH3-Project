@@ -39,9 +39,6 @@ protected:
 	
 	virtual void OnDeath() override;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI")
-	UWidgetComponent* HealthBarWidgetComponent;
-
 	static constexpr float VISIBLE_DISTANCE_MAX = 3000.0f;
 	static constexpr float VISIBLE_DISTANCE_MAX_SQ = VISIBLE_DISTANCE_MAX * VISIBLE_DISTANCE_MAX;
 
