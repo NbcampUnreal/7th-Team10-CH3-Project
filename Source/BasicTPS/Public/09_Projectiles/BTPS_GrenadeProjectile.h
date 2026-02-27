@@ -21,6 +21,9 @@ protected:
 	float ExplosionDamage;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<USphereComponent> ExplosionComp;
+	
+	UFUNCTION(BlueprintImplementableEvent)
+	void BP_Explosion();
 
 protected:
 	virtual void BeginPlay() override;

@@ -7,8 +7,8 @@ UBTPS_GrenadeSkill::UBTPS_GrenadeSkill()
 {
 	SkillCost = 20;
 	SkillCoolTime = 8.f;
-	UpwardForce = 500.f;
-	RiseAngle = FRotator(0.f, 0.f, 20.f);
+	UpwardForce = 2000.f;
+	RiseAngle = FRotator(20.f, 0.f, 0.f);
 }
 
 void UBTPS_GrenadeSkill::SkillActivation()
@@ -56,10 +56,7 @@ void UBTPS_GrenadeSkill::SpawnGrenadeProjectile()
 
 		FVector FinalVelocity = LunchDir * UpwardForce;
 
-		PMC->InitialSpeed += FinalVelocity.Size();
-		PMC->MaxSpeed = FMath::Max(PMC->MaxSpeed, PMC->InitialSpeed);
-
-		PMC->Velocity += FinalVelocity;
+		PMC->AddForce(FinalVelocity);
 
 		PMC->UpdateComponentVelocity();
 	}
