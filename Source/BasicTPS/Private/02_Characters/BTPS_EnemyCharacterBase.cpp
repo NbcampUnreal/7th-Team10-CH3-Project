@@ -27,6 +27,7 @@ ABTPS_EnemyCharacterBase::ABTPS_EnemyCharacterBase()
 	HealthBarWidgetComponent->SetWidgetSpace(EWidgetSpace::World);
 	HealthBarWidgetComponent->SetDrawSize(FVector2D(120.0f, 15.0f));
 	HealthBarWidgetComponent->SetRelativeLocation(FVector(0.0f, 0.0f, 130.0f));
+	HealthBarWidgetComponent->SetBlendMode(EWidgetBlendMode::Transparent);
 	
 	VisionConeDecal = CreateDefaultSubobject<UDecalComponent>(TEXT("VisionConeDecal"));
 	VisionConeDecal->SetupAttachment(RootComponent);
@@ -47,28 +48,76 @@ void ABTPS_EnemyCharacterBase::BeginPlay()
 			HealthBarWidget->BindStatComp(StatComp);
 		}
 	}
+
+	GetWorldTimerManager().SetTimer(DistanceCheckTimer, this, &ABTPS_EnemyCharacterBase::CheckDistanceFromCamera, 0.5f, true);
+}
+
+void ABTPS_EnemyCharacterBase::CheckDistanceFromCamera()
+{
+	if (!HealthBarWidgetComponent) return;
+
+	APlayerCameraManager* CameraManager = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0);
+	if (!CameraManager) return;
+
+
+	float DistanceSq = FVector::DistSquared(GetActorLocation(), CameraManager->GetCameraLocation());
+
+	if (DistanceSq > VISIBLE_DISTANCE_MAX_SQ)
+	{
+		HealthBarWidgetComponent->SetVisibility(false);
+		HealthBarWidgetComponent->SetComponentTickEnabled(false);
+	}
+	else
+	{
+		if (!HealthBarWidgetComponent->IsVisible())
+		{
+			HealthBarWidgetComponent->SetVisibility(true);
+			HealthBarWidgetComponent->SetComponentTickEnabled(true);
+		}
+
+		if (DistanceSq < TICK_INTERVAL_THRESHOLD)
+		{
+			HealthBarWidgetComponent->SetComponentTickInterval(0.0f);
+		}
+		else
+		{
+			HealthBarWidgetComponent->SetComponentTickInterval(0.1f);
+		}
+	}
 }
 
 void ABTPS_EnemyCharacterBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	
-	if (HealthBarWidgetComponent)
+	if (!HealthBarWidgetComponent || !HealthBarWidgetComponent->IsVisible()) return;
+
+	APlayerCameraManager* CameraManager = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0);
+	if (!CameraManager) return;
+
+	FVector CameraLocation = CameraManager->GetCameraLocation();
+	FVector WidgetLocation = HealthBarWidgetComponent->GetComponentLocation();
+
+	FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(WidgetLocation, CameraLocation);
+	HealthBarWidgetComponent->SetWorldRotation(LookAtRotation);
+
+	float DistanceSq = FVector::DistSquared(WidgetLocation, CameraLocation);
+
+	if (DistanceSq <= FADE_START_DISTANCE_SQ)
 	{
-		APlayerCameraManager* CameraManager = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0);
-		if (CameraManager)
+		if (!bIsHealthBarFullyOpaque)
 		{
-			// 너무 멀리 있는 적은 계산할 필요가 없다면 거리 체크 후 연산
-			// float Distance = FVector::Dist(GetActorLocation(), CameraManager->GetCameraLocation());
-			// if (Distance > 3000.0f) return;
-
-			FVector CameraLocation = CameraManager->GetCameraLocation();
-			FVector WidgetLocation = HealthBarWidgetComponent->GetComponentLocation();
-
-			FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(WidgetLocation, CameraLocation);
-			HealthBarWidgetComponent->SetWorldRotation(LookAtRotation);
+			HealthBarWidgetComponent->SetTintColorAndOpacity(FLinearColor(1.f, 1.f, 1.f, 1.f));
+			bIsHealthBarFullyOpaque = true;
 		}
+	}
+	else
+	{
+		float Distance = FMath::Sqrt(DistanceSq);
+		float TargetOpacity = 1.0f - ((Distance - FADE_START_DISTANCE) / (VISIBLE_DISTANCE_MAX - FADE_START_DISTANCE));
+
+		HealthBarWidgetComponent->SetTintColorAndOpacity(FLinearColor(1.f, 1.f, 1.f, TargetOpacity));
+		bIsHealthBarFullyOpaque = false;
 	}
 	
 	if (VisionMatInstance)
@@ -96,7 +145,6 @@ void ABTPS_EnemyCharacterBase::Tick(float DeltaTime)
 		VisionMatInstance->SetScalarParameterValue(TEXT("FadeOpacity"), CurrentOpacity);
 	}
 }
-
 
 void ABTPS_EnemyCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -198,10 +246,14 @@ void ABTPS_EnemyCharacterBase::OnDeath()
 		VisionConeDecal->SetVisibility(false);
 	}
 	
+	GetWorldTimerManager().ClearTimer(DistanceCheckTimer);
+
 	if (HealthBarWidgetComponent)
 	{
 		HealthBarWidgetComponent->SetVisibility(false);
+		HealthBarWidgetComponent->SetComponentTickEnabled(false);
 	}
+
 	
 	SetLifeSpan(3.0f);
 }

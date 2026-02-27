@@ -115,7 +115,9 @@ public:
 	FTimerHandle FireDelayTimer;
 	FTimerHandle ActionEndTimer;
 
-	void ExecuteFire();
+	static constexpr float FIRE_SPEED = 300.0f;
+	static constexpr float NORMAL_SPEED = 800.0f;
+
 	void EndFireAction();
 
 private:
