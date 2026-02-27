@@ -10,6 +10,9 @@
 #include "Components/WidgetComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "GameFramework/Character.h"
+#include "Components/DecalComponent.h"
+#include "Materials/MaterialInstanceDynamic.h"
 
 
 ABTPS_EnemyCharacterBase::ABTPS_EnemyCharacterBase()
@@ -27,6 +30,11 @@ ABTPS_EnemyCharacterBase::ABTPS_EnemyCharacterBase()
 	HealthBarWidgetComponent->SetDrawSize(FVector2D(120.0f, 15.0f));
 	HealthBarWidgetComponent->SetRelativeLocation(FVector(0.0f, 0.0f, 130.0f));
 	HealthBarWidgetComponent->SetBlendMode(EWidgetBlendMode::Transparent);
+	
+	VisionConeDecal = CreateDefaultSubobject<UDecalComponent>(TEXT("VisionConeDecal"));
+	VisionConeDecal->SetupAttachment(RootComponent);
+	VisionConeDecal->SetRelativeRotation(FRotator(-90.0f, 0.0f, 0.0f));
+	VisionConeDecal->DecalSize = FVector(200.0f,SightRadius, SightRadius);
 }
 
 void ABTPS_EnemyCharacterBase::BeginPlay()
@@ -113,11 +121,60 @@ void ABTPS_EnemyCharacterBase::Tick(float DeltaTime)
 		HealthBarWidgetComponent->SetTintColorAndOpacity(FLinearColor(1.f, 1.f, 1.f, TargetOpacity));
 		bIsHealthBarFullyOpaque = false;
 	}
+	
+	if (VisionMatInstance)
+	{
+		float CurrentOpacity = 0.0f;
+
+		if (HasTarget())
+		{
+			CurrentOpacity = 1.0f;
+		}
+		else
+		{
+			ACharacter* PlayerChar = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
+			if (PlayerChar)
+			{
+				float DistanceToPlayer = FVector::Dist(GetActorLocation(), PlayerChar->GetActorLocation());
+                
+				CurrentOpacity = FMath::GetMappedRangeValueClamped(
+					FVector2D(SightRadius + DecalFadeMinDistance, LoseSightRadius + DecalFadeMaxDistance), 
+					FVector2D(1.0f, 0.0f), 
+					DistanceToPlayer
+				);
+			}
+		}
+		VisionMatInstance->SetScalarParameterValue(TEXT("FadeOpacity"), CurrentOpacity);
+	}
 }
 
 void ABTPS_EnemyCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
+}
+
+void ABTPS_EnemyCharacterBase::OnConstruction(const FTransform& Transform)
+{
+	Super::OnConstruction(Transform);
+
+	if (VisionConeDecal)
+	{
+		VisionConeDecal->DecalSize = FVector(200.0f, SightRadius, SightRadius);
+		
+		VisionMatInstance = Cast<UMaterialInstanceDynamic>(VisionConeDecal->GetDecalMaterial());
+        
+		if (!VisionMatInstance)
+		{
+			VisionMatInstance = VisionConeDecal->CreateDynamicMaterialInstance();
+		}
+
+		if (VisionMatInstance)
+		{
+			float CosValue = FMath::Cos(FMath::DegreesToRadians(PeripheralVisionAngle));
+			VisionMatInstance->SetScalarParameterValue(TEXT("CosHalfAngle"), CosValue);
+			VisionMatInstance->SetVectorParameterValue(TEXT("VisionColor"), NormalVisionColor);
+		}
+	}
 }
 
 float ABTPS_EnemyCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -140,7 +197,10 @@ void ABTPS_EnemyCharacterBase::SetTarget(AActor* NewTarget)
 
 	CurrentTarget = NewTarget;
 
-	//AI 관련 추가 시 타겟관련 행동 추가
+	if (VisionMatInstance)
+	{
+		VisionMatInstance->SetVectorParameterValue(TEXT("VisionColor"), AlertVisionColor);
+	}
 }
 
 AActor* ABTPS_EnemyCharacterBase::GetTarget() const
@@ -156,6 +216,11 @@ bool ABTPS_EnemyCharacterBase::HasTarget() const
 void ABTPS_EnemyCharacterBase::ClearTarget()
 {
 	CurrentTarget = nullptr;
+	
+	if (VisionMatInstance)
+	{
+		VisionMatInstance->SetVectorParameterValue(TEXT("VisionColor"), NormalVisionColor);
+	}
 }
 
 void ABTPS_EnemyCharacterBase::OnDeath()
@@ -190,8 +255,11 @@ void ABTPS_EnemyCharacterBase::OnDeath()
 		GS->OnMonsterKilled(10);
 	}
 	
-	SetLifeSpan(3.0f);
-
+	if (VisionConeDecal)
+	{
+		VisionConeDecal->SetVisibility(false);
+	}
+	
 	GetWorldTimerManager().ClearTimer(DistanceCheckTimer);
 
 	if (HealthBarWidgetComponent)
@@ -200,6 +268,8 @@ void ABTPS_EnemyCharacterBase::OnDeath()
 		HealthBarWidgetComponent->SetComponentTickEnabled(false);
 	}
 
+	
+	SetLifeSpan(3.0f);
 	if (LastAttacker)
 	{
 		APlayerController* PC = Cast<APlayerController>(LastAttacker);
