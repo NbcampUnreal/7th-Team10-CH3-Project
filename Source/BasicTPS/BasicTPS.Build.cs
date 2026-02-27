@@ -17,7 +17,9 @@ public class BasicTPS : ModuleRules
 			"UMG",
 			"AIModule", 
 			"NavigationSystem",
-			"GameplayTasks"
+			"GameplayTasks",
+			"Niagara", 
+			"NiagaraTextToolkit"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });

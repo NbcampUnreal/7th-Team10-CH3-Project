@@ -32,6 +32,8 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State")
 	bool bIsDead = false;
 	
+
+	
 public:	
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual FGenericTeamId GetGenericTeamId() const override;
@@ -40,6 +42,18 @@ public:
 		class AController* EventInstigator,
 		AActor* DamageCauser
 		) override;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DamageText")
+	float TextOffsetZ = 150.F;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DamageText")
+	float TextOffsetY = 50.f;
+	FVector DamageTextZOffset = FVector(0.f, 0.f, TextOffsetZ);
+	FVector DamageTextYOffset = FVector(0.f, TextOffsetY, 0);
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DamageText")
+	TObjectPtr<class UNiagaraSystem> DamageTextSystem;
+	UFUNCTION()
+	void ShowDamageText(float DamageAmount);
 	
 	UBTPS_StatComponent* GetStatComp() const { return StatComp; }
 	UBTPS_CombatComponent* GetCombatComp() const {return CombatComp;}

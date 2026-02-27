@@ -9,6 +9,7 @@
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnHPChangedDelegate, float, CurrentHP, float, MaxHP);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnStaminaChangedDelegate, float, CurrentStamina, float, MaxStamina);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDeathDelegate);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDamageReceivedDelegate, float, DamageAmount);
 
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
@@ -34,6 +35,8 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "Stat")
 	FOnDeathDelegate OnDeath;
 
+	UPROPERTY(BlueprintAssignable, Category = "DamageText")
+	FOnDamageReceivedDelegate OnDamageReceived;
 	
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat")
