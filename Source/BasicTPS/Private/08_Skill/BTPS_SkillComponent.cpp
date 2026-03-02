@@ -18,6 +18,11 @@ void UBTPS_SkillComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 		{
 			CurrentCoolTime = 0.f;
 			bCanActivate = true;
+
+			if (OnCoolTimeFinished.IsBound())
+			{
+				OnCoolTimeFinished.Broadcast();
+			}
 		}
 	}
 }

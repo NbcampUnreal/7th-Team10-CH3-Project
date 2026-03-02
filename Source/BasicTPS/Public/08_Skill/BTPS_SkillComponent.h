@@ -19,6 +19,14 @@ public:
 
 	void TryActivate();
 
+	float GetCurrentCoolTime() const { return CurrentCoolTime; }
+	float GetMaxCoolTime() const { return SkillCoolTime; }
+
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCoolTimeFinished);
+
+	UPROPERTY(BlueprintAssignable, Category = "Events")
+	FOnCoolTimeFinished OnCoolTimeFinished;
+
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SkillCost")
 	int32 SkillCost = 0;

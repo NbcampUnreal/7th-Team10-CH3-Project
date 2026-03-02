@@ -1,10 +1,9 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "05_UI/BTPS_HUD.h"
+#include "05_UI/BTPS_GrenadeSlotWidget.h"
 #include "05_UI/BTPS_MainWidget.h"
 #include "02_Characters/BTPS_PlayerCharacter.h"
 #include "03_Components/BTPS_StatComponent.h"
+#include "08_Skill/BTPS_GrenadeSkill.h"
 
 void ABTPS_HUD::BeginPlay()
 {
@@ -37,6 +36,13 @@ void ABTPS_HUD::BeginPlay()
 				if (PlayerChar && PlayerChar->GetShootingComp())
 				{
 					MainWidget->BindShootingComp(PlayerChar->GetShootingComp());
+				}
+				
+				UBTPS_GrenadeSkill* GrenadeComp = PC->GetPawn()
+					->FindComponentByClass<UBTPS_GrenadeSkill>();
+				if (GrenadeComp && MainWidget->GetGrenadeSlot())
+				{
+					MainWidget->GetGrenadeSlot()->BindSkillComponent(GrenadeComp);
 				}
 			}
 		}

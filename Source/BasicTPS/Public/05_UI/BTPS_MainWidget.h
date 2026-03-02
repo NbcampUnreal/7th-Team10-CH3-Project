@@ -1,5 +1,3 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -13,6 +11,7 @@ class UOverlay;
 class UBorder;
 class UBTPS_StatComponent;
 class UBTPS_ShootingMachineComponent;
+class UBTPS_GrenadeSlotWidget;
 
 UCLASS()
 class BASICTPS_API UBTPS_MainWidget : public UUserWidget
@@ -40,6 +39,8 @@ public:
 	// UFUNCTION()
 	// void SetWeaponImage(UTexture2D* NewTexture);
 	
+	UBTPS_GrenadeSlotWidget* GetGrenadeSlot() const { return GrenadeSlot; }
+
 protected:
 	virtual void NativeConstruct() override;
 	virtual void NativeDestruct() override;
@@ -82,6 +83,9 @@ protected:
 
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UImage> Image_KillMarker;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UBTPS_GrenadeSlotWidget> GrenadeSlot;
 	
 protected:
 	FTimerHandle RetryBindHandle;
