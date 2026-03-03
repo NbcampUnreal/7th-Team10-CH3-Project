@@ -90,12 +90,12 @@ float ABTPS_GameState::GetLevelRemainingTime() const
 	return 0.f;
 }
 
-void ABTPS_GameState::AddKillLog(EnemyList EnemyName)
+void ABTPS_GameState::AddKillLog(FText EnemyName)
 {
 	FKillLogData NewLog;
 	
 	NewLog.KillerName = TEXT("Player");
-	NewLog.VictimName = UEnum::GetValueAsString(EnemyName);
+	NewLog.VictimName = EnemyName.ToString();
 	
 	KillLogs.Add(NewLog);
 	LastKillLogData = NewLog;

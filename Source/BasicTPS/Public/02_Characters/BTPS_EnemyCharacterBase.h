@@ -57,6 +57,9 @@ protected:
 	void CheckDistanceFromCamera();
 
 public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy|Info")
+	FText EnemyName;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Vision")
 	float SightRadius = 1500.0f;
 

@@ -102,4 +102,5 @@ void ABTPS_BaseCharacter::OnDeath()
 	GetCharacterMovement()->StopMovementImmediately();
 	GetCharacterMovement()->DisableMovement();
 	
+	// 게임 모드에 이 캐릭터의 정보를 넘겨
 }

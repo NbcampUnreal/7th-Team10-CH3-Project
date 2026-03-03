@@ -106,7 +106,7 @@ public:
 	UFUNCTION(BlueprintPure)
 	float GetLevelRemainingTime() const;
 	UFUNCTION(BlueprintCallable, Category = "KillLog")
-	void AddKillLog(EnemyList EnemyName);
+	void AddKillLog(FText EnemyName);
 
 	void OnGameOver();
 	void OnLevelTimeUp();	
