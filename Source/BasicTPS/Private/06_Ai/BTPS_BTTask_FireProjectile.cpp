@@ -19,6 +19,7 @@ EBTNodeResult::Type UBTPS_BTTask_FireProjectile::ExecuteTask(UBehaviorTreeCompon
 		if (RangedEnemy)
 		{
 			RangedEnemy->FireProjectile();
+			RangedEnemy->StartAttackCooldown();
 			return EBTNodeResult::Succeeded;
 		}
 	}

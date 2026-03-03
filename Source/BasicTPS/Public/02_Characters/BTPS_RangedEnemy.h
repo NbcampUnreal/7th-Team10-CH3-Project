@@ -18,9 +18,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
 	TSubclassOf<class AActor> ProjectileClass;
 
-
 public:
 	UFUNCTION(BlueprintCallable, Category = "Combat")
 	void FireProjectile();
-
 };

@@ -16,11 +16,12 @@ public:
 	ABTPS_EnemyCharacterBase();
 
 protected:
+	bool bCanAttack = true;
+	
+	FTimerHandle TouchCooldownTimerHandle;
+	FTimerHandle AttackCooldownTimerHandle;
+	
 	virtual void BeginPlay() override;
-
-	//AI관련 정리 후 주석 해제하여 사용
-	//virtual void PossessedBy(AController* NewController) override;
-	//virtual void UnPossessed() override;
 
 	UPROPERTY(VisibleInstanceOnly, Category = "Combat")
 	TWeakObjectPtr<AActor> CurrentTarget;
@@ -37,10 +38,25 @@ protected:
 	UPROPERTY()
 	TObjectPtr<UMaterialInstanceDynamic> VisionMatInstance;
 	
-	virtual void OnDeath() override;
-
 	UPROPERTY()
 	AController* LastAttacker;
+	
+	UPROPERTY()
+	TObjectPtr<class UBTPS_TouchDamageComponent> TouchDamageComp;
+	
+	UFUNCTION()
+	void OnTouchCompOverlap(
+		UPrimitiveComponent* OverlappedComponent,
+		AActor* OtherActor,
+		UPrimitiveComponent* OtherComp,
+		int32 OtherBodyIndex,
+		bool bFromSweep,
+		const FHitResult& SweepResult);
+	
+	void EnableTouchCollision();
+	void ResetAttackCooldown();
+	
+	virtual void OnDeath() override;
 
 	static constexpr float VISIBLE_DISTANCE_MAX = 3000.0f;
 	static constexpr float VISIBLE_DISTANCE_MAX_SQ = VISIBLE_DISTANCE_MAX * VISIBLE_DISTANCE_MAX;
@@ -57,6 +73,9 @@ protected:
 	void CheckDistanceFromCamera();
 
 public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Combat")
+	float AttackInterval = 2.0f;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI|Vision")
 	float SightRadius = 1500.0f;
 
@@ -86,6 +105,9 @@ public:
 
 	UBehaviorTree* GetBehaviorTree() const { return TreeToRun; }
 
+	void StartAttackCooldown();
+	bool IsAttackReady() const {return bCanAttack;}
+	
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 	
 	virtual void SetTarget(AActor* NewTarget);
@@ -93,5 +115,6 @@ public:
 	virtual bool HasTarget() const;
 	virtual void ClearTarget();
 	virtual void OnConstruction(const FTransform& Transform) override;
+	
 
 };
