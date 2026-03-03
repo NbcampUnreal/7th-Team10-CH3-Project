@@ -11,6 +11,9 @@
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Blueprint/UserWidget.h"
+#include "Camera/CameraActor.h"
+#include "Camera/CameraComponent.h"
+#include "Components/WidgetComponent.h"
 
 ABTPS_PlayerController::ABTPS_PlayerController()
 	: InputMappingContext(nullptr),
@@ -63,12 +66,13 @@ void ABTPS_PlayerController::BeginPlay()
 	if (CurrentMapName.Contains("L_MenuLevel"))
 	{
 		ShowMainMenu(false);
-		TArray<AActor*> FoundCameras;
-		UGameplayStatics::GetAllActorsWithTag(GetWorld(), MenuCameraTag, FoundCameras);
+		
+		TArray<AActor*> MenuLevelCameras;
+		UGameplayStatics::GetAllActorsWithTag(GetWorld(), MenuCameraTag, MenuLevelCameras);
 
-		if (FoundCameras.Num() > 0)
+		if (MenuLevelCameras.Num() > 0)
 		{
-			SetViewTarget(FoundCameras[0]); // 시작 시점은 메뉴 카메라
+			SetViewTarget(MenuLevelCameras[0]); 
 		}
 
 		if (ACharacter* MyChar = GetCharacter())
@@ -87,43 +91,14 @@ void ABTPS_PlayerController::BeginPlay()
 
 		SetPause(false);
 	}
-}
-
-
-/*
-UUserWidget* ABTPS_PlayerController::GetHUDWidget() const
-{
-	return HUDWidgetInstance;
-}
-*/
-
-/*
-void ABTPS_PlayerController::ShowGameHUD()
-{
-	ClearAllWidgets();
-
-	SetPause(false);
-	bIsGamePaused = false;
-
-	if (HUDWidgetClass)
+	
+	if (MenuCameraActor == nullptr)
 	{
-		HUDWidgetInstance = CreateWidget<UUserWidget>(this, HUDWidgetClass);
-		if (HUDWidgetInstance)
-		{
-			HUDWidgetInstance->AddToViewport();
-
-			bShowMouseCursor = false;
-			SetInputMode(FInputModeGameOnly());
-		}
-
-		ABTPS_GameState* BTPS_GameState = GetWorld() ? GetWorld()->GetGameState<ABTPS_GameState>() : nullptr;
-		if (BTPS_GameState)
-		{
-			BTPS_GameState->UpdateHUD();
-		}
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		MenuCameraActor = GetWorld()->SpawnActor<ACameraActor>(FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
 	}
 }
-*/
 
 void ABTPS_PlayerController::ShowMainMenu(bool bIsRestart)
 {
@@ -135,23 +110,14 @@ void ABTPS_PlayerController::ShowMainMenu(bool bIsRestart)
 		if (MainMenuWidgetInstance)
 		{
 			MainMenuWidgetInstance->AddToViewport();
-
 			bShowMouseCursor = true;
-
 			SetInputMode(FInputModeUIOnly());
 		}
 
 		if (UTextBlock* ButtonText = Cast<UTextBlock>(
 			MainMenuWidgetInstance->GetWidgetFromName(TEXT("StartButtonText"))))
 		{
-			if (bIsRestart)
-			{
-				ButtonText->SetText(FText::FromString(TEXT("Restart")));
-			}
-			else
-			{
-				ButtonText->SetText(FText::FromString(TEXT("Start")));
-			}
+			ButtonText->SetText(bIsRestart ? FText::FromString(TEXT("Restart")) : FText::FromString(TEXT("Start")));
 		}
 
 		if (bIsRestart)
@@ -179,52 +145,144 @@ void ABTPS_PlayerController::ShowMainMenu(bool bIsRestart)
 
 void ABTPS_PlayerController::ShowPauseMenu()
 {
-	if (PauseMenuWidgetInstance)
-	{
-		PauseMenuWidgetInstance->RemoveFromParent();
-		PauseMenuWidgetInstance = nullptr;
-	}
+    SetIgnoreLookInput(true);
+    SetIgnoreMoveInput(true);
+    
+    if (ACharacter* MyChar = GetCharacter())
+    {
+       MyChar->GetCharacterMovement()->StopMovementImmediately();
 
-	if (PauseMenuWidgetClass)
-	{
-		PauseMenuWidgetInstance = CreateWidget<UUserWidget>(this, PauseMenuWidgetClass);
-		if (PauseMenuWidgetInstance)
-		{
-			PauseMenuWidgetInstance->AddToViewport(10);
+       /*
+       UWidgetComponent* MenuWidgetComp = Cast<UWidgetComponent>(MyChar->GetComponentByClass(UWidgetComponent::StaticClass()));
+       if (MenuWidgetComp)
+       {
+          MenuWidgetComp->SetVisibility(true);
+       }
+       */
 
-			bShowMouseCursor = true;
-			FInputModeGameAndUI InputMode;
-			InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
-			SetInputMode(InputMode);
-		}
-	}
-	bIsGamePaused = true;
-	SetPause(true);
-	
-	if (ABTPS_HUD* CurrentHUD = Cast<ABTPS_HUD>(GetHUD()))
-	{
-		if (UBTPS_MainWidget* MainWidget = CurrentHUD->GetMainWidget())
-		{
-			MainWidget->SetVisibility(ESlateVisibility::Hidden); 
-		}
-	}
-	
+       TArray<UCameraComponent*> CameraComps;
+       MyChar->GetComponents<UCameraComponent>(CameraComps);
+
+       for (UCameraComponent* Cam : CameraComps)
+       {
+       	if (Cam->ComponentHasTag(TEXT("ToggleMenuCam")) || Cam->GetName().Contains(TEXT("ToggleCam")))
+       	{
+          	if (MenuCameraActor)
+          	{
+          		MenuCameraActor->SetActorLocationAndRotation(Cam->GetComponentLocation(), Cam->GetComponentRotation());
+
+          		UCameraComponent* SpawnedCamComp = MenuCameraActor->GetCameraComponent();if (SpawnedCamComp)
+          		{
+          			SpawnedCamComp->SetFieldOfView(Cam->FieldOfView);
+
+          			SpawnedCamComp->PostProcessSettings.bOverride_MotionBlurAmount = true;
+          			SpawnedCamComp->PostProcessSettings.MotionBlurAmount = 0.0f;
+
+          			SpawnedCamComp->PostProcessSettings.bOverride_DepthOfFieldFstop = true;
+          			SpawnedCamComp->PostProcessSettings.DepthOfFieldFstop = 100.0f;
+                     
+          			SpawnedCamComp->PostProcessSettings.bOverride_DepthOfFieldSensorWidth = true;
+          			SpawnedCamComp->PostProcessSettings.DepthOfFieldSensorWidth = 144.0f;
+          		}
+          	}
+             break; 
+          }
+       }
+
+       if (MenuCameraActor)
+       {
+           SetViewTargetWithBlend(MenuCameraActor, 0.5f, VTBlend_Cubic);
+       }
+    }
+
+    if (ABTPS_HUD* CurrentHUD = Cast<ABTPS_HUD>(GetHUD()))
+    {
+       if (UBTPS_MainWidget* MainWidget = CurrentHUD->GetMainWidget())
+       {
+          MainWidget->SetVisibility(ESlateVisibility::Hidden); 
+       }
+    }
+    
+    GetWorldTimerManager().SetTimer(CameraBlendTimerHandle, this, &ABTPS_PlayerController::OnShowMenuBlendFinished, 0.6f, false);
 }
-
+void ABTPS_PlayerController::OnShowMenuBlendFinished()
+{
+    bShowMouseCursor = true;
+    FInputModeGameAndUI InputMode;
+    InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+    SetInputMode(InputMode);
+	
+	//
+	if (ACharacter* MyChar = GetCharacter())
+	{
+		UWidgetComponent* MenuWidgetComp = Cast<UWidgetComponent>(MyChar->GetComponentByClass(UWidgetComponent::StaticClass()));
+		if (MenuWidgetComp)
+		{
+			MenuWidgetComp->SetVisibility(true);
+		}
+	}
+	
+	//
+	
+	/*
+	if (PlayerCameraManager)
+	{
+		PlayerCameraManager->bGameCameraCutThisFrame = true;
+	}
+	*/
+    
+    bIsGamePaused = true;
+    SetPause(true);
+}
 void ABTPS_PlayerController::HidePauseMenu()
 {
-	if (PauseMenuWidgetInstance)
-	{
-		PauseMenuWidgetInstance->RemoveFromParent();
-		PauseMenuWidgetInstance = nullptr;
-	}
+	bIsGamePaused = false;
+	SetPause(false);
 
 	bShowMouseCursor = false;
 	SetInputMode(FInputModeGameOnly());
 
-	bIsGamePaused = false;
-	SetPause(false);
-	
+	if (ACharacter* MyChar = GetCharacter())
+	{
+		UWidgetComponent* MenuWidgetComp = Cast<UWidgetComponent>(MyChar->GetComponentByClass(UWidgetComponent::StaticClass()));
+		if (MenuWidgetComp)
+		{
+			MenuWidgetComp->SetVisibility(false);
+		}
+		
+		SetViewTargetWithBlend(MyChar, 0.1f, VTBlend_Cubic);
+
+		TArray<UCameraComponent*> CameraComps;
+		MyChar->GetComponents<UCameraComponent>(CameraComps);
+
+		for (UCameraComponent* Cam : CameraComps)
+		{
+			if (Cam->ComponentHasTag(TEXT("ToggleMenuCam")))
+			{
+				Cam->SetActive(false);
+			}
+			else
+			{
+				Cam->SetActive(true);
+             
+				Cam->PostProcessSettings.bOverride_MotionBlurAmount = true;
+				Cam->PostProcessSettings.MotionBlurAmount = 0.0f;
+			}
+		}
+		
+		/*
+		if (ABTPS_HUD* CurrentHUD = Cast<ABTPS_HUD>(GetHUD()))
+		{
+			if (UBTPS_MainWidget* MainWidget = CurrentHUD->GetMainWidget())
+			{
+				MainWidget->SetVisibility(ESlateVisibility::Visible); 
+			}
+		}*/
+
+		GetWorldTimerManager().SetTimer(CameraBlendTimerHandle, this, &ABTPS_PlayerController::OnHideMenuBlendFinished, 0.1f, false);
+	}
+
+
 	if (ABTPS_HUD* CurrentHUD = Cast<ABTPS_HUD>(GetHUD()))
 	{
 		if (UBTPS_MainWidget* MainWidget = CurrentHUD->GetMainWidget())
@@ -232,6 +290,22 @@ void ABTPS_PlayerController::HidePauseMenu()
 			MainWidget->SetVisibility(ESlateVisibility::Visible); 
 		}
 	}
+
+	GetWorldTimerManager().SetTimer(CameraBlendTimerHandle, this, &ABTPS_PlayerController::OnHideMenuBlendFinished, 0.05f, false);
+}
+
+void ABTPS_PlayerController::OnHideMenuBlendFinished()
+{
+    SetIgnoreLookInput(false);
+    SetIgnoreMoveInput(false);
+
+    /*
+    if (MenuCameraActor)
+    {
+        MenuCameraActor->Destroy();
+        MenuCameraActor = nullptr;
+    }*/
+	
 }
 
 void ABTPS_PlayerController::TogglePauseMenu()

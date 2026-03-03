@@ -126,5 +126,16 @@ private:
 	FRotator TargetRotation; 
 	float SequenceStartTime;  
 	float RotationDuration = 0.5f;   
+	
+	// 메뉴 카메라 블렌딩 함수
+	FTimerHandle CameraBlendTimerHandle;
+	UPROPERTY()
+	ACameraActor* MenuCameraActor;
+	void OnShowMenuBlendFinished();
+	void OnHideMenuBlendFinished();
+public:
+	// 맵에 배치된 메뉴 전용 카메라를 블루프린트에서 찾아 넣거나 Tag로 찾기 위한 변수
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Menu")
+	FName ToggleCameraTag = TEXT("ToggleMenuCam");
 
 };
