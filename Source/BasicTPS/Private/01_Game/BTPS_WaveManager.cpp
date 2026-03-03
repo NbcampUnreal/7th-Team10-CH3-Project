@@ -1,6 +1,7 @@
 ﻿#include "01_Game/BTPS_WaveManager.h"
 #include "01_Game/BTPS_GameState.h"
 #include "Kismet/GameplayStatics.h"
+#include "05_UI/BTPS_HUD.h"
 
 void UBTPS_WaveManager::Init(ABTPS_GameState* InGameState)
 {
@@ -43,39 +44,57 @@ void UBTPS_WaveManager::StartWave(int32 WaveIndex)
 
 	if (WaveIndex >= Waves.Num())
 		return;
-	
-	OnWaveChanged.Broadcast(CurrentWaveIndex + 1, Waves.Num());
-	
-	const FBTPS_WaveData& Wave = Waves[WaveIndex];
 
-	AliveEnemyCount = Wave.EnemyCount;
-	CurrentState = EBTPS_WaveState::Progress;
+	if (!GameStateRef || !GameStateRef->GetWorld()) return;
 
-	SpawnedEnemyCount = 0;
+	UWorld* World = GameStateRef->GetWorld();
 
-	if (SpawnManagers.Num() == 0) return;
+	FTimerHandle UIDelayTimer;
+	World->GetTimerManager().SetTimer(UIDelayTimer, FTimerDelegate::CreateWeakLambda(this, [this, WaveIndex, World]()
+		{
+			if (APlayerController* PC = World->GetFirstPlayerController())
+			{
+				if (ABTPS_HUD* HUD = Cast<ABTPS_HUD>(PC->GetHUD()))
+				{
+					HUD->ShowWaveAlert(WaveIndex + 1);
+				}
+			}
+		}), 0.5f, false);
 
-	if (UWorld* World = SpawnManagers[0]->GetWorld())
-	{
-		World->GetTimerManager().SetTimer(
-			SpawnTimerHandle,
-			this,
-			&UBTPS_WaveManager::SpawnEnemyByTimer,
-			Wave.SpawnInterval,
-			true
-		);
-	}
 
-	if (UWorld* World = GameStateRef->GetWorld())
-	{
-		World->GetTimerManager().SetTimer(
-			WaveTimerHandle,
-			this,
-			&UBTPS_WaveManager::EndWave,
-			Wave.WaveDuration,
-			false
-		);
-	}
+	FTimerHandle WaveStartDelayTimer;
+	World->GetTimerManager().SetTimer(WaveStartDelayTimer, FTimerDelegate::CreateWeakLambda(this, [this, WaveIndex]()
+		{
+			OnWaveChanged.Broadcast(CurrentWaveIndex + 1, Waves.Num());
+
+			const FBTPS_WaveData& Wave = Waves[WaveIndex];
+
+			AliveEnemyCount += Wave.EnemyCount;
+			CurrentState = EBTPS_WaveState::Progress;
+			SpawnedEnemyCount = 0;
+
+			if (SpawnManagers.Num() > 0 && SpawnManagers[0]->GetWorld())
+			{
+				SpawnManagers[0]->GetWorld()->GetTimerManager().SetTimer(
+					SpawnTimerHandle,
+					this,
+					&UBTPS_WaveManager::SpawnEnemyByTimer,
+					Wave.SpawnInterval,
+					true
+				);
+			}
+
+			if (GameStateRef && GameStateRef->GetWorld())
+			{
+				GameStateRef->GetWorld()->GetTimerManager().SetTimer(
+					WaveTimerHandle,
+					this,
+					&UBTPS_WaveManager::EndWave,
+					Wave.WaveDuration,
+					false
+				);
+			}
+		}), 3.5f, false);
 }
 
 void UBTPS_WaveManager::EndWave()
@@ -100,6 +119,11 @@ void UBTPS_WaveManager::EndWave()
 void UBTPS_WaveManager::OnEnemyDead()
 {	//TODO_CSH 몬스터 사망 함수가 이 함수를 호출해 줘야 정상적으로 웨이브 구현이 가능
 	AliveEnemyCount--;
+
+	if (CurrentState != EBTPS_WaveState::Progress)
+	{
+		return;
+	}
 
 	if (AliveEnemyCount <= 0)
 	{

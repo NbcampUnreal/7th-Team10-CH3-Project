@@ -33,7 +33,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon|Ammo")
 	int32 CurrentAmmo = 30;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon|Ammo")
-	int32 ReserveAmmo = 90;
+	int32 ReserveAmmo = 180;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
 	TObjectPtr<UTexture2D> WeaponIcon;

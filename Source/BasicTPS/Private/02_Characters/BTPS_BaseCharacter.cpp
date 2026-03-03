@@ -101,5 +101,4 @@ void ABTPS_BaseCharacter::OnDeath()
 	
 	GetCharacterMovement()->StopMovementImmediately();
 	GetCharacterMovement()->DisableMovement();
-	
 }
