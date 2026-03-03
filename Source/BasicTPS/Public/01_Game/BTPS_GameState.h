@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/GameState.h"
 #include "BTPS_WaveState.h"
+#include "00_Common/BTPS_CoreTypes.h"
 #include "BTPS_GameState.generated.h"
 
 // 점수 변경 호출 델리게이트
@@ -67,6 +68,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Wave")
 	TObjectPtr<UBTPS_WaveManager> WaveManager;
 	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "KillLog")
+	FKillLogData LastKillLogData; 
+	
 	FTimerHandle HUDUpdateTimerHandle;
 	
 public:
@@ -82,7 +86,9 @@ public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Wave|Data")
 	UDataTable* WaveDataTable;
-
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "KillLog")
+	TArray<FKillLogData> KillLogs;
+	
 public:
 	UFUNCTION(BlueprintPure, Category = "Score")
 	int32 GetScore() const;
@@ -92,7 +98,8 @@ public:
 	void OnMonsterKilled(int32 ScoreReward);
 	UFUNCTION(BlueprintPure)
 	float GetLevelRemainingTime() const;
-	
+	UFUNCTION(BlueprintCallable, Category = "KillLog")
+	void AddKillLog(EnemyList EnemyName);
 
 	void OnGameOver();
 	void OnLevelTimeUp();	
