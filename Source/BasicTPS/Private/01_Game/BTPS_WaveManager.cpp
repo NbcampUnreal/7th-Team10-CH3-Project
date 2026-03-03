@@ -43,7 +43,9 @@ void UBTPS_WaveManager::StartWave(int32 WaveIndex)
 
 	if (WaveIndex >= Waves.Num())
 		return;
-
+	
+	OnWaveChanged.Broadcast(CurrentWaveIndex + 1, Waves.Num());
+	
 	const FBTPS_WaveData& Wave = Waves[WaveIndex];
 
 	AliveEnemyCount = Wave.EnemyCount;

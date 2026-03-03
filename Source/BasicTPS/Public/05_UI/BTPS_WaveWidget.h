@@ -14,6 +14,11 @@ UCLASS()
 class BASICTPS_API UBTPS_WaveWidget : public UUserWidget
 {
 	GENERATED_BODY()
+public:
+	virtual void NativeConstruct() override;
+	
+	UFUNCTION()
+	void UpdateWaveText(int32 CurrentWave, int32 TotalWaves);
 	
 protected:
 	UPROPERTY(meta = (BindWidget))
