@@ -145,6 +145,8 @@ void ABTPS_PlayerController::ShowMainMenu(bool bIsRestart)
 
 void ABTPS_PlayerController::ShowPauseMenu()
 {
+	bIsMenuTransitioning = true;
+	
     SetIgnoreLookInput(true);
     SetIgnoreMoveInput(true);
     
@@ -152,13 +154,18 @@ void ABTPS_PlayerController::ShowPauseMenu()
     {
        MyChar->GetCharacterMovement()->StopMovementImmediately();
 
-       /*
-       UWidgetComponent* MenuWidgetComp = Cast<UWidgetComponent>(MyChar->GetComponentByClass(UWidgetComponent::StaticClass()));
-       if (MenuWidgetComp)
-       {
-          MenuWidgetComp->SetVisibility(true);
-       }
-       */
+    	UWidgetComponent* MenuWidgetComp = Cast<UWidgetComponent>(MyChar->GetComponentByClass(UWidgetComponent::StaticClass()));
+    	if (MenuWidgetComp)
+    	{
+    		MenuWidgetComp->SetVisibility(true);
+          
+    		StartOpacity = CurrentMenuOpacity; 
+    		TargetOpacity = 1.0f; 
+    		FadeStartTime = GetWorld()->GetTimeSeconds();
+    		FadeDuration = 0.5f;
+
+    		GetWorldTimerManager().SetTimer(FadeTimerHandle, this, &ABTPS_PlayerController::SmoothFadeStep, 0.01f, true);
+    	}
 
        TArray<UCameraComponent*> CameraComps;
        MyChar->GetComponents<UCameraComponent>(CameraComps);
@@ -222,20 +229,15 @@ void ABTPS_PlayerController::OnShowMenuBlendFinished()
 		}
 	}
 	
-	//
-	
-	/*
-	if (PlayerCameraManager)
-	{
-		PlayerCameraManager->bGameCameraCutThisFrame = true;
-	}
-	*/
-    
     bIsGamePaused = true;
     SetPause(true);
+	
+	bIsMenuTransitioning = false;
 }
 void ABTPS_PlayerController::HidePauseMenu()
 {
+	bIsMenuTransitioning = true;
+	
 	bIsGamePaused = false;
 	SetPause(false);
 
@@ -247,9 +249,14 @@ void ABTPS_PlayerController::HidePauseMenu()
 		UWidgetComponent* MenuWidgetComp = Cast<UWidgetComponent>(MyChar->GetComponentByClass(UWidgetComponent::StaticClass()));
 		if (MenuWidgetComp)
 		{
-			MenuWidgetComp->SetVisibility(false);
+			StartOpacity = CurrentMenuOpacity; 
+			TargetOpacity = 0.0f; 
+			FadeStartTime = GetWorld()->GetTimeSeconds();
+			FadeDuration = 0.1f;  
+
+			GetWorldTimerManager().SetTimer(FadeTimerHandle, this, &ABTPS_PlayerController::SmoothFadeStep, 0.01f, true);
 		}
-		
+       
 		SetViewTargetWithBlend(MyChar, 0.1f, VTBlend_Cubic);
 
 		TArray<UCameraComponent*> CameraComps;
@@ -269,19 +276,7 @@ void ABTPS_PlayerController::HidePauseMenu()
 				Cam->PostProcessSettings.MotionBlurAmount = 0.0f;
 			}
 		}
-		
-		/*
-		if (ABTPS_HUD* CurrentHUD = Cast<ABTPS_HUD>(GetHUD()))
-		{
-			if (UBTPS_MainWidget* MainWidget = CurrentHUD->GetMainWidget())
-			{
-				MainWidget->SetVisibility(ESlateVisibility::Visible); 
-			}
-		}*/
-
-		GetWorldTimerManager().SetTimer(CameraBlendTimerHandle, this, &ABTPS_PlayerController::OnHideMenuBlendFinished, 0.1f, false);
 	}
-
 
 	if (ABTPS_HUD* CurrentHUD = Cast<ABTPS_HUD>(GetHUD()))
 	{
@@ -291,25 +286,23 @@ void ABTPS_PlayerController::HidePauseMenu()
 		}
 	}
 
-	GetWorldTimerManager().SetTimer(CameraBlendTimerHandle, this, &ABTPS_PlayerController::OnHideMenuBlendFinished, 0.05f, false);
+	GetWorldTimerManager().SetTimer(CameraBlendTimerHandle, this, &ABTPS_PlayerController::OnHideMenuBlendFinished, 0.1f, false);
 }
-
 void ABTPS_PlayerController::OnHideMenuBlendFinished()
 {
     SetIgnoreLookInput(false);
     SetIgnoreMoveInput(false);
 
-    /*
-    if (MenuCameraActor)
-    {
-        MenuCameraActor->Destroy();
-        MenuCameraActor = nullptr;
-    }*/
-	
+	bIsMenuTransitioning = false;
 }
 
 void ABTPS_PlayerController::TogglePauseMenu()
 {
+	if (bIsMenuTransitioning)
+	{
+		return;
+	}
+
 	if (bIsGamePaused)
 	{
 		HidePauseMenu();
@@ -317,6 +310,38 @@ void ABTPS_PlayerController::TogglePauseMenu()
 	else
 	{
 		ShowPauseMenu();
+	}
+}
+
+void ABTPS_PlayerController::SmoothFadeStep()
+{
+	if (ACharacter* MyChar = GetCharacter())
+	{
+		UWidgetComponent* MenuWidgetComp = Cast<UWidgetComponent>(MyChar->GetComponentByClass(UWidgetComponent::StaticClass()));
+		if (MenuWidgetComp)
+		{
+			float CurrentTime = GetWorld()->GetTimeSeconds();
+			float Alpha = (CurrentTime - FadeStartTime) / FadeDuration;
+			Alpha = FMath::Clamp(Alpha, 0.0f, 1.0f);
+
+			CurrentMenuOpacity = FMath::Lerp(StartOpacity, TargetOpacity, Alpha);
+            
+			MenuWidgetComp->SetTintColorAndOpacity(FLinearColor(1.0f, 1.0f, 1.0f, CurrentMenuOpacity));
+
+			if (Alpha >= 1.0f)
+			{
+				GetWorldTimerManager().ClearTimer(FadeTimerHandle);
+
+				if (TargetOpacity <= 0.0f)
+				{
+					MenuWidgetComp->SetVisibility(false);
+				}
+			}
+		}
+	}
+	else
+	{
+		GetWorldTimerManager().ClearTimer(FadeTimerHandle);
 	}
 }
 

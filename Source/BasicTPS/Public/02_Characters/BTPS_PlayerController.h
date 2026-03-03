@@ -133,9 +133,21 @@ private:
 	ACameraActor* MenuCameraActor;
 	void OnShowMenuBlendFinished();
 	void OnHideMenuBlendFinished();
+	
+	FTimerHandle FadeTimerHandle;
+	float FadeStartTime;
+	float FadeDuration;
+	float StartOpacity;
+	float TargetOpacity;
+	float CurrentMenuOpacity = 0.0f;
+	void SmoothFadeStep();
+	
+	bool bIsMenuTransitioning = false;
+	
 public:
-	// 맵에 배치된 메뉴 전용 카메라를 블루프린트에서 찾아 넣거나 Tag로 찾기 위한 변수
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Menu")
 	FName ToggleCameraTag = TEXT("ToggleMenuCam");
+	
+	
 
 };
