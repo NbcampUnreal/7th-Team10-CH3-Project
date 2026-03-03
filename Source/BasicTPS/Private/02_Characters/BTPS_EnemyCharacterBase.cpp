@@ -253,6 +253,8 @@ void ABTPS_EnemyCharacterBase::OnDeath()
 	if (ABTPS_GameState* GS = GetWorld()->GetGameState<ABTPS_GameState>())
 	{
 		GS->OnMonsterKilled(10);
+		//TODO : (서우정)캐릭터 이름과 연동 작업 필요
+		GS->AddKillLog(EnemyList::Temp1);
 	}
 	
 	if (VisionConeDecal)
