@@ -7,6 +7,8 @@
 #include "Engine/DataTable.h"
 #include "BTPS_WaveManager.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnWaveChanged, int32, CurrentWave, int32, TotalWaves);
+
 class ABTPS_GameState;
 
 USTRUCT(BlueprintType)
@@ -29,6 +31,11 @@ class BASICTPS_API UBTPS_WaveManager : public UObject
 	GENERATED_BODY()
 	
 public:
+	//delegate
+	UPROPERTY(BlueprintAssignable)
+	FOnWaveChanged OnWaveChanged;
+	
+public:
 	void Init(ABTPS_GameState* InGameState);
 	void StartWave(int32 WaveIndex);
 	void EndWave();
@@ -36,6 +43,12 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Wave")
 	float GetWaveRemainingTime() const;
+	
+	UFUNCTION(BlueprintPure, Category = "WaveInfo")
+	int32 GetCurrentWaveIndex() const { return CurrentWaveIndex; }
+
+	UFUNCTION(BlueprintPure, Category = "WaveInfo")
+	int32 GetTotalWaves() const { return Waves.Num(); }
 
 protected:
 	int32 AliveEnemyCount;

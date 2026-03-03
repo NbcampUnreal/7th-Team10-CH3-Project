@@ -14,6 +14,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnScoreChanged, int32, NewScore);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnKillCountChanged, int32, KilledCount, int32, TotalCount);
 // 웨이브 변경 호출 델리게이트
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnWaveStateChanged, EBTPS_WaveState, NewWaveState);
+// 미션 스코어 위젯용 델리게이트
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnMissionScoreChanged,int32, KillCount, int32, SpawnCount);
 
 
 class UBTPS_WaveManager;
@@ -78,6 +80,9 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "Score")
 	FOnScoreChanged OnScoreChanged;
 	
+	UPROPERTY(BlueprintAssignable, Category = "Score")
+	FOnMissionScoreChanged OnMissionScoreChanged;
+	
 	UPROPERTY(BlueprintAssignable, Category = "Monster")
 	FOnKillCountChanged OnKillCountChanged;
 	
@@ -96,6 +101,8 @@ public:
 	void AddScore(int32 Amount);
 	UFUNCTION(BlueprintCallable, Category = "Monster")
 	void OnMonsterKilled(int32 ScoreReward);
+	void AddSpawnCount();
+
 	UFUNCTION(BlueprintPure)
 	float GetLevelRemainingTime() const;
 	UFUNCTION(BlueprintCallable, Category = "KillLog")

@@ -62,16 +62,22 @@ void ABTPS_GameState::OnMonsterKilled(int32 ScoreReward)
 	LevelScore += ScoreReward;
 
 	UE_LOG(LogTemp, Log, TEXT("Monster Killed! (%d / %d)"), KilledMonsterCount, SpawnMonsterCount);
+	OnMissionScoreChanged.Broadcast(KilledMonsterCount, SpawnMonsterCount);
 	
 	AddScore(ScoreReward);
 	
-	// TODO: UI 업데이트
 	UpdateHUD();
 
 	if (WaveManager)
 	{
 		WaveManager->OnEnemyDead();
 	}
+}
+
+void ABTPS_GameState::AddSpawnCount()
+{
+	SpawnMonsterCount++;
+	OnMissionScoreChanged.Broadcast(KilledMonsterCount, SpawnMonsterCount);
 }
 
 float ABTPS_GameState::GetLevelRemainingTime() const
