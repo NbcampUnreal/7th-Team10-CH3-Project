@@ -1,6 +1,9 @@
 ﻿#include "02_Characters/BTPS_PlayerController.h"
 #include "01_Game/BTPS_GameState.h"
 #include "01_Game/BTPS_GameInstance.h"
+#include "05_UI/BTPS_HUD.h"
+#include "05_UI/BTPS_MainWidget.h"
+
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -22,8 +25,12 @@ ABTPS_PlayerController::ABTPS_PlayerController()
 	  ToggleCameraAction(nullptr),
 	  ToggleMenuAction(nullptr),
 	  ThrowGrenadeAction(nullptr),
+
+	  /*
 	  HUDWidgetClass(nullptr),
 	  HUDWidgetInstance(nullptr),
+	  */
+
 	  MainMenuWidgetClass(nullptr),
 	  MainMenuWidgetInstance(nullptr),
 	  PauseMenuWidgetClass(nullptr),
@@ -83,11 +90,14 @@ void ABTPS_PlayerController::BeginPlay()
 }
 
 
+/*
 UUserWidget* ABTPS_PlayerController::GetHUDWidget() const
 {
 	return HUDWidgetInstance;
 }
+*/
 
+/*
 void ABTPS_PlayerController::ShowGameHUD()
 {
 	ClearAllWidgets();
@@ -113,6 +123,7 @@ void ABTPS_PlayerController::ShowGameHUD()
 		}
 	}
 }
+*/
 
 void ABTPS_PlayerController::ShowMainMenu(bool bIsRestart)
 {
@@ -189,6 +200,15 @@ void ABTPS_PlayerController::ShowPauseMenu()
 	}
 	bIsGamePaused = true;
 	SetPause(true);
+	
+	if (ABTPS_HUD* CurrentHUD = Cast<ABTPS_HUD>(GetHUD()))
+	{
+		if (UBTPS_MainWidget* MainWidget = CurrentHUD->GetMainWidget())
+		{
+			MainWidget->SetVisibility(ESlateVisibility::Hidden); 
+		}
+	}
+	
 }
 
 void ABTPS_PlayerController::HidePauseMenu()
@@ -204,6 +224,14 @@ void ABTPS_PlayerController::HidePauseMenu()
 
 	bIsGamePaused = false;
 	SetPause(false);
+	
+	if (ABTPS_HUD* CurrentHUD = Cast<ABTPS_HUD>(GetHUD()))
+	{
+		if (UBTPS_MainWidget* MainWidget = CurrentHUD->GetMainWidget())
+		{
+			MainWidget->SetVisibility(ESlateVisibility::Visible); 
+		}
+	}
 }
 
 void ABTPS_PlayerController::TogglePauseMenu()
@@ -233,11 +261,17 @@ void ABTPS_PlayerController::ShowGameOverMenu(bool bIsRestart)
 			SetInputMode(FInputModeUIOnly());
 		}
 	}
-	
+
 	bIsGamePaused = true;
 	SetPause(true);
 	
-	
+	if (ABTPS_HUD* CurrentHUD = Cast<ABTPS_HUD>(GetHUD()))
+	{
+		if (UBTPS_MainWidget* MainWidget = CurrentHUD->GetMainWidget())
+		{
+			MainWidget->SetVisibility(ESlateVisibility::Hidden);
+		}
+	}
 }
 
 void ABTPS_PlayerController::ShowGameClearMenu()
@@ -250,15 +284,22 @@ void ABTPS_PlayerController::ShowGameClearMenu()
 		if (GameClearMenuWidgetInstance)
 		{
 			GameClearMenuWidgetInstance->AddToViewport();
-          
+
 			bShowMouseCursor = true;
 			SetInputMode(FInputModeUIOnly());
 		}
 	}
-	
+
 	bIsGamePaused = true;
 	SetPause(true);
 	
+	if (ABTPS_HUD* CurrentHUD = Cast<ABTPS_HUD>(GetHUD()))
+	{
+		if (UBTPS_MainWidget* MainWidget = CurrentHUD->GetMainWidget())
+		{
+			MainWidget->SetVisibility(ESlateVisibility::Hidden); 
+		}
+	}
 }
 
 
@@ -365,7 +406,11 @@ void ABTPS_PlayerController::SmoothRotateStep()
 void ABTPS_PlayerController::ClearAllWidgets()
 {
 	TObjectPtr<UUserWidget> WidgetsToClear[] = {
+		
+		/*
 		HUDWidgetInstance,
+		*/
+		
 		MainMenuWidgetInstance,
 		PauseMenuWidgetInstance,
 		GameOverMenuWidgetInstance,

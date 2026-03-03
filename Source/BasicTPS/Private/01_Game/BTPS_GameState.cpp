@@ -7,8 +7,12 @@
 #include "01_Game/BTPS_SpawnManager.h"
 #include "02_Characters/BTPS_PlayerController.h"
 #include "Kismet/GameplayStatics.h"
+
+
+/*
 #include "Components/TextBlock.h"
 #include "Blueprint/UserWidget.h"
+*/
 
 
 ABTPS_GameState::ABTPS_GameState()
@@ -68,7 +72,9 @@ void ABTPS_GameState::OnMonsterKilled(int32 ScoreReward)
 	
 	AddScore(ScoreReward);
 	
+	/*
 	UpdateHUD();
+	*/
 
 	if (WaveManager)
 	{
@@ -115,6 +121,7 @@ void ABTPS_GameState::OnLevelTimeUp()
 }
 
 
+/*
 void ABTPS_GameState::UpdateHUD()
 {
 	
@@ -157,10 +164,13 @@ void ABTPS_GameState::UpdateHUD()
 	}
 	
 }
+*/
 
 
 void ABTPS_GameState::StartLevel()
 {
+	
+	/*
 	if (APlayerController* PlayerController = GetWorld()->GetFirstPlayerController())
 	{
 		if (ABTPS_PlayerController* BTPS_PlayerController = Cast<ABTPS_PlayerController>(PlayerController))
@@ -168,6 +178,7 @@ void ABTPS_GameState::StartLevel()
 			BTPS_PlayerController->ShowGameHUD();
 		}
 	}
+	*/
 
 	if (UGameInstance* GameInstance = GetGameInstance())
 	{
@@ -187,7 +198,9 @@ void ABTPS_GameState::StartLevel()
 	
 	//UE_LOG(LogTemp, Log, TEXT("Level %d Started. Total Monsters: %d"), CurrentLevelIndex + 1, SpawnMonsterCount);
 	
+	/*
 	UpdateHUD();
+	*/
 
 	FString CurrentMapName = UGameplayStatics::GetCurrentLevelName(GetWorld());
 

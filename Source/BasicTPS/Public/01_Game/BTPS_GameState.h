@@ -105,7 +105,10 @@ public:
 	void OnGameOver();
 	void OnLevelTimeUp();	
 	
+	/*
 	void UpdateHUD();
+	*/
+	
 	void StartLevel();
 	void EndLevel();
 	
