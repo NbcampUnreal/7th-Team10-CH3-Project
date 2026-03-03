@@ -1,6 +1,7 @@
-#include "05_UI/BTPS_HUD.h"
+﻿#include "05_UI/BTPS_HUD.h"
 #include "05_UI/BTPS_GrenadeSlotWidget.h"
 #include "05_UI/BTPS_MainWidget.h"
+#include "05_UI/BTPS_WaveAlertWidget.h"
 #include "02_Characters/BTPS_PlayerCharacter.h"
 #include "03_Components/BTPS_StatComponent.h"
 #include "08_Skill/BTPS_GrenadeSkill.h"
@@ -21,6 +22,7 @@ void ABTPS_HUD::BeginPlay()
 		if (MainWidget)
 		{
 			MainWidget->AddToViewport();
+			MainWidget->SetVisibility(ESlateVisibility::Hidden);
 			
 			APlayerController* PC = GetOwningPlayerController();
 			if (PC && PC->GetPawn())
@@ -46,5 +48,48 @@ void ABTPS_HUD::BeginPlay()
 				}
 			}
 		}
+	}
+	if (WaveAlertWidgetClass)
+	{
+		WaveAlertWidget = CreateWidget<UBTPS_WaveAlertWidget>(GetWorld(), WaveAlertWidgetClass);
+		if (WaveAlertWidget)
+		{
+			WaveAlertWidget->AddToViewport();
+			WaveAlertWidget->SetVisibility(ESlateVisibility::Hidden);
+		}
+	}
+}
+
+void ABTPS_HUD::HideMainUI()
+{
+	if (MainWidget)
+	{
+		MainWidget->SetVisibility(ESlateVisibility::Hidden);
+	}
+}
+
+void ABTPS_HUD::ShowWaveAlert(int32 WaveLevel)
+{
+	HideMainUI();
+
+	if (WaveAlertWidget)
+	{
+		WaveAlertWidget->PlayWaveStartAlert(WaveLevel);
+
+		float AnimDuration = WaveAlertWidget->GetWaveAlertDuration();
+		GetWorld()->GetTimerManager().SetTimer(WaveAlertTimerHandle, this, &ABTPS_HUD::RestoreMainUI, AnimDuration, false);
+	}
+}
+
+void ABTPS_HUD::RestoreMainUI()
+{
+	if (WaveAlertWidget)
+	{
+		WaveAlertWidget->SetVisibility(ESlateVisibility::Hidden);
+	}
+
+	if (MainWidget)
+	{
+		MainWidget->SetVisibility(ESlateVisibility::Visible);
 	}
 }

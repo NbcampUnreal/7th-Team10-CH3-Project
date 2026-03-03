@@ -1,7 +1,9 @@
 ﻿#include "02_Characters/BTPS_EnemyCharacterBase.h"
 #include "01_Game/BTPS_GameState.h"
 #include "BrainComponent.h"
+#include "BehaviorTree/BlackboardComponent.h"
 #include "03_Components/BTPS_StatComponent.h"
+#include "03_Components/BTPS_TouchDamageComponent.h"
 #include "05_UI/BTPS_EnemyHealthBarWidget.h"
 #include "05_UI/BTPS_HUD.h"
 #include "05_UI/BTPS_MainWidget.h"
@@ -52,8 +54,14 @@ void ABTPS_EnemyCharacterBase::BeginPlay()
 			HealthBarWidget->BindStatComp(StatComp);
 		}
 	}
-
 	GetWorldTimerManager().SetTimer(DistanceCheckTimer, this, &ABTPS_EnemyCharacterBase::CheckDistanceFromCamera, 0.5f, true);
+	
+	TouchDamageComp = FindComponentByClass<UBTPS_TouchDamageComponent>();
+	if (TouchDamageComp)
+	{
+		TouchDamageComp->OnComponentBeginOverlap.AddDynamic(
+			this, &ABTPS_EnemyCharacterBase::OnTouchCompOverlap);
+	}
 }
 
 void ABTPS_EnemyCharacterBase::CheckDistanceFromCamera()
@@ -225,6 +233,67 @@ void ABTPS_EnemyCharacterBase::ClearTarget()
 	}
 }
 
+void ABTPS_EnemyCharacterBase::StartAttackCooldown()
+{
+	bCanAttack = false;
+	
+	ABTPS_AIController* AIC = Cast<ABTPS_AIController>(GetController());
+	if (AIC && AIC->GetBlackboardComponent())
+	{
+		AIC->GetBlackboardComponent()->SetValueAsBool(TEXT("CanAttack"), false);
+	}
+	
+	GetWorldTimerManager().SetTimer(
+		AttackCooldownTimerHandle,
+		this,
+		&ABTPS_EnemyCharacterBase::ResetAttackCooldown,
+		AttackInterval,
+		false
+		);
+}
+
+void ABTPS_EnemyCharacterBase::ResetAttackCooldown()
+{
+	bCanAttack = true;
+	
+	ABTPS_AIController* AIC = Cast<ABTPS_AIController>(GetController());
+	if (AIC && AIC->GetBlackboardComponent())
+	{
+		AIC->GetBlackboardComponent()->SetValueAsBool(TEXT("CanAttack"), true);
+	}
+}
+
+void ABTPS_EnemyCharacterBase::OnTouchCompOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (OtherActor == this || !OtherActor) return;
+    
+	ACharacter* PlayerChar = Cast<ACharacter>(OtherActor);
+	if (PlayerChar 
+	   && PlayerChar->GetController() 
+	   && PlayerChar->GetController()->IsPlayerController())
+	{
+		if (TouchDamageComp)
+		{
+			TouchDamageComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		}
+		
+		GetWorldTimerManager().SetTimer(
+			TouchCooldownTimerHandle,
+			this,
+			&ABTPS_EnemyCharacterBase::EnableTouchCollision,
+			AttackInterval,
+			false);
+	}
+}
+
+void ABTPS_EnemyCharacterBase::EnableTouchCollision()
+{
+	if (TouchDamageComp)
+	{
+		TouchDamageComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	}
+}
+
 void ABTPS_EnemyCharacterBase::OnDeath()
 {
 	Super::OnDeath();
@@ -251,6 +320,8 @@ void ABTPS_EnemyCharacterBase::OnDeath()
 		FVector PushDirection = GetActorForwardVector() * -1.0f; // 캐릭터의 뒤쪽 방향
 		Capsule->AddImpulse(PushDirection * 1500.0f, NAME_None, true); // 힘(1500)을 가함
 	}
+	
+	GetWorldTimerManager().ClearTimer(TouchCooldownTimerHandle);
 	
 	if (ABTPS_GameState* GS = GetWorld()->GetGameState<ABTPS_GameState>())
 	{
@@ -287,4 +358,8 @@ void ABTPS_EnemyCharacterBase::OnDeath()
 			}
 		}
 	}
+	
+	GetWorldTimerManager().ClearTimer(DistanceCheckTimer);
+	GetWorldTimerManager().ClearTimer(TouchCooldownTimerHandle);
+	GetWorldTimerManager().ClearTimer(AttackCooldownTimerHandle);
 }

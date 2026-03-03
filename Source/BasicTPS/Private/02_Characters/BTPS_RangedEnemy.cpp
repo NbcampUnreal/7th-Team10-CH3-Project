@@ -3,8 +3,6 @@
 
 #include "02_Characters/BTPS_RangedEnemy.h"
 
-
-
 ABTPS_RangedEnemy::ABTPS_RangedEnemy()
 {
 	PrimaryActorTick.bCanEverTick = true;

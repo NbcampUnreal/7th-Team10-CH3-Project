@@ -10,6 +10,7 @@
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISenseConfig_Sight.h"
 #include "Perception/AISenseConfig_Damage.h"
+#include "Perception/AISense_Damage.h"
 
 ABTPS_AIController::ABTPS_AIController()
 {
@@ -64,6 +65,11 @@ void ABTPS_AIController::OnPossess(APawn* InPawn)
 		if (Enemy->GetBehaviorTree())
 		{
 			RunBehaviorTree(Enemy->GetBehaviorTree());
+			
+			if (GetBlackboardComponent())
+			{
+				GetBlackboardComponent()->SetValueAsFloat(TEXT("AttackDelay"), Enemy->AttackInterval);
+			}
 		}
 	}
 }
@@ -85,26 +91,35 @@ void ABTPS_AIController::OnTargetDetected(AActor* Actor, FAIStimulus Stimulus)
 	}
 	
 	UBlackboardComponent* BB = GetBlackboardComponent();
+	if (!BB) return;
 	
 	if (Actor && Stimulus.WasSuccessfullySensed())
 	{
 		UE_LOG(LogTemp, Log, TEXT("[AI Controller] Target Found!: %s"), *Actor->GetName());
 		MyPawn->SetTarget(Actor);
-		
-		if (BB)
-		{
-			BB->SetValueAsObject(TargetKeyName, Actor);
-		}
+		BB->SetValueAsObject(TEXT("TargetActor"), Actor);
+		BB->ClearValue(TEXT("LastKnownLocation"));
+		SetFocus(Actor);
 	}
 	else
 	{
+		FActorPerceptionBlueprintInfo Info;
+		if (PerceptionComponent->GetActorsPerception(Actor, Info))
+		{
+			for (const FAIStimulus& S : Info.LastSensedStimuli)
+			{
+				if (S.Type == UAISense::GetSenseID<UAISense_Damage>() && S.GetAge() < 5.0f)
+				{
+					return; 
+				}
+			}
+		}
+		
 		UE_LOG(LogTemp, Log, TEXT("[AI Controller] Target Lost: %s"), *Actor->GetName());
 		MyPawn->ClearTarget();
-		
-		if (BB)
-		{
-			BB->SetValueAsObject(TargetKeyName, nullptr);
-		}
+		BB->SetValueAsObject(TEXT("TargetActor"), nullptr);
+		BB->SetValueAsVector(TEXT("LastKnownLocation"), Stimulus.StimulusLocation);
+		ClearFocus(EAIFocusPriority::Gameplay);
 	}
 }
 
