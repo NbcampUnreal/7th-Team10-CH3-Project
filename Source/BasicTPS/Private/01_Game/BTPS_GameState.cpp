@@ -1,6 +1,5 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "01_Game/BTPS_GameState.h"
 #include "01_Game/BTPS_GameInstance.h"
 #include "01_Game/BTPS_WaveManager.h"
@@ -13,7 +12,6 @@
 #include "Components/TextBlock.h"
 #include "Blueprint/UserWidget.h"
 */
-
 
 ABTPS_GameState::ABTPS_GameState()
 {
@@ -98,7 +96,16 @@ float ABTPS_GameState::GetLevelRemainingTime() const
 	return 0.f;
 }
 
-
+void ABTPS_GameState::AddKillLog(EnemyList EnemyName)
+{
+	FKillLogData NewLog;
+	
+	NewLog.KillerName = TEXT("Player");
+	NewLog.VictimName = UEnum::GetValueAsString(EnemyName);
+	
+	KillLogs.Add(NewLog);
+	LastKillLogData = NewLog;
+}
 
 void ABTPS_GameState::OnGameOver()
 {

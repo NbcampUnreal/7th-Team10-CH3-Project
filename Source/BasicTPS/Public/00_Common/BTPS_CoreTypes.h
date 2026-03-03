@@ -11,6 +11,14 @@ enum class EXxType : uint8
 	Xx
 };
 
+UENUM(BlueprintType)
+enum class EnemyList : uint8
+{
+	Temp1,
+	Temp2,
+	Temp3
+};
+
 USTRUCT(Atomic, BlueprintType)
 struct FXxData
 {
@@ -30,4 +38,15 @@ public:
 	TSubclassOf<APawn> EnemyClass;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float SpawnChance = 1.f;
+};
+
+USTRUCT(BlueprintType)
+struct FKillLogData
+{
+	GENERATED_BODY();
+	
+	UPROPERTY(BlueprintReadOnly)
+	FString KillerName;
+	UPROPERTY(BlueprintReadOnly)
+	FString VictimName;
 };
