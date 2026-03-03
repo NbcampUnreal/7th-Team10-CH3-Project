@@ -117,6 +117,8 @@ void UBTPS_WaveManager::SpawnEnemyByTimer()
 	SpawnManagers[RandomIndex]->SpawnRandomEnemy();
 
 	SpawnedEnemyCount++;
+	
+	GameStateRef->AddSpawnCount();
 
 	if (SpawnedEnemyCount >= Waves[CurrentWaveIndex].EnemyCount)
 	{
