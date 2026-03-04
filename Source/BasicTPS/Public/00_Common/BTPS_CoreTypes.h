@@ -11,13 +11,13 @@ enum class EXxType : uint8
 	Xx
 };
 
-UENUM(BlueprintType)
-enum class EnemyList : uint8
-{
-	Temp1,
-	Temp2,
-	Temp3
-};
+// UENUM(BlueprintType)
+// enum class EnemyList : uint8
+// {
+// 	Temp1,
+// 	Temp2,
+// 	Temp3
+// };
 
 USTRUCT(Atomic, BlueprintType)
 struct FXxData

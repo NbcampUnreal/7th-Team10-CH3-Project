@@ -16,7 +16,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnKillCountChanged, int32, KilledC
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnWaveStateChanged, EBTPS_WaveState, NewWaveState);
 // 미션 스코어 위젯용 델리게이트
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnMissionScoreChanged,int32, KillCount, int32, SpawnCount);
-
+// 킬 발생 시 죽은 에너미 이름 델리게이트
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnKillLogAdded, FText, EnemyName);
 
 class UBTPS_WaveManager;
 class UDataTable;
@@ -73,6 +74,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "KillLog")
 	FKillLogData LastKillLogData; 
 	
+	UPROPERTY(BlueprintAssignable)
+	FOnKillLogAdded OnKillLogAdded;
+	
 	FTimerHandle HUDUpdateTimerHandle;
 	
 public:
@@ -106,7 +110,7 @@ public:
 	UFUNCTION(BlueprintPure)
 	float GetLevelRemainingTime() const;
 	UFUNCTION(BlueprintCallable, Category = "KillLog")
-	void AddKillLog(EnemyList EnemyName);
+	void AddKillLog(FText EnemyName);
 
 	void OnGameOver();
 	void OnLevelTimeUp();	
