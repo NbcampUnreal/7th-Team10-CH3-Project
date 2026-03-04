@@ -44,10 +44,13 @@ public:
 	TObjectPtr<UInputAction> ThrowGrenadeAction;
 	
 	// Menu HUD
+	
+	/*
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HUD")
 	TSubclassOf<UUserWidget> HUDWidgetClass;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "HUD")
 	UUserWidget* HUDWidgetInstance;
+	*/
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Menu")
 	TSubclassOf<UUserWidget> MainMenuWidgetClass;
@@ -74,11 +77,19 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Menu")
 	FName MenuCameraTag = TEXT("MenuCam");
 	
+	/*
 	UFUNCTION(BlueprintPure, Category = "HUD")
 	UUserWidget* GetHUDWidget() const;
+	*/
+	
 	// HUD 표시
+	
+	/*
 	UFUNCTION(BlueprintCallable, Category = "HUD")
 	void ShowGameHUD();
+	*/
+	
+	
 	UFUNCTION(BlueprintCallable, Category = "Menu")
 	void ShowMainMenu(bool bIsRestart);
 	UFUNCTION(BlueprintCallable, Category = "Menu")
@@ -115,5 +126,28 @@ private:
 	FRotator TargetRotation; 
 	float SequenceStartTime;  
 	float RotationDuration = 0.5f;   
+	
+	// 메뉴 카메라 블렌딩 함수
+	FTimerHandle CameraBlendTimerHandle;
+	UPROPERTY()
+	ACameraActor* MenuCameraActor;
+	void OnShowMenuBlendFinished();
+	void OnHideMenuBlendFinished();
+	
+	FTimerHandle FadeTimerHandle;
+	float FadeStartTime;
+	float FadeDuration;
+	float StartOpacity;
+	float TargetOpacity;
+	float CurrentMenuOpacity = 0.0f;
+	void SmoothFadeStep();
+	
+	bool bIsMenuTransitioning = false;
+	
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Menu")
+	FName ToggleCameraTag = TEXT("ToggleMenuCam");
+	
+	
 
 };
