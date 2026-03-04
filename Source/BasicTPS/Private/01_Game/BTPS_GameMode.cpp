@@ -61,11 +61,6 @@ void ABTPS_GameMode::GameOver()
 {
 }
 
-//TODO: 게임스테이트 관리, 리팩토링시 사용
-/*void ABTPS_GameMode::KilledMonsterCount()
-{
-}
-*/
 void ABTPS_GameMode::SpawnMonstersForWave()
 {
 }

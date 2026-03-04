@@ -77,19 +77,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Menu")
 	FName MenuCameraTag = TEXT("MenuCam");
 	
-	/*
-	UFUNCTION(BlueprintPure, Category = "HUD")
-	UUserWidget* GetHUDWidget() const;
-	*/
-	
-	// HUD 표시
-	
-	/*
-	UFUNCTION(BlueprintCallable, Category = "HUD")
-	void ShowGameHUD();
-	*/
-	
-	
 	UFUNCTION(BlueprintCallable, Category = "Menu")
 	void ShowMainMenu(bool bIsRestart);
 	UFUNCTION(BlueprintCallable, Category = "Menu")

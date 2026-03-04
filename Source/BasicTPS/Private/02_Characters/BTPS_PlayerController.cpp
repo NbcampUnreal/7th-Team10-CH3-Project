@@ -29,10 +29,6 @@ ABTPS_PlayerController::ABTPS_PlayerController()
 	  ToggleMenuAction(nullptr),
 	  ThrowGrenadeAction(nullptr),
 
-	  /*
-	  HUDWidgetClass(nullptr),
-	  HUDWidgetInstance(nullptr),
-	  */
 
 	  MainMenuWidgetClass(nullptr),
 	  MainMenuWidgetInstance(nullptr),
@@ -298,6 +294,11 @@ void ABTPS_PlayerController::OnHideMenuBlendFinished()
 
 void ABTPS_PlayerController::TogglePauseMenu()
 {
+	if (GetWorld()->GetMapName().Contains(TEXT("L_MenuLevel")))
+	{
+		return;
+	}
+	
 	if (bIsMenuTransitioning)
 	{
 		return;
@@ -505,10 +506,6 @@ void ABTPS_PlayerController::SmoothRotateStep()
 void ABTPS_PlayerController::ClearAllWidgets()
 {
 	TObjectPtr<UUserWidget> WidgetsToClear[] = {
-		
-		/*
-		HUDWidgetInstance,
-		*/
 		
 		MainMenuWidgetInstance,
 		PauseMenuWidgetInstance,
