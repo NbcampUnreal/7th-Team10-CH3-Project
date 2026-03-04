@@ -37,6 +37,8 @@ ABTPS_EnemyCharacterBase::ABTPS_EnemyCharacterBase()
 	VisionConeDecal->SetupAttachment(RootComponent);
 	VisionConeDecal->SetRelativeRotation(FRotator(-90.0f, 0.0f, 0.0f));
 	VisionConeDecal->DecalSize = FVector(200.0f,SightRadius, SightRadius);
+
+	EnemyName = FText::FromString(TEXT("Unknown Enemy"));
 }
 
 void ABTPS_EnemyCharacterBase::BeginPlay()
@@ -324,8 +326,7 @@ void ABTPS_EnemyCharacterBase::OnDeath()
 	if (ABTPS_GameState* GS = GetWorld()->GetGameState<ABTPS_GameState>())
 	{
 		GS->OnMonsterKilled(10);
-		//TODO : (서우정)캐릭터 이름과 연동 작업 필요
-		GS->AddKillLog(EnemyList::Temp1);
+		GS->AddKillLog(EnemyName);
 	}
 	
 	if (VisionConeDecal)
