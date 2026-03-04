@@ -99,6 +99,9 @@ public:
 	FLinearColor AlertVisionColor = 
 		FLinearColor(1.0f, 0.0f, 0.0f, 0.5f);
 	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy|Info")
+	FText EnemyName;
+	
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;

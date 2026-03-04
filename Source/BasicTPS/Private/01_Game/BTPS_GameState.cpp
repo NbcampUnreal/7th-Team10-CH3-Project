@@ -99,6 +99,7 @@ void ABTPS_GameState::AddKillLog(FText EnemyName)
 	
 	KillLogs.Add(NewLog);
 	LastKillLogData = NewLog;
+	OnKillLogAdded.Broadcast(EnemyName);
 }
 
 void ABTPS_GameState::OnGameOver()
