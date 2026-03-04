@@ -52,4 +52,6 @@ public:
 
 	FVector GetMuzzleLocation() const;
 	FTransform GetMuzzleTransform() const;
+	
+	void AddReserveAmmo(int32 Amount);
 };

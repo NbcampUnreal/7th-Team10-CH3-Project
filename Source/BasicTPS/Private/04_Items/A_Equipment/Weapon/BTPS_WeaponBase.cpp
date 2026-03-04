@@ -88,6 +88,15 @@ FTransform ABTPS_WeaponBase::GetMuzzleTransform() const
 	return GetActorTransform();
 }
 
+void ABTPS_WeaponBase::AddReserveAmmo(int32 Amount)
+{
+	// 탄약 보급 (최대 소지량 제한이 있다면 여기서 처리)
+	ReserveAmmo += Amount;
+    
+	// UI 업데이트가 필요하다면 여기서 Delegate를 호출하거나 로그를 남깁니다.
+	UE_LOG(LogTemp, Log, TEXT("Ammo Added! Current Reserve: %d"), ReserveAmmo);
+}
+
 /*
 TODO.에디터 추가작업
 1.무기 상속받아서 BP에서 Mesh설정
