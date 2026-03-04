@@ -5,13 +5,9 @@
 #include "01_Game/BTPS_WaveManager.h"
 #include "01_Game/BTPS_SpawnManager.h"
 #include "02_Characters/BTPS_PlayerController.h"
+#include "04_Items/A_Equipment/Weapon/BTPS_WeaponBase.h"
+#include "GameFramework/Character.h"
 #include "Kismet/GameplayStatics.h"
-
-
-/*
-#include "Components/TextBlock.h"
-#include "Blueprint/UserWidget.h"
-*/
 
 ABTPS_GameState::ABTPS_GameState()
 {
@@ -65,14 +61,29 @@ void ABTPS_GameState::OnMonsterKilled(int32 ScoreReward)
 	KilledMonsterCount++;
 	LevelScore += ScoreReward;
 
+	ACharacter* PlayerChar = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
+	if (PlayerChar)
+	{
+        
+		TArray<AActor*> AttachedActors;
+		PlayerChar->GetAttachedActors(AttachedActors);
+        
+		for (AActor* Actor : AttachedActors)
+		{
+			ABTPS_WeaponBase* CurrentWeapon = Cast<ABTPS_WeaponBase>(Actor);
+			if (CurrentWeapon)
+			{
+				int32 AmmoToGive = 5; 
+				CurrentWeapon->AddReserveAmmo(AmmoToGive);
+				break;
+			}
+		}
+	}
+	
 	UE_LOG(LogTemp, Log, TEXT("Monster Killed! (%d / %d)"), KilledMonsterCount, SpawnMonsterCount);
 	OnMissionScoreChanged.Broadcast(KilledMonsterCount, SpawnMonsterCount);
 	
 	AddScore(ScoreReward);
-	
-	/*
-	UpdateHUD();
-	*/
 
 	if (WaveManager)
 	{
@@ -128,66 +139,9 @@ void ABTPS_GameState::OnLevelTimeUp()
 	}
 }
 
-
-/*
-void ABTPS_GameState::UpdateHUD()
-{
-	
-	if (APlayerController* PlayerController = GetWorld()->GetFirstPlayerController())
-	{
-		ABTPS_PlayerController* BTPS_PlayerController = Cast<ABTPS_PlayerController>(PlayerController);
-		{
-			if (UUserWidget* HUDWidget = BTPS_PlayerController->GetHUDWidget())
-			{
-				if (UTextBlock* TimeText = Cast<UTextBlock>(HUDWidget->GetWidgetFromName(TEXT("Time"))))
-				{
-					float RemainingTime = 0.0f;
-					if (WaveManager)
-					{
-						RemainingTime = WaveManager->GetWaveRemainingTime();
-					}
-					TimeText->SetText(FText::FromString(FString::Printf(TEXT("Time: %.1f"), RemainingTime)));
-				}
-
-				if (UTextBlock* ScoreText = Cast<UTextBlock>(HUDWidget->GetWidgetFromName(TEXT("Score"))))
-				{
-					if (UGameInstance* GameInstance = GetGameInstance())
-					{
-						UBTPS_GameInstance* BTPS_GameInstance = Cast<UBTPS_GameInstance>(GameInstance);
-						if (BTPS_GameInstance)
-						{
-							ScoreText->SetText(
-								FText::FromString(FString::Printf(TEXT("Score: %d"), BTPS_GameInstance->TotalScore)));
-						}
-					}
-				}
-
-				if (UTextBlock* LevelIndexText = Cast<UTextBlock>(HUDWidget->GetWidgetFromName(TEXT("Level"))))
-				{
-					LevelIndexText->SetText(
-						FText::FromString(FString::Printf(TEXT("Level: %d"), CurrentLevelIndex + 1)));
-				}
-			}
-		}
-	}
-	
-}
-*/
-
-
 void ABTPS_GameState::StartLevel()
 {
 	
-	/*
-	if (APlayerController* PlayerController = GetWorld()->GetFirstPlayerController())
-	{
-		if (ABTPS_PlayerController* BTPS_PlayerController = Cast<ABTPS_PlayerController>(PlayerController))
-		{
-			BTPS_PlayerController->ShowGameHUD();
-		}
-	}
-	*/
-
 	if (UGameInstance* GameInstance = GetGameInstance())
 	{
 		UBTPS_GameInstance* BTPS_GameInstance = Cast<UBTPS_GameInstance>(GameInstance);
@@ -204,12 +158,6 @@ void ABTPS_GameState::StartLevel()
 		WaveManager->StartWave(0);
 	}
 	
-	//UE_LOG(LogTemp, Log, TEXT("Level %d Started. Total Monsters: %d"), CurrentLevelIndex + 1, SpawnMonsterCount);
-	
-	/*
-	UpdateHUD();
-	*/
-
 	FString CurrentMapName = UGameplayStatics::GetCurrentLevelName(GetWorld());
 
 }
@@ -219,14 +167,12 @@ void ABTPS_GameState::EndLevel()
 	AddScore(LevelScore);
 	CurrentLevelIndex++;
 
-	// 모든 레벨을 다 돌았다면 게임 오버 처리
 	if (CurrentLevelIndex >= MaxLevels)
 	{
 		OnGameClear();
 		return;
 	}
 
-	// 레벨 맵 이름이 있다면 해당 맵 불러오기
 	if (LevelMapNames.IsValidIndex(CurrentLevelIndex))
 	{
 		UGameplayStatics::OpenLevel(GetWorld(), LevelMapNames[CurrentLevelIndex]);
